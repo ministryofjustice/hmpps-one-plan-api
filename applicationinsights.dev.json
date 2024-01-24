@@ -1,6 +1,6 @@
 {
   "role": {
-    "name": "hmpps-template-kotlin"
+    "name": "hmpss-one-plan-api"
   },
   "customDimensions": {
     "service.version": "${BUILD_NUMBER}"

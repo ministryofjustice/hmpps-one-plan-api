@@ -9,6 +9,11 @@ configurations {
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
+  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+  runtimeOnly("org.flywaydb:flyway-core")
+  runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
+  runtimeOnly("org.postgresql:postgresql:42.7.1")
 }
 
 kotlin {

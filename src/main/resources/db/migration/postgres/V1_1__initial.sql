@@ -81,4 +81,4 @@ create table step_history
 
 
     constraint objective_id_fk foreign key (step_id) references step (id)
-)
+);

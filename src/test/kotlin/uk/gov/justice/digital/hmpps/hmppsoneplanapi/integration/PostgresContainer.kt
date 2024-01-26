@@ -9,7 +9,7 @@ object PostgresContainer {
 
   private fun startPostgresqlContainer(): PostgreSQLContainer<Nothing> {
     log.info("Creating a Postgres database")
-    return PostgreSQLContainer<Nothing>("postgres").apply {
+    return PostgreSQLContainer<Nothing>("postgres:16.1").apply {
       withEnv("HOSTNAME_EXTERNAL", "localhost")
       withDatabaseName("one-plan")
       withUsername("one-plan")

@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="HmppsOnePlanApi" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="DATABASE_ENDPOINT" value="localhost:5432" />
+      <env name="DATABASE_NAME" value="one-plan" />
+      <env name="DATABASE_USERNAME" value="one-plan" />
+      <env name="DATABASE_PASSWORD" value="one-plan" />
+    </envs>
+    <module name="hmpps-one-plan-api.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.justice.digital.hmpps.hmppsoneplanapi.HmppsOnePlanApi" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -21,11 +21,15 @@ abstract class IntegrationTestBase {
     @JvmStatic
     @DynamicPropertySource
     fun properties(registry: DynamicPropertyRegistry) {
-      pgContainer?.run {
-        registry.add("DATABASE_NAME", pgContainer::getDatabaseName)
-        registry.add("DATABASE_ENDPOINT") { "localhost:${pgContainer.getMappedPort(5432)}" }
-        registry.add("DATABASE_PASSWORD", pgContainer::getPassword)
-        registry.add("DATABASE_USERNAME", pgContainer::getUsername)
+      println(pgContainer.jdbcUrl)
+
+      pgContainer.run {
+        registry.add("spring.flyway.url", pgContainer::getJdbcUrl)
+        registry.add("spring.flyway.user", pgContainer::getUsername)
+        registry.add("spring.flyway.password", pgContainer::getPassword)
+        registry.add("spring.datasource.url", pgContainer::getJdbcUrl)
+        registry.add("spring.datasource.username", pgContainer::getUsername)
+        registry.add("spring.datasource.password", pgContainer::getPassword)
       }
     }
   }

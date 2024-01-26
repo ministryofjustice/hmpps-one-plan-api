@@ -14,6 +14,8 @@ dependencies {
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.1")
+
+  testImplementation("org.testcontainers:postgresql:1.19.3")
 }
 
 kotlin {

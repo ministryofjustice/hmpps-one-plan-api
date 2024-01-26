@@ -1,0 +1,15 @@
+version: "3"
+services:
+  db:
+    image: postgres:16.1
+    networks:
+      - hmpps
+    container_name: one-plan-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=one-plan
+      - POSTGRES_USER=one-plan
+      - POSTGRES_DB=one-plan
+networks:
+  hmpps:

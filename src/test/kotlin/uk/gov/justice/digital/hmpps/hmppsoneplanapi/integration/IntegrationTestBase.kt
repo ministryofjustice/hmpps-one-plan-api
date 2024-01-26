@@ -22,7 +22,6 @@ abstract class IntegrationTestBase {
     @DynamicPropertySource
     fun properties(registry: DynamicPropertyRegistry) {
       pgContainer?.run {
-        System.getenv("5123")
         registry.add("DATABASE_NAME", pgContainer::getDatabaseName)
         registry.add("DATABASE_ENDPOINT") { "localhost:${pgContainer.getMappedPort(5432)}" }
         registry.add("DATABASE_PASSWORD", pgContainer::getPassword)

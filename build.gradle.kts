@@ -16,6 +16,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.1")
 
   testImplementation("org.testcontainers:postgresql:1.19.3")
+  testImplementation("org.assertj:assertj-core:3.25.2")
 }
 
 kotlin {

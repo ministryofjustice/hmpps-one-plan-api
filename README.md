@@ -6,7 +6,7 @@
 
 # About
 
-TODO: Write an explanation of what this repository does
+`One Plan` stores a person's Plan and Objective data
 
 # Running locally
 ## From the shell

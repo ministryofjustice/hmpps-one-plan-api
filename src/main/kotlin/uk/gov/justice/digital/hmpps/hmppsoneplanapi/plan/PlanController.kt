@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping
@@ -25,5 +26,13 @@ class PlanController(val planRepository: PlanRepository) {
       ),
     )
     return CreatePlanResponse(entity.reference)
+  }
+
+  @RequestMapping("/person/{prisonNumber}/plans/{reference}")
+  suspend fun getPlan(
+    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "reference") reference: UUID,
+  ): PlanEntity? {
+    return planRepository.findByPrisonNumberAndReference(prisonNumber, reference)
   }
 }

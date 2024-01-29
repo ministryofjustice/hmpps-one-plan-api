@@ -10,7 +10,7 @@
 
 # Running locally
 ## From the shell
-* Start the database with `docker compose up -d`
+* Start the database with `docker compose -f docker-compose-local.yml up -d`
 * Set environment variables
 ```shell
   export DATABASE_ENDPOINT=localhost:5432

@@ -88,6 +88,15 @@ class PlanControllerTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `PUT is not allowed`() {
+    webTestClient.put()
+      .uri("person/{prisonNumber}/plans", "456")
+      .exchange()
+      .expectStatus()
+      .isEqualTo(HttpStatus.METHOD_NOT_ALLOWED)
+  }
+
+  @Test
   fun `Can DELETE a plan, making it no long visible`() {
     val prisonNumber = "delete"
     val planId = createPlan(prisonNumber, PlanType.PERSONAL_LEARNING)

@@ -10,18 +10,28 @@ import java.util.UUID
 
 @Table(name = "plan")
 data class PlanEntity(
-  @Id @InsertOnlyProperty @JsonIgnore private val id: UUID = UUID.randomUUID(),
-  @InsertOnlyProperty val reference: UUID = UUID.randomUUID(),
-  @InsertOnlyProperty val prisonNumber: String,
+  @Id
+  @InsertOnlyProperty
+  @JsonIgnore
+  private val id: UUID = UUID.randomUUID(),
+  @InsertOnlyProperty
+  val reference: UUID = UUID.randomUUID(),
+  @InsertOnlyProperty
+  val prisonNumber: String,
   val type: PlanType,
 
+  @InsertOnlyProperty
   val createdBy: String,
+  @InsertOnlyProperty
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   var updatedBy: String = createdBy,
   var updatedAt: ZonedDateTime = createdAt,
+
+  @JsonIgnore
+  var isDeleted: Boolean = false,
 ) : Persistable<UUID> {
   override fun getId(): UUID = id
-  override fun isNew(): Boolean = true
+  override fun isNew(): Boolean = !isDeleted
 }
 
 enum class PlanType {

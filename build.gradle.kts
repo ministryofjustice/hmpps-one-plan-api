@@ -18,6 +18,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+  implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")

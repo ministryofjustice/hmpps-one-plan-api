@@ -2,11 +2,17 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import java.util.UUID
 
 class PlanControllerTest : IntegrationTestBase() {
+
+  @Autowired
+  private lateinit var databaseClient: DatabaseClient
 
   @Test
   fun `Creates a plan on POST`() {
@@ -22,9 +28,7 @@ class PlanControllerTest : IntegrationTestBase() {
   fun `Can GET a Plan`() {
     val planReference = createPlan("123")
 
-    webTestClient.get()
-      .uri("person/{prisonNumber}/plans/{reference}", "123", planReference)
-      .exchange()
+    getPlan(prisonNumber = "123", planReference)
       .expectStatus().isOk
       .expectBody()
       .jsonPath("$.type").isEqualTo("PERSONAL_LEARNING")
@@ -38,21 +42,18 @@ class PlanControllerTest : IntegrationTestBase() {
 
   @Test
   fun `Gives 404 when Plan does not exist`() {
-    webTestClient.get()
-      .uri("person/{prisonNumber}/plans/{reference}", "123", UUID.randomUUID())
-      .exchange()
+    getPlan("123", UUID.randomUUID())
       .expectStatus().isNotFound()
   }
 
+  private fun getPlan(prisonNumber: String, planReference: UUID): WebTestClient.ResponseSpec =
+    webTestClient.get()
+      .uri("person/{prisonNumber}/plans/{reference}", prisonNumber, planReference)
+      .exchange()
+
   @Test
   fun `Gives Empty list when Person does not exist`() {
-    webTestClient.get()
-      .uri("person/{prisonNumber}/plans", "no-person")
-      .exchange()
-      .expectStatus().isOk()
-      .expectBody()
-      .jsonPath("$").isArray()
-      .jsonPath("$.size()").isEqualTo(0)
+    getAllExpectingCount("no-person", 0)
   }
 
   @Test
@@ -62,13 +63,7 @@ class PlanControllerTest : IntegrationTestBase() {
     createPlan(prisonNumber, PlanType.SENTENCE)
     createPlan(prisonNumber, PlanType.RESETTLEMENT)
 
-    webTestClient.get()
-      .uri("person/{prisonNumber}/plans", prisonNumber)
-      .exchange()
-      .expectStatus().isOk()
-      .expectBody()
-      .jsonPath("$").isArray()
-      .jsonPath("$.size()").isEqualTo(3)
+    getAllExpectingCount(prisonNumber, 3)
   }
 
   private fun createPlan(prisonNumber: String, type: PlanType = PlanType.PERSONAL_LEARNING): UUID {
@@ -90,5 +85,38 @@ class PlanControllerTest : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isEqualTo(HttpStatus.METHOD_NOT_ALLOWED)
+  }
+
+  @Test
+  fun `Can DELETE a plan, making it no long visible`() {
+    val prisonNumber = "delete"
+    val planId = createPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
+
+    webTestClient.delete()
+      .uri("person/{prisonNumber}/plans/{plan}", prisonNumber, planId.toString())
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
+      .expectBody().isEmpty()
+
+    val isDeletedInDb =
+      databaseClient.sql(""" select is_deleted from plan where reference = :reference and prison_number = :pnumber """)
+        .bind("reference", planId)
+        .bind("pnumber", prisonNumber)
+        .fetch().one().map { it["is_deleted"] as Boolean }.block()
+    assertThat(isDeletedInDb!!).describedAs("Db is_deleted flag should be true").isTrue()
+
+    getAllExpectingCount(prisonNumber, 0)
+    getPlan(prisonNumber, planId)
+      .expectStatus().isNotFound()
+  }
+
+  private fun getAllExpectingCount(prisonNumber: String, count: Int) {
+    webTestClient.get()
+      .uri("person/{prisonNumber}/plans", prisonNumber)
+      .exchange()
+      .expectStatus().isOk()
+      .expectBody()
+      .jsonPath("$").isArray()
+      .jsonPath("$.size()").isEqualTo(count)
   }
 }

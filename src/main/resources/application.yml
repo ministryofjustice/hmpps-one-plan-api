@@ -2,7 +2,6 @@ info.app:
   name: Hmpps One Plan Api
   version: 1.0
 
-
 spring:
   application:
     name: hmpps-one-plan-api
@@ -28,6 +27,8 @@ spring:
     enabled: true
     user: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
+  main:
+    web-application-type: reactive
 
 
 server:

@@ -1,3 +1,4 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 
 plugins {
@@ -39,4 +40,8 @@ tasks {
       jvmTarget = "21"
     }
   }
+}
+
+tasks.named<BootRun>("bootRun") {
+  systemProperty("spring.profiles.active", "local")
 }

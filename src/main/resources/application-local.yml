@@ -1,0 +1,16 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/one-plan
+    username: one-plan
+    password: one-plan
+    pool:
+      max-life-time: -1
+    properties:
+      sslMode: DISABLE
+      sslRootCert:
+
+  flyway:
+    url: jdbc:postgresql://localhost:5432/one-plan
+    enabled: true
+    user: one-plan
+    password: one-plan

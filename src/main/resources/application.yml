@@ -13,14 +13,14 @@ spring:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
   r2dbc:
-    url: r2dbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME}?sslMode=DISABLE
+    url: r2dbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     pool:
       max-life-time: -1
     properties:
-      ssl: false
-  #      sslRootCert: /home/appuser/.postgresql/root.crt
+      ssl: true
+      sslRootCert: /home/appuser/.postgresql/root.crt
 
   flyway:
     url: 'jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME}?sslmode=prefer'

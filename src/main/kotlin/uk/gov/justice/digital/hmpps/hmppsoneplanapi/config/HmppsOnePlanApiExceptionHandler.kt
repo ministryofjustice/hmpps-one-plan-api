@@ -29,7 +29,7 @@ class HmppsOnePlanApiExceptionHandler {
     .body(
       ErrorResponse(
         status = e.statusCode.value(),
-        userMessage = "${e.statusCode}: ${e.message}",
+        userMessage = e.message,
         developerMessage = e.message,
       ),
     ).also { log.info("Response status exception, {}", e.message) }

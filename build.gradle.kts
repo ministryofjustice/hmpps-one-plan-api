@@ -20,8 +20,10 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
-  runtimeOnly("org.flywaydb:flyway-core")
+  runtimeOnly("org.flywaydb:flyway-core:10.6.0")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:10.6.0")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.1")
   runtimeOnly("org.postgresql:r2dbc-postgresql")

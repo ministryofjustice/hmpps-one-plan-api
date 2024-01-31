@@ -11,12 +11,7 @@
 # Running locally
 ## From the shell
 * Start the database with `docker compose -f docker-compose-local.yml up -d`
-* Set environment variables
-```shell
-  export DATABASE_ENDPOINT=localhost:5432
-  export DATABASE_{NAME,USERNAME,PASSWORD}=one-plan
-```
-* start with `gradle bootrun`
+* start with `gradle bootrun` (it will automatically use the `local` profile)
 
 # pre-commit
 To save you from the linter failing your build due to formatting, you can enable pre commit git hooks

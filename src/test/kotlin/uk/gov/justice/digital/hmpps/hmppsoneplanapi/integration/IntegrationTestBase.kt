@@ -25,9 +25,9 @@ abstract class IntegrationTestBase {
         registry.add("spring.flyway.url", pgContainer::getJdbcUrl)
         registry.add("spring.flyway.user", pgContainer::getUsername)
         registry.add("spring.flyway.password", pgContainer::getPassword)
-        registry.add("spring.datasource.url", pgContainer::getJdbcUrl)
-        registry.add("spring.datasource.username", pgContainer::getUsername)
-        registry.add("spring.datasource.password", pgContainer::getPassword)
+        registry.add("spring.r2dbc.url") { "r2dbc:postgresql://${pgContainer.host}:${pgContainer.getMappedPort(5432)}/${pgContainer.databaseName}?sslMode=disable" }
+        registry.add("spring.r2dbc.username", pgContainer::getUsername)
+        registry.add("spring.r2dbc.password", pgContainer::getPassword)
       }
     }
   }

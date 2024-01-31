@@ -10,3 +10,8 @@ spring:
     properties:
       sslMode: DISABLE
       sslRootCert:
+
+api:
+  base:
+    url:
+      oauth: http://localhost:9091

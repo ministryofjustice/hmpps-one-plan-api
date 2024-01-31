@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration
 
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -14,6 +16,18 @@ abstract class IntegrationTestBase {
 
   @Autowired
   lateinit var webTestClient: WebTestClient
+  lateinit var authedWebTestClient: WebTestClient
+
+  @Autowired
+  lateinit var jwtAuthHelper: JwtAuthTestOverride
+
+  @BeforeEach
+  fun setupAuth() {
+    if (!::authedWebTestClient.isInitialized) {
+      authedWebTestClient = webTestClient
+        .mutateWith { builder, _, _ -> builder.defaultHeader(HttpHeaders.AUTHORIZATION, jwtAuthHelper.createAuthHeader()) }
+    }
+  }
 
   companion object {
     private val pgContainer = PostgresContainer.instance

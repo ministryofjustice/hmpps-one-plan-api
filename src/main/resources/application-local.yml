@@ -18,4 +18,4 @@ spring:
 api:
   base:
     url:
-      oauth: http://localhost:9091
+      oauth: http://localhost:9090

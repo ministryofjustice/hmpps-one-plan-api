@@ -39,7 +39,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${api.base.url.oauth}/.well-known/jwks.json
+          jwk-set-uri: ${api.base.url.oauth}/auth/.well-known/jwks.json
 
 
 server:

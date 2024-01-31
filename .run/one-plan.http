@@ -1,0 +1,26 @@
+### Get an auth token from local docker hmpps-auth
+POST http://localhost:9090/auth/oauth/token?grant_type=password&username=AUTH_USER&password=password123456
+Authorization: Basic elite2apiclient clientsecret
+
+> {% client.global.set("auth_token", response.body["access_token"]); %}
+
+### Create a plan
+POST {{base.url}}/person/123/plans
+content-type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "planType": "PERSONAL_LEARNING"
+}
+
+> {% client.global.set("plan_reference", response.body["reference"]); %}
+
+### Get plan
+GET {{base.url}}/person/123/plans/{{plan_reference}}
+content-type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get all plans
+GET {{base.url}}/person/123/plans
+content-type: application/json
+Authorization: Bearer {{auth_token}}

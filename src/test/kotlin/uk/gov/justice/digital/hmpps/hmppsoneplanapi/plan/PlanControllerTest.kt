@@ -128,4 +128,13 @@ class PlanControllerTest : IntegrationTestBase() {
       .jsonPath("$").isArray()
       .jsonPath("$.size()").isEqualTo(count)
   }
+
+  @Test
+  fun `401 when not authenticated`() {
+    webTestClient.get()
+      .uri("person/123/plans")
+      .exchange()
+      .expectStatus()
+      .isUnauthorized()
+  }
 }

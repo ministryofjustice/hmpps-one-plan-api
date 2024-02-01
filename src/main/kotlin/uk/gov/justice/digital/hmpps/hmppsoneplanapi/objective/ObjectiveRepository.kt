@@ -11,7 +11,12 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
         objective o
             join plan_objective_link l
             on o.id = l.objective_id
-            and l.plan_id = (select id from plan p where p.reference=:planReference and p.prison_number = :prisonNumber)
+            and l.plan_id = (
+                select id from plan p
+                    where p.reference=:planReference
+                    and p.prison_number = :prisonNumber
+                    and p.is_deleted = false
+            )
 
     where o.reference = :objectiveReference
   """,

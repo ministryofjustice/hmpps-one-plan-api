@@ -62,4 +62,12 @@ abstract class IntegrationTestBase {
       .reference
     return PlanKey(prisonNumber, reference)
   }
+
+  fun givenPlanIsDeleted(planKey: PlanKey) {
+    authedWebTestClient.delete()
+      .uri("/person/{number}/plans/{ref}", planKey.prisonNumber, planKey.reference)
+      .exchange()
+      .expectStatus()
+      .isNoContent()
+  }
 }

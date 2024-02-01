@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
@@ -62,13 +63,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val planKey = givenAPlan()
     val objectiveReference = givenAnObjective(planKey)
 
-    authedWebTestClient.get()
-      .uri(
-        "/person/{pNumber}/plans/{pReference}/objectives/{objReference}",
-        planKey.prisonNumber,
-        planKey.reference,
-        objectiveReference,
-      ).exchange()
+    getObjective(planKey, objectiveReference)
       .expectStatus().isOk()
       .expectBody()
       .jsonPath("$.id").doesNotExist()
@@ -84,6 +79,17 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.updatedAt").isNotEmpty()
   }
 
+  private fun getObjective(
+    planKey: PlanKey,
+    objectiveReference: UUID,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.get()
+    .uri(
+      "/person/{pNumber}/plans/{pReference}/objectives/{objReference}",
+      planKey.prisonNumber,
+      planKey.reference,
+      objectiveReference,
+    ).exchange()
+
   fun givenAnObjective(planKey: PlanKey): UUID {
     val exchangeResult = authedWebTestClient.post()
       .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
@@ -95,5 +101,32 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .returnResult()
 
     return exchangeResult.responseBody!!.reference
+  }
+
+  @Test
+  fun `404 when plan does not exist`() {
+    getObjective(PlanKey("not-exist", UUID.randomUUID()), UUID.randomUUID())
+      .expectStatus()
+      .isNotFound()
+  }
+
+  @Test
+  fun `404 when objective does not exist`() {
+    val aPlan = givenAPlan()
+
+    getObjective(aPlan, UUID.randomUUID())
+      .expectStatus()
+      .isNotFound()
+  }
+
+  @Test
+  fun `404 when plan is deleted`() {
+    val planKey = givenAPlan()
+    val objectiveReference = givenAnObjective(planKey)
+    givenPlanIsDeleted(planKey)
+
+    getObjective(planKey, objectiveReference)
+      .expectStatus()
+      .isNotFound()
   }
 }

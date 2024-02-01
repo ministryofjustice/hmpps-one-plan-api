@@ -22,7 +22,7 @@ class HealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `Health info reports version`() {
-    webTestClient.get().uri("/health")
+    authedWebTestClient.get().uri("/health")
       .exchange()
       .expectStatus().isOk
       .expectBody().jsonPath("components.healthInfo.details.version").value(
@@ -34,7 +34,7 @@ class HealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `Health ping page is accessible`() {
-    webTestClient.get()
+    authedWebTestClient.get()
       .uri("/health/ping")
       .exchange()
       .expectStatus()
@@ -45,7 +45,7 @@ class HealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `readiness reports ok`() {
-    webTestClient.get()
+    authedWebTestClient.get()
       .uri("/health/readiness")
       .exchange()
       .expectStatus()
@@ -56,7 +56,7 @@ class HealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `liveness reports ok`() {
-    webTestClient.get()
+    authedWebTestClient.get()
       .uri("/health/liveness")
       .exchange()
       .expectStatus()

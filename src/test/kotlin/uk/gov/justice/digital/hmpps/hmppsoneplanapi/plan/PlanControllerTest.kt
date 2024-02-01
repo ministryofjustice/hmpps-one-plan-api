@@ -16,7 +16,7 @@ class PlanControllerTest : IntegrationTestBase() {
 
   @Test
   fun `Creates a plan on POST`() {
-    webTestClient.post().uri("/person/123/plans").bodyValue(CreatePlanRequest(PlanType.PERSONAL_LEARNING))
+    authedWebTestClient.post().uri("/person/123/plans").bodyValue(CreatePlanRequest(PlanType.PERSONAL_LEARNING))
       .exchange()
       .expectStatus()
       .isOk
@@ -47,7 +47,7 @@ class PlanControllerTest : IntegrationTestBase() {
   }
 
   private fun getPlan(prisonNumber: String, planReference: UUID): WebTestClient.ResponseSpec =
-    webTestClient.get()
+    authedWebTestClient.get()
       .uri("person/{prisonNumber}/plans/{reference}", prisonNumber, planReference)
       .exchange()
 
@@ -67,7 +67,7 @@ class PlanControllerTest : IntegrationTestBase() {
   }
 
   private fun createPlan(prisonNumber: String, type: PlanType = PlanType.PERSONAL_LEARNING): UUID {
-    return webTestClient.post().uri("/person/{prisonNumber}/plans", prisonNumber)
+    return authedWebTestClient.post().uri("/person/{prisonNumber}/plans", prisonNumber)
       .bodyValue(CreatePlanRequest(planType = type))
       .exchange()
       .expectStatus()
@@ -80,7 +80,7 @@ class PlanControllerTest : IntegrationTestBase() {
 
   @Test
   fun `PATCH is not allowed`() {
-    webTestClient.patch()
+    authedWebTestClient.patch()
       .uri("person/{prisonNumber}/plans", "456")
       .exchange()
       .expectStatus()
@@ -89,7 +89,7 @@ class PlanControllerTest : IntegrationTestBase() {
 
   @Test
   fun `PUT is not allowed`() {
-    webTestClient.put()
+    authedWebTestClient.put()
       .uri("person/{prisonNumber}/plans", "456")
       .exchange()
       .expectStatus()
@@ -101,7 +101,7 @@ class PlanControllerTest : IntegrationTestBase() {
     val prisonNumber = "delete"
     val planId = createPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
 
-    webTestClient.delete()
+    authedWebTestClient.delete()
       .uri("person/{prisonNumber}/plans/{plan}", prisonNumber, planId.toString())
       .exchange()
       .expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
@@ -120,12 +120,21 @@ class PlanControllerTest : IntegrationTestBase() {
   }
 
   private fun getAllExpectingCount(prisonNumber: String, count: Int) {
-    webTestClient.get()
+    authedWebTestClient.get()
       .uri("person/{prisonNumber}/plans", prisonNumber)
       .exchange()
       .expectStatus().isOk()
       .expectBody()
       .jsonPath("$").isArray()
       .jsonPath("$.size()").isEqualTo(count)
+  }
+
+  @Test
+  fun `401 when not authenticated`() {
+    webTestClient.get()
+      .uri("person/123/plans")
+      .exchange()
+      .expectStatus()
+      .isUnauthorized()
   }
 }

@@ -32,7 +32,7 @@ class HmppsOnePlanApiExceptionHandler {
         userMessage = e.message,
         developerMessage = e.message,
       ),
-    ).also { log.info("Response status exception, {}", e.message) }
+    ).also { log.info("Response status exception, {}", e.message, e) }
 
   @ExceptionHandler(Exception::class)
   fun handleException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity

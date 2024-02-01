@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import java.util.UUID
 
@@ -20,13 +21,13 @@ class PlanControllerTest : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isOk
-      .expectBody(CreatePlanResponse::class.java)
+      .expectBody(CreateEntityResponse::class.java)
       .value { response -> assertThat(response.reference).isNotNull() }
   }
 
   @Test
   fun `Can GET a Plan`() {
-    val planReference = createPlan("123")
+    val (_, planReference) = givenAPlan("123")
 
     getPlan(prisonNumber = "123", planReference)
       .expectStatus().isOk
@@ -59,23 +60,11 @@ class PlanControllerTest : IntegrationTestBase() {
   @Test
   fun `Can GET all plans for a person`() {
     val prisonNumber = "get-all"
-    createPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
-    createPlan(prisonNumber, PlanType.SENTENCE)
-    createPlan(prisonNumber, PlanType.RESETTLEMENT)
+    givenAPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
+    givenAPlan(prisonNumber, PlanType.SENTENCE)
+    givenAPlan(prisonNumber, PlanType.RESETTLEMENT)
 
     getAllExpectingCount(prisonNumber, 3)
-  }
-
-  private fun createPlan(prisonNumber: String, type: PlanType = PlanType.PERSONAL_LEARNING): UUID {
-    return authedWebTestClient.post().uri("/person/{prisonNumber}/plans", prisonNumber)
-      .bodyValue(CreatePlanRequest(planType = type))
-      .exchange()
-      .expectStatus()
-      .isOk()
-      .expectBody(CreatePlanResponse::class.java)
-      .returnResult()
-      .responseBody!!
-      .reference
   }
 
   @Test
@@ -99,23 +88,23 @@ class PlanControllerTest : IntegrationTestBase() {
   @Test
   fun `Can DELETE a plan, making it no long visible`() {
     val prisonNumber = "delete"
-    val planId = createPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
+    val (_, planReference) = givenAPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
 
     authedWebTestClient.delete()
-      .uri("person/{prisonNumber}/plans/{plan}", prisonNumber, planId.toString())
+      .uri("person/{prisonNumber}/plans/{plan}", prisonNumber, planReference.toString())
       .exchange()
       .expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
       .expectBody().isEmpty()
 
     val isDeletedInDb =
       databaseClient.sql(""" select is_deleted from plan where reference = :reference and prison_number = :pnumber """)
-        .bind("reference", planId)
+        .bind("reference", planReference)
         .bind("pnumber", prisonNumber)
         .fetch().one().map { it["is_deleted"] as Boolean }.block()
     assertThat(isDeletedInDb!!).describedAs("Db is_deleted flag should be true").isTrue()
 
     getAllExpectingCount(prisonNumber, 0)
-    getPlan(prisonNumber, planId)
+    getPlan(prisonNumber, planReference)
       .expectStatus().isNotFound()
   }
 

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
@@ -43,5 +44,10 @@ class ObjectiveService(
     if (count != 1) {
       throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")
     }
+  }
+
+  suspend fun getObjectives(planKey: PlanKey): Flow<ObjectiveEntity> {
+    val plan = planService.getByKey(planKey)
+    return objectiveRepository.findAllByPlanId(plan.id)
   }
 }

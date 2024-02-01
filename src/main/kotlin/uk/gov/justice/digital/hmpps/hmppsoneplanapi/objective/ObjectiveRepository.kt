@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
+import kotlinx.coroutines.flow.Flow
 import org.springframework.data.r2dbc.repository.Modifying
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -41,4 +42,17 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
     """,
   )
   suspend fun markObjectiveDeleted(prisonNumber: String, planReference: UUID, objectiveReference: UUID): Int
+
+  @Query(
+    """
+      select o.* from objective o
+          join plan_objective_link l
+            on o.id = l.objective_id
+            and l.plan_id = :id
+          join plan p
+            on l.plan_id = p.id
+      where p.is_deleted = false
+    """,
+  )
+  suspend fun findAllByPlanId(id: UUID): Flow<ObjectiveEntity>
 }

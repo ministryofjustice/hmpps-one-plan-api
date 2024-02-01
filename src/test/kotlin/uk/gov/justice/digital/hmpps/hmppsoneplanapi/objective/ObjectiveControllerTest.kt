@@ -209,4 +209,44 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .expectStatus()
       .isNotFound()
   }
+
+  @Test
+  fun `GET all objectives for a plan`() {
+    val planKey = givenAPlan()
+    val objectiveReferenceA = givenAnObjective(planKey)
+    val objectiveReferenceB = givenAnObjective(planKey)
+
+    authedWebTestClient.get()
+      .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.[*].reference")
+      .value { refs: List<String> ->
+        assertThat(refs).containsExactlyInAnyOrder(objectiveReferenceA.toString(), objectiveReferenceB.toString())
+      }
+  }
+
+  @Test
+  fun `Empty array on GET all when a plan has no objectives`() {
+    val planKey = givenAPlan()
+
+    authedWebTestClient.get()
+      .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
+  @Test
+  fun `404 on GET all when a plan does not exist`() {
+    authedWebTestClient.get()
+      .uri("/person/{pNumber}/plans/{pReference}/objectives", "pie", UUID.randomUUID())
+      .exchange()
+      .expectStatus()
+      .isNotFound()
+  }
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -90,6 +91,38 @@ class ObjectiveController(val service: ObjectiveService) {
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): ObjectiveEntity {
     return service.getObjective(PlanKey(prisonNumber, planReference), objectiveReference)
+  }
+
+  @Operation(
+    summary = "Get all objectives for a Plan",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Objective data is returned, empty array if no objectives found for the Plan",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives")
+  suspend fun getObjectives(
+    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "planReference") planReference: UUID,
+  ): Flow<ObjectiveEntity> {
+    return service.getObjectives(PlanKey(prisonNumber, planReference))
   }
 
   @Operation(

@@ -35,4 +35,13 @@ class ObjectiveService(
     val updated = request.updateEntity(objective)
     return entityTemplate.update(updated).awaitSingle()
   }
+
+  @Transactional
+  suspend fun deleteObjective(planKey: PlanKey, objectiveReference: UUID) {
+    val (prisonNumber, planReference) = planKey
+    val count = objectiveRepository.markObjectiveDeleted(prisonNumber, planReference, objectiveReference)
+    if (count != 1) {
+      throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")
+    }
+  }
 }

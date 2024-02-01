@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
@@ -10,6 +12,8 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import java.util.UUID
 
 class ObjectiveControllerTest : IntegrationTestBase() {
+  @Autowired
+  private lateinit var databaseClient: DatabaseClient
 
   val planRequestBody = """
         {
@@ -163,5 +167,46 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.status").isEqualTo("status2")
       .jsonPath("$.note").isEqualTo("note2")
       .jsonPath("$.outcome").isEqualTo("outcome2")
+  }
+
+  @Test
+  fun `DELETE Objective marks as is_deleted`() {
+    val planKey = givenAPlan()
+    val objectiveReference = givenAnObjective(planKey)
+
+    deleteObjective(planKey, objectiveReference)
+      .expectStatus()
+      .isNoContent()
+
+    val isDeletedInDb =
+      databaseClient.sql(""" select is_deleted from objective where reference = :reference """)
+        .bind("reference", objectiveReference)
+        .fetch().one().map { it["is_deleted"] as Boolean }.block()
+    assertThat(isDeletedInDb!!).describedAs("Db is_deleted flag should be true").isTrue()
+  }
+
+  private fun deleteObjective(
+    planKey: PlanKey,
+    objectiveReference: UUID,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.delete()
+    .uri(
+      "/person/{pNumber}/plans/{pReference}/objectives/{obj}",
+      planKey.prisonNumber,
+      planKey.reference,
+      objectiveReference,
+    ).exchange()
+
+  @Test
+  fun `404 if try to GET deleted objective`() {
+    val planKey = givenAPlan()
+    val objectiveReference = givenAnObjective(planKey)
+
+    deleteObjective(planKey, objectiveReference)
+      .expectStatus()
+      .isNoContent()
+
+    getObjective(planKey, objectiveReference)
+      .expectStatus()
+      .isNotFound()
   }
 }

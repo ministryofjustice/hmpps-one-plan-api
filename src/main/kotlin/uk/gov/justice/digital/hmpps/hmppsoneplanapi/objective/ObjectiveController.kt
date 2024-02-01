@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -122,5 +124,39 @@ class ObjectiveController(val service: ObjectiveService) {
     @RequestBody request: ObjectiveRequest,
   ): ObjectiveEntity {
     return service.updateObjective(PlanKey(prisonNumber, planReference), objectiveReference, request)
+  }
+
+  @Operation(
+    summary = "Remove an Objective",
+    responses = [
+      ApiResponse(
+        responseCode = "204",
+        description = "Objective data is removed",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Objective or plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @DeleteMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  suspend fun deleteObjective(
+    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+  ): ResponseEntity<Nothing> {
+    service.deleteObjective(PlanKey(prisonNumber, planReference), objectiveReference)
+    return ResponseEntity.noContent().build()
   }
 }

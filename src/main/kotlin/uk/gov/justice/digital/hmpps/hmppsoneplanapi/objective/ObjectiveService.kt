@@ -16,7 +16,7 @@ class ObjectiveService(
   private val objectiveRepository: ObjectiveRepository,
 ) {
   @Transactional
-  suspend fun createObjective(planKey: PlanKey, request: CreateObjectiveRequest): ObjectiveEntity {
+  suspend fun createObjective(planKey: PlanKey, request: ObjectiveRequest): ObjectiveEntity {
     val plan = planService.getByKey(planKey)
     val objective = request.buildEntity()
     val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
@@ -29,5 +29,10 @@ class ObjectiveService(
     val (prisonNumber, planReference) = planKey
     return objectiveRepository.getObjective(prisonNumber, planReference, objectiveReference)
       ?: throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")
+  }
+  suspend fun updateObjective(planKey: PlanKey, objectiveReference: UUID, request: ObjectiveRequest): ObjectiveEntity {
+    val objective = getObjective(planKey, objectiveReference)
+    val updated = request.updateEntity(objective)
+    return entityTemplate.update(updated).awaitSingle()
   }
 }

@@ -129,4 +129,39 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .expectStatus()
       .isNotFound()
   }
+
+  @Test
+  fun `PUT plan updates`() {
+    val planKey = givenAPlan()
+    val objectiveReference = givenAnObjective(planKey)
+
+    authedWebTestClient.put()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{obj}",
+        planKey.prisonNumber,
+        planKey.reference,
+        objectiveReference,
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        """
+        {
+                "title":"title2",
+                "targetCompletionDate": "2024-02-02",
+                "status":"status2",
+                "note":"note2",
+                "outcome":"outcome2"
+        }
+        """.trimIndent(),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.title").isEqualTo("title2")
+      .jsonPath("$.targetCompletionDate").isEqualTo("2024-02-02")
+      .jsonPath("$.status").isEqualTo("status2")
+      .jsonPath("$.note").isEqualTo("note2")
+      .jsonPath("$.outcome").isEqualTo("outcome2")
+  }
 }

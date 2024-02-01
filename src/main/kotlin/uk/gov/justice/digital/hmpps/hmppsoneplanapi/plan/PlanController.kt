@@ -21,7 +21,7 @@ import java.util.UUID
 @RestController
 @RequestMapping
 @Tag(name = "Plan", description = "Manage plans")
-class PlanController(val planRepository: PlanRepository, val planService: PlanService) {
+class PlanController(private val planRepository: PlanRepository, private val planService: PlanService) {
 
   @Operation(
     summary = "Create a Plan for the person identified by the given prison number",

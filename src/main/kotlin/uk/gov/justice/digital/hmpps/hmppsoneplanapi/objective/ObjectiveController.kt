@@ -23,7 +23,7 @@ import java.util.UUID
 @RestController
 @RequestMapping
 @Tag(name = "Objective", description = "Manage Objectives")
-class ObjectiveController(val service: ObjectiveService) {
+class ObjectiveController(private val service: ObjectiveService) {
 
   @Operation(
     summary = "Create an Objective for a given plan",
@@ -90,7 +90,7 @@ class ObjectiveController(val service: ObjectiveService) {
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): ObjectiveEntity {
-    return service.getObjective(PlanKey(prisonNumber, planReference), objectiveReference)
+    return service.getObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference))
   }
 
   @Operation(
@@ -156,7 +156,7 @@ class ObjectiveController(val service: ObjectiveService) {
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody request: ObjectiveRequest,
   ): ObjectiveEntity {
-    return service.updateObjective(PlanKey(prisonNumber, planReference), objectiveReference, request)
+    return service.updateObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference), request)
   }
 
   @Operation(
@@ -189,7 +189,7 @@ class ObjectiveController(val service: ObjectiveService) {
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): ResponseEntity<Nothing> {
-    service.deleteObjective(PlanKey(prisonNumber, planReference), objectiveReference)
+    service.deleteObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference))
     return ResponseEntity.noContent().build()
   }
 }

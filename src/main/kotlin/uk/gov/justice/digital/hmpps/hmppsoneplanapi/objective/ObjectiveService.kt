@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanService
-import java.util.UUID
 
 @Service
 class ObjectiveService(
@@ -26,20 +25,20 @@ class ObjectiveService(
     return savedObjective
   }
 
-  suspend fun getObjective(planKey: PlanKey, objectiveReference: UUID): ObjectiveEntity {
-    val (prisonNumber, planReference) = planKey
-    return objectiveRepository.getObjective(prisonNumber, planReference, objectiveReference)
+  suspend fun getObjective(objectiveKey: ObjectiveKey): ObjectiveEntity {
+    val (prisonNumber, planReference, objectiveReference) = objectiveKey
+    return objectiveRepository.getObjective(prisonNumber, planReference, objectiveKey.objectiveReference)
       ?: throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")
   }
-  suspend fun updateObjective(planKey: PlanKey, objectiveReference: UUID, request: ObjectiveRequest): ObjectiveEntity {
-    val objective = getObjective(planKey, objectiveReference)
+  suspend fun updateObjective(objectiveKey: ObjectiveKey, request: ObjectiveRequest): ObjectiveEntity {
+    val objective = getObjective(objectiveKey)
     val updated = request.updateEntity(objective)
     return entityTemplate.update(updated).awaitSingle()
   }
 
   @Transactional
-  suspend fun deleteObjective(planKey: PlanKey, objectiveReference: UUID) {
-    val (prisonNumber, planReference) = planKey
+  suspend fun deleteObjective(objectiveKey: ObjectiveKey) {
+    val (prisonNumber, planReference, objectiveReference) = objectiveKey
     val count = objectiveRepository.markObjectiveDeleted(prisonNumber, planReference, objectiveReference)
     if (count != 1) {
       throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")

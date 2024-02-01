@@ -15,7 +15,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Autowired
   private lateinit var databaseClient: DatabaseClient
 
-  val planRequestBody = """
+  val requestBody = """
         {
                 "title":"title",
                 "targetCompletionDate": "2024-02-01",
@@ -32,7 +32,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     authedWebTestClient.post()
       .uri("/person/{pNumber}/plans/{pReference}/objectives", prisonNumber, planReference)
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(planRequestBody)
+      .bodyValue(requestBody)
       .exchange()
       .expectStatus()
       .isOk()
@@ -45,7 +45,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     authedWebTestClient.post()
       .uri("/person/{pNumber}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(planRequestBody)
+      .bodyValue(requestBody)
       .exchange()
       .expectStatus()
       .isNotFound()
@@ -56,7 +56,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     webTestClient.post()
       .uri("/person/{pNumber}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(planRequestBody)
+      .bodyValue(requestBody)
       .exchange()
       .expectStatus()
       .isUnauthorized()
@@ -98,7 +98,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val exchangeResult = authedWebTestClient.post()
       .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(planRequestBody)
+      .bodyValue(requestBody)
       .exchange()
       .expectStatus().isOk()
       .expectBody(CreateEntityResponse::class.java)

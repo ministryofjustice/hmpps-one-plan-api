@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.step
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
@@ -34,7 +34,7 @@ class StepControllerTest : IntegrationTestBase() {
       .expectStatus()
       .isOk()
       .expectBody()
-      .jsonPath("$.reference").value { ref: String -> Assertions.assertThat(ref).hasSize(36) }
+      .jsonPath("$.reference").value { ref: String -> assertThat(ref).hasSize(36) }
   }
 
   @Test
@@ -94,5 +94,56 @@ class StepControllerTest : IntegrationTestBase() {
       .returnResult()
 
     return exchangeResult.responseBody!!.reference
+  }
+
+  @Test
+  fun `GET All Steps for an objective`() {
+    val objectiveKey = givenAnObjective()
+    val stepReferenceA = givenAStep(objectiveKey)
+    val stepReferenceB = givenAStep(objectiveKey)
+
+    authedWebTestClient.get()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps",
+        objectiveKey.prisonNumber,
+        objectiveKey.planReference,
+        objectiveKey.objectiveReference,
+      ).exchange()
+      .expectStatus().isOk()
+      .expectBody()
+      .jsonPath("$.[*].reference")
+      .value {
+          refs: List<String> ->
+        assertThat(refs)
+          .containsExactlyInAnyOrder(stepReferenceA.toString(), stepReferenceB.toString())
+      }
+  }
+
+  @Test
+  fun `GET All Steps gives empty array when none are created`() {
+    val objectiveKey = givenAnObjective()
+
+    authedWebTestClient.get()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps",
+        objectiveKey.prisonNumber,
+        objectiveKey.planReference,
+        objectiveKey.objectiveReference,
+      ).exchange()
+      .expectStatus().isOk()
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
+  @Test
+  fun `GET All Steps gives 404 when objective does not exist`() {
+    authedWebTestClient.get()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps",
+        "123",
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+      ).exchange()
+      .expectStatus().isNotFound()
   }
 }

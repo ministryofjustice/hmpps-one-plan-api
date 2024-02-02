@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import kotlinx.coroutines.flow.Flow
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,7 +26,7 @@ class StepController(private val service: StepService) {
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Objective successfully created, response contains the unique reference that identifies the created Objective",
+        description = "Step successfully created, response contains the unique reference that identifies the created Step",
         content = [
           Content(
             mediaType = "application/json",
@@ -61,6 +62,30 @@ class StepController(private val service: StepService) {
     return CreateEntityResponse(entity.reference)
   }
 
+  @Operation(
+    summary = "Get a single Step",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Step, Objective or Plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun getStep(
     @PathVariable(value = "prisonNumber") prisonNumber: String,
@@ -69,4 +94,35 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "stepReference") stepReference: UUID,
   ): StepEntity =
     service.getStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference)
+
+  @Operation(
+    summary = "Get all steps for an objective, empty array if there are none.",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Objective or Plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps")
+  suspend fun getSteps(
+    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+  ): Flow<StepEntity> = service.getSteps(ObjectiveKey(prisonNumber, planReference, objectiveReference))
 }

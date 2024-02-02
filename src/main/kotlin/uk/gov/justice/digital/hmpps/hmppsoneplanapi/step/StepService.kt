@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.step
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
@@ -24,6 +25,11 @@ class StepService(
     val objective = objectiveService.getObjective(objectiveKey)
     return stepRepository.findByReferenceAndObjectiveId(stepReference, objective.id)
       ?: throw stepNotFound(objectiveKey, stepReference)
+  }
+
+  suspend fun getSteps(objectiveKey: ObjectiveKey): Flow<StepEntity> {
+    val objective = objectiveService.getObjective(objectiveKey)
+    return stepRepository.findAllByObjectiveId(objective.id)
   }
 }
 

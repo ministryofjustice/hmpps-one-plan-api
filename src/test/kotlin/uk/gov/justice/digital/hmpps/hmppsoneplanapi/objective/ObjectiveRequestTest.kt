@@ -45,5 +45,6 @@ class ObjectiveRequestTest {
     assertThat(updated.status).isEqualTo("status2")
     assertThat(updated.note).isEqualTo("note2")
     assertThat(updated.outcome).isEqualTo("outcome2")
+    assertThat(updated.isNew).describedAs("should be seen as update to db mapping").isFalse()
   }
 }

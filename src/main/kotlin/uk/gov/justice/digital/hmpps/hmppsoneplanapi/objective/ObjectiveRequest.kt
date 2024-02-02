@@ -23,5 +23,5 @@ data class ObjectiveRequest(
     status = status,
     note = note,
     outcome = outcome,
-  )
+  ).markAsUpdate()
 }

@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
@@ -23,14 +25,18 @@ data class PlanEntity(
   @InsertOnlyProperty
   val createdBy: String,
   @InsertOnlyProperty
-  val createdAt: ZonedDateTime = ZonedDateTime.now(),
+  @CreatedDate
+  val createdAt: ZonedDateTime? = null,
   var updatedBy: String = createdBy,
-  var updatedAt: ZonedDateTime = createdAt,
+  @LastModifiedDate
+  var updatedAt: ZonedDateTime? = createdAt,
 
   @JsonIgnore
   var isDeleted: Boolean = false,
 ) : Persistable<UUID> {
   override fun getId(): UUID = id
+
+  @JsonIgnore
   override fun isNew(): Boolean = !isDeleted
 }
 

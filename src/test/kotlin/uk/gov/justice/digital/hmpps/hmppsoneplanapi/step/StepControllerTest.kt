@@ -119,8 +119,7 @@ class StepControllerTest : IntegrationTestBase() {
     getAllSteps(objectiveKey)
       .expectBody()
       .jsonPath("$.[*].reference")
-      .value {
-          refs: List<String> ->
+      .value { refs: List<String> ->
         assertThat(refs)
           .containsExactlyInAnyOrder(stepReferenceA.toString(), stepReferenceB.toString())
       }
@@ -219,5 +218,76 @@ class StepControllerTest : IntegrationTestBase() {
       ).exchange()
       .expectStatus()
       .isNotFound()
+  }
+
+  @Test
+  fun `PUT updates a Step`() {
+    val objective = givenAnObjective()
+    val step = givenAStep(objective)
+
+    authedWebTestClient.put()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{obj}/steps/{step}",
+        objective.prisonNumber,
+        objective.planReference,
+        objective.objectiveReference,
+        step,
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        """
+          {
+            "description":"description2",
+            "stepOrder": 2,
+            "status": "status2"
+          }
+        """.trimIndent(),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.description").isEqualTo("description2")
+      .jsonPath("$.stepOrder").isEqualTo(2)
+      .jsonPath("$.status").isEqualTo("status2")
+  }
+
+  @Test
+  fun `404 on PUT if Step does not exist`() {
+    authedWebTestClient.put()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{obj}/steps/{step}",
+        "123",
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        """
+          {
+            "description":"description2",
+            "stepOrder": 2,
+            "status": "status2"
+          }
+        """.trimIndent(),
+      )
+      .exchange()
+      .expectStatus()
+      .isNotFound()
+  }
+
+  @Test
+  fun `401 If not authed`() {
+    webTestClient.delete()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+        "123",
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+      ).exchange()
+      .expectStatus()
+      .isUnauthorized()
   }
 }

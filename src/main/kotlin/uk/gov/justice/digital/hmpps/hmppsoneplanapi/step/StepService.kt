@@ -39,6 +39,12 @@ class StepService(
       throw stepNotFound(objectiveKey, stepReference)
     }
   }
+
+  suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: StepRequest): StepEntity {
+    val step = getStep(objectiveKey, stepReference)
+    val updated = request.updateEntity(step)
+    return entityTemplate.update(updated).awaitSingle()
+  }
 }
 
 fun stepNotFound(objectiveKey: ObjectiveKey, stepReference: UUID): NotFoundException {

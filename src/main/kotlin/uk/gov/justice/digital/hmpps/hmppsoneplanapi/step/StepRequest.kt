@@ -13,4 +13,10 @@ data class StepRequest(
     status = status,
     stepOrder = stepOrder,
   )
+
+  fun updateEntity(entity: StepEntity) = entity.copy(
+    description = description,
+    stepOrder = stepOrder,
+    status = status,
+  )
 }

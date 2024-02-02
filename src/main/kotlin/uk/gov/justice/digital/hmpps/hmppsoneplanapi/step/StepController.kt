@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -161,5 +162,40 @@ class StepController(private val service: StepService) {
   ): ResponseEntity<Nothing> {
     service.deleteStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference)
     return ResponseEntity.noContent().build()
+  }
+
+  @Operation(
+    summary = "Updated a single Step",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "The result of the update",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Step, Objective or Plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PutMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  suspend fun updateStep(
+    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+    @PathVariable(value = "stepReference") stepReference: UUID,
+    @RequestBody stepRequest: StepRequest,
+  ): StepEntity {
+    return service.updateStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference, stepRequest)
   }
 }

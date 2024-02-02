@@ -55,3 +55,30 @@ Authorization: Bearer {{auth_token}}
   "outcome":"outcome2"
 }
 > {% client.global.set("objectiveReference", response.body["reference"]); %}
+
+### Create Step
+POST {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}/steps
+content-type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "description":"description",
+  "stepOrder": 1,
+  "status": "status"
+}
+> {% client.global.set("stepReference", response.body["reference"]); %}
+
+### Get Step
+GET {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}/steps/{{stepReference}}
+Authorization: Bearer {{auth_token}}
+
+### Update Step
+PUT {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}/steps/{{stepReference}}
+content-type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "description":"description2",
+  "stepOrder": 2,
+  "status": "status2"
+}

@@ -55,6 +55,7 @@ class StepControllerTest : IntegrationTestBase() {
       .isOk()
       .expectBody()
       .jsonPath("$.id").doesNotExist()
+      .jsonPath("$.isDeleted").doesNotExist()
       .jsonPath("$.description").isEqualTo("description")
       .jsonPath("$.status").isEqualTo("status")
       .jsonPath("$.stepOrder").isEqualTo(1)

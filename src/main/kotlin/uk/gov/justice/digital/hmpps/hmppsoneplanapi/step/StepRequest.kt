@@ -18,5 +18,5 @@ data class StepRequest(
     description = description,
     stepOrder = stepOrder,
     status = status,
-  )
+  ).markAsUpdate()
 }

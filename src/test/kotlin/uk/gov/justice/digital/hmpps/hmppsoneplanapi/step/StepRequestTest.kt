@@ -19,4 +19,26 @@ class StepRequestTest {
     assertThat(entity.stepOrder).isEqualTo(1)
     assertThat(entity.description).isEqualTo("desc")
   }
+
+  @Test
+  fun `updates step entity`() {
+    val original = StepEntity(
+      objectiveId = UUID.randomUUID(),
+      description = "desc",
+      stepOrder = 1,
+      status = "status",
+    )
+
+    val updated = StepRequest(
+      "desc2",
+      2,
+      "status2",
+    ).updateEntity(original)
+
+    assertThat(updated.objectiveId).isEqualTo(original.objectiveId)
+    assertThat(updated.status).isEqualTo("status2")
+    assertThat(updated.stepOrder).isEqualTo(2)
+    assertThat(updated.description).isEqualTo("desc2")
+    assertThat(updated.isNew).describedAs("Should be flagged as an update").isFalse()
+  }
 }

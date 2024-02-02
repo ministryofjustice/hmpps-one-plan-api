@@ -1,14 +1,22 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.step
 
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import java.util.UUID
 
 class StepControllerTest : IntegrationTestBase() {
+  @Autowired
+  private lateinit var databaseClient: DatabaseClient
+
   val requestBody = """
         {
                 "description":"description",
@@ -42,16 +50,9 @@ class StepControllerTest : IntegrationTestBase() {
     val objectiveKey = givenAnObjective()
     val stepRef = givenAStep(objectiveKey)
 
-    authedWebTestClient.get()
-      .uri(
-        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
-        objectiveKey.prisonNumber,
-        objectiveKey.planReference,
-        objectiveKey.objectiveReference,
-        stepRef,
-      )
-      .exchange()
-      .expectStatus().isOk()
+    getStep(objectiveKey, stepRef)
+      .expectStatus()
+      .isOk()
       .expectBody()
       .jsonPath("$.id").doesNotExist()
       .jsonPath("$.description").isEqualTo("description")
@@ -63,6 +64,19 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.updatedBy").isEqualTo("TODO")
       .jsonPath("$.updatedAt").isNotEmpty()
   }
+
+  private fun getStep(
+    objectiveKey: ObjectiveKey,
+    stepRef: UUID,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.get()
+    .uri(
+      "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+      objectiveKey.prisonNumber,
+      objectiveKey.planReference,
+      objectiveKey.objectiveReference,
+      stepRef,
+    )
+    .exchange()
 
   @Test
   fun `404 when step does not exist`() {
@@ -102,14 +116,7 @@ class StepControllerTest : IntegrationTestBase() {
     val stepReferenceA = givenAStep(objectiveKey)
     val stepReferenceB = givenAStep(objectiveKey)
 
-    authedWebTestClient.get()
-      .uri(
-        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps",
-        objectiveKey.prisonNumber,
-        objectiveKey.planReference,
-        objectiveKey.objectiveReference,
-      ).exchange()
-      .expectStatus().isOk()
+    getAllSteps(objectiveKey)
       .expectBody()
       .jsonPath("$.[*].reference")
       .value {
@@ -123,6 +130,12 @@ class StepControllerTest : IntegrationTestBase() {
   fun `GET All Steps gives empty array when none are created`() {
     val objectiveKey = givenAnObjective()
 
+    getAllSteps(objectiveKey)
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
+  private fun getAllSteps(objectiveKey: ObjectiveKey): WebTestClient.ResponseSpec =
     authedWebTestClient.get()
       .uri(
         "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps",
@@ -131,9 +144,6 @@ class StepControllerTest : IntegrationTestBase() {
         objectiveKey.objectiveReference,
       ).exchange()
       .expectStatus().isOk()
-      .expectBody()
-      .jsonPath("$.size()").isEqualTo(0)
-  }
 
   @Test
   fun `GET All Steps gives 404 when objective does not exist`() {
@@ -145,5 +155,69 @@ class StepControllerTest : IntegrationTestBase() {
         UUID.randomUUID(),
       ).exchange()
       .expectStatus().isNotFound()
+  }
+
+  @Test
+  fun `DELETE Step marks step as is_deleted`() {
+    val objectiveKey = givenAnObjective()
+    val stepReference = givenAStep(objectiveKey)
+
+    deleteStep(objectiveKey, stepReference)
+
+    runBlocking {
+      val isDeleted = databaseClient.sql("select is_deleted from step where reference = :ref")
+        .bind("ref", stepReference)
+        .fetch()
+        .one()
+        .map { it["is_deleted"] as Boolean }
+        .awaitSingle()
+
+      assertThat(isDeleted).describedAs("is_deleted should be true").isTrue()
+    }
+  }
+
+  private fun deleteStep(
+    objectiveKey: ObjectiveKey,
+    stepReference: UUID,
+  ) {
+    authedWebTestClient.delete()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+        objectiveKey.prisonNumber,
+        objectiveKey.planReference,
+        objectiveKey.objectiveReference,
+        stepReference,
+      ).exchange()
+      .expectStatus()
+      .isNoContent()
+  }
+
+  @Test
+  fun `GET calls do not show a step after it is deleted`() {
+    val objectiveKey = givenAnObjective()
+    val stepReference = givenAStep(objectiveKey)
+    deleteStep(objectiveKey, stepReference)
+
+    getStep(objectiveKey, stepReference)
+      .expectStatus()
+      .isNotFound()
+
+    getAllSteps(objectiveKey)
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
+  @Test
+  fun `DELETE 404 when Step does not exist`() {
+    authedWebTestClient.delete()
+      .uri(
+        "/person/{pNumber}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+        "123",
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+      ).exchange()
+      .expectStatus()
+      .isNotFound()
   }
 }

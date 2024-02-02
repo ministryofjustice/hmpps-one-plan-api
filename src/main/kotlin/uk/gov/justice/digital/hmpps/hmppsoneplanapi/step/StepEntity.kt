@@ -27,4 +27,5 @@ data class StepEntity(
   val createdAt: ZonedDateTime = ZonedDateTime.now(),
   val updatedBy: String = createdBy,
   val updatedAt: ZonedDateTime = createdAt,
+  val isDeleted: Boolean = false,
 )

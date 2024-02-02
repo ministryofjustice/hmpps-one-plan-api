@@ -23,13 +23,21 @@ class StepService(
 
   suspend fun getStep(objectiveKey: ObjectiveKey, stepReference: UUID): StepEntity {
     val objective = objectiveService.getObjective(objectiveKey)
-    return stepRepository.findByReferenceAndObjectiveId(stepReference, objective.id)
+    return stepRepository.findByReferenceAndObjectiveIdAndIsDeletedIsFalse(stepReference, objective.id)
       ?: throw stepNotFound(objectiveKey, stepReference)
   }
 
   suspend fun getSteps(objectiveKey: ObjectiveKey): Flow<StepEntity> {
     val objective = objectiveService.getObjective(objectiveKey)
-    return stepRepository.findAllByObjectiveId(objective.id)
+    return stepRepository.findAllByObjectiveIdAndIsDeletedIsFalse(objective.id)
+  }
+
+  suspend fun deleteStep(objectiveKey: ObjectiveKey, stepReference: UUID) {
+    val objective = objectiveService.getObjective(objectiveKey)
+    val count = stepRepository.markStepDeleted(objective.id, stepReference)
+    if (count != 1) {
+      throw stepNotFound(objectiveKey, stepReference)
+    }
   }
 }
 

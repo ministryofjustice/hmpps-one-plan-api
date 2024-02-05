@@ -52,8 +52,6 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       PlanEntity(
         type = planRequest.planType,
         prisonNumber = prisonNumber,
-        createdBy = "TODO",
-
       ),
     )
     return CreateEntityResponse(entity.reference)

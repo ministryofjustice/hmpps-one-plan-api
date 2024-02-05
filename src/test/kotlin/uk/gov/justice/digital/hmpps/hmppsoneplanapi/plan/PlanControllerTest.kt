@@ -35,9 +35,9 @@ class PlanControllerTest : IntegrationTestBase() {
       .jsonPath("$.type").isEqualTo("PERSONAL_LEARNING")
       .jsonPath("$.id").doesNotExist()
       .jsonPath("$.reference").isEqualTo(planReference.toString())
-      .jsonPath("$.createdBy").isEqualTo("TODO")
+      .jsonPath("$.createdBy").isEqualTo("test-user")
       .jsonPath("$.createdAt").isNotEmpty()
-      .jsonPath("$.updatedBy").isEqualTo("TODO")
+      .jsonPath("$.updatedBy").isEqualTo("test-user")
       .jsonPath("$.updatedAt").isNotEmpty()
   }
 

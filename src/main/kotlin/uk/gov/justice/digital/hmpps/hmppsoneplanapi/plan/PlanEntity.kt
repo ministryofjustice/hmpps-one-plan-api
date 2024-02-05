@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
@@ -23,11 +25,13 @@ data class PlanEntity(
   val type: PlanType,
 
   @InsertOnlyProperty
-  val createdBy: String,
+  @CreatedBy
+  val createdBy: String? = null,
   @InsertOnlyProperty
   @CreatedDate
   val createdAt: ZonedDateTime? = null,
-  var updatedBy: String = createdBy,
+  @LastModifiedBy
+  var updatedBy: String? = createdBy,
   @LastModifiedDate
   var updatedAt: ZonedDateTime? = createdAt,
 

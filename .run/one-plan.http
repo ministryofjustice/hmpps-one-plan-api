@@ -52,7 +52,8 @@ Authorization: Bearer {{auth_token}}
   "targetCompletionDate": "2024-02-02",
   "status":"status2",
   "note":"note2",
-  "outcome":"outcome2"
+  "outcome":"outcome2",
+  "reasonForChange": "The reason that it changed"
 }
 > {% client.global.set("objectiveReference", response.body["reference"]); %}
 
@@ -80,5 +81,6 @@ Authorization: Bearer {{auth_token}}
 {
   "description":"description2",
   "stepOrder": 2,
-  "status": "status2"
+  "status": "status2",
+  "reasonForChange": "2"
 }

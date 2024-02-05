@@ -77,9 +77,9 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.note").isEqualTo("note")
       .jsonPath("$.outcome").isEqualTo("outcome")
       .jsonPath("$.reference").isEqualTo(objectiveReference.toString())
-      .jsonPath("$.createdBy").isEqualTo("TODO")
+      .jsonPath("$.createdBy").isEqualTo("test-user")
       .jsonPath("$.createdAt").isNotEmpty()
-      .jsonPath("$.updatedBy").isEqualTo("TODO")
+      .jsonPath("$.updatedBy").isEqualTo("test-user")
       .jsonPath("$.updatedAt").isNotEmpty()
   }
 

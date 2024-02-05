@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Transient
 import org.springframework.data.domain.Persistable
@@ -28,11 +30,13 @@ data class ObjectiveEntity(
   val outcome: String,
 
   @InsertOnlyProperty
-  val createdBy: String = "TODO",
+  @CreatedBy
+  val createdBy: String? = null,
   @InsertOnlyProperty
   @CreatedDate
   val createdAt: ZonedDateTime? = null,
-  val updatedBy: String = createdBy,
+  @LastModifiedBy
+  val updatedBy: String? = createdBy,
   @LastModifiedDate
   val updatedAt: ZonedDateTime? = createdAt,
 ) : Persistable<UUID> {

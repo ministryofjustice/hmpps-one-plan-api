@@ -9,6 +9,13 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveRequest
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.CreatePlanRequest
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanType
+import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -25,7 +32,12 @@ abstract class IntegrationTestBase {
   fun setupAuth() {
     if (!::authedWebTestClient.isInitialized) {
       authedWebTestClient = webTestClient
-        .mutateWith { builder, _, _ -> builder.defaultHeader(HttpHeaders.AUTHORIZATION, jwtAuthHelper.createAuthHeader()) }
+        .mutateWith { builder, _, _ ->
+          builder.defaultHeader(
+            HttpHeaders.AUTHORIZATION,
+            jwtAuthHelper.createAuthHeader(),
+          )
+        }
     }
   }
 
@@ -44,5 +56,57 @@ abstract class IntegrationTestBase {
         registry.add("spring.r2dbc.password", pgContainer::getPassword)
       }
     }
+  }
+
+  fun givenAPlan(prisonNumber: String = "123", type: PlanType = PlanType.PERSONAL_LEARNING): PlanKey {
+    val reference = authedWebTestClient.post().uri("/person/{prisonNumber}/plans", prisonNumber)
+      .bodyValue(CreatePlanRequest(planType = type))
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody(CreateEntityResponse::class.java)
+      .returnResult()
+      .responseBody!!
+      .reference
+    return PlanKey(prisonNumber, reference)
+  }
+
+  fun givenPlanIsDeleted(planKey: PlanKey) {
+    authedWebTestClient.delete()
+      .uri("/person/{number}/plans/{ref}", planKey.prisonNumber, planKey.reference)
+      .exchange()
+      .expectStatus()
+      .isNoContent()
+  }
+
+  fun givenAnObjective(
+    prisonNumber: String = "123",
+    type: PlanType = PlanType.PERSONAL_LEARNING,
+    title: String = "title",
+    targetCompletionDate: LocalDate = LocalDate.of(2024, 2, 1),
+    status: String = "status",
+    note: String = "note",
+    outcome: String = "outcome",
+  ): ObjectiveKey {
+    val (_, planReference) = givenAPlan(prisonNumber, type)
+    val objectiveReference =
+      authedWebTestClient.post().uri("/person/{prisonNumber}/plans/{pRef}/objectives", prisonNumber, planReference)
+        .bodyValue(
+          ObjectiveRequest(
+            title = title,
+            targetCompletionDate = targetCompletionDate,
+            status = status,
+            note = note,
+            outcome = outcome,
+          ),
+        )
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(CreateEntityResponse::class.java)
+        .returnResult()
+        .responseBody!!
+        .reference
+    return ObjectiveKey(prisonNumber, planReference, objectiveReference)
   }
 }

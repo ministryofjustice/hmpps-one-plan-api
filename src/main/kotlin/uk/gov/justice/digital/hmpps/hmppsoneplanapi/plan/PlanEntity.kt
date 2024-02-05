@@ -39,3 +39,5 @@ enum class PlanType {
   SENTENCE,
   RESETTLEMENT,
 }
+
+data class PlanKey(val prisonNumber: String, val reference: UUID)

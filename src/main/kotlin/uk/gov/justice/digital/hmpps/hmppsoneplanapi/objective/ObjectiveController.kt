@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
+package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -11,24 +11,26 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import java.util.UUID
 
 @RestController
 @RequestMapping
-@Tag(name = "Plan", description = "Manage plans")
-class PlanController(private val planRepository: PlanRepository, private val planService: PlanService) {
+@Tag(name = "Objective", description = "Manage Objectives")
+class ObjectiveController(private val service: ObjectiveService) {
 
   @Operation(
-    summary = "Create a Plan for the person identified by the given prison number",
+    summary = "Create an Objective for a given plan",
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Plan successfully created, response contains the unique reference that identifies the created Plan",
+        description = "Objective successfully created, response contains the unique reference that identifies the created Objective",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateEntityResponse::class))],
       ),
       ApiResponse(
@@ -41,30 +43,62 @@ class PlanController(private val planRepository: PlanRepository, private val pla
         description = "Incorrect permissions to use this endpoint",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
   )
-  @PostMapping("/person/{prisonNumber}/plans")
-  suspend fun createPlan(
+  @PostMapping("/person/{prisonNumber}/plans/{reference}/objectives")
+  suspend fun createObjective(
     @PathVariable(value = "prisonNumber") prisonNumber: String,
-    @RequestBody planRequest: CreatePlanRequest,
+    @PathVariable(value = "reference") planReference: UUID,
+    @RequestBody request: ObjectiveRequest,
   ): CreateEntityResponse {
-    val entity = planRepository.save(
-      PlanEntity(
-        type = planRequest.planType,
-        prisonNumber = prisonNumber,
-        createdBy = "TODO",
-
-      ),
-    )
+    val entity = service.createObjective(PlanKey(prisonNumber, planReference), request)
     return CreateEntityResponse(entity.reference)
   }
 
   @Operation(
-    summary = "Get data for a single Plan",
+    summary = "Get data for a single Objective",
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Plan data is returned",
+        description = "Objective data is returned",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Objective or plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  suspend fun getObjective(
+    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+  ): ObjectiveEntity {
+    return service.getObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference))
+  }
+
+  @Operation(
+    summary = "Get all objectives for a Plan",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Objective data is returned, empty array if no objectives found for the Plan",
       ),
       ApiResponse(
         responseCode = "401",
@@ -83,20 +117,20 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans/{reference}")
-  suspend fun getPlan(
+  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives")
+  suspend fun getObjectives(
     @PathVariable(value = "prisonNumber") prisonNumber: String,
-    @PathVariable(value = "reference") reference: UUID,
-  ): PlanEntity? {
-    return planService.getByKey(PlanKey(prisonNumber, reference))
+    @PathVariable(value = "planReference") planReference: UUID,
+  ): Flow<ObjectiveEntity> {
+    return service.getObjectives(PlanKey(prisonNumber, planReference))
   }
 
   @Operation(
-    summary = "Get data for all plans for a given person",
+    summary = "Update data for a single Objective",
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "An array containing all plans for the given person. Will be empty if no plans are found",
+        description = "Objective data is returned",
       ),
       ApiResponse(
         responseCode = "401",
@@ -108,21 +142,29 @@ class PlanController(private val planRepository: PlanRepository, private val pla
         description = "Incorrect permissions to use this endpoint",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Objective or plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans")
-  suspend fun getAllPlans(
+  @PutMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  suspend fun putObjective(
     @PathVariable(value = "prisonNumber") prisonNumber: String,
-  ): Flow<PlanEntity> {
-    return planRepository.findByPrisonNumberAndIsDeletedIsFalse(prisonNumber)
+    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+    @RequestBody request: ObjectiveRequest,
+  ): ObjectiveEntity {
+    return service.updateObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference), request)
   }
 
   @Operation(
-    summary = "Delete a single plan",
+    summary = "Remove an Objective",
     responses = [
       ApiResponse(
         responseCode = "204",
-        description = "Plan marked as deleted",
+        description = "Objective data is removed",
       ),
       ApiResponse(
         responseCode = "401",
@@ -136,20 +178,18 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       ),
       ApiResponse(
         responseCode = "404",
-        description = "Plan not found",
+        description = "Objective or plan not found",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
   )
-  @DeleteMapping("/person/{prisonNumber}/plans/{reference}")
-  suspend fun deletePlan(
+  @DeleteMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  suspend fun deleteObjective(
     @PathVariable(value = "prisonNumber") prisonNumber: String,
-    @PathVariable(value = "reference") reference: UUID,
+    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): ResponseEntity<Nothing> {
-    val countUpdated = planRepository.updateMarkDeleted(prisonNumber, reference)
-    if (countUpdated != 1) {
-      throw planNotFound(prisonNumber, reference)
-    }
+    service.deleteObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference))
     return ResponseEntity.noContent().build()
   }
 }

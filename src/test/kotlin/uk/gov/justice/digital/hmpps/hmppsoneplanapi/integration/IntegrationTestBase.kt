@@ -10,8 +10,8 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.CreateObjectiveRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.CreatePlanRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanType
@@ -92,7 +92,7 @@ abstract class IntegrationTestBase {
     val objectiveReference =
       authedWebTestClient.post().uri("/person/{prisonNumber}/plans/{pRef}/objectives", prisonNumber, planReference)
         .bodyValue(
-          ObjectiveRequest(
+          CreateObjectiveRequest(
             title = title,
             targetCompletionDate = targetCompletionDate,
             status = status,

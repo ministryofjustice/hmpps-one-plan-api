@@ -4,11 +4,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class StepRequestTest {
+class CreateStepRequestTest {
   @Test
   fun `build step entity`() {
     val id = UUID.randomUUID()
-    val entity = StepRequest(
+    val entity = CreateStepRequest(
       "desc",
       1,
       "status",

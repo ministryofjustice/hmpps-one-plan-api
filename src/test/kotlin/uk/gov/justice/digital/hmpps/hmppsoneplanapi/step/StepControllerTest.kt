@@ -55,13 +55,14 @@ class StepControllerTest : IntegrationTestBase() {
       .isOk()
       .expectBody()
       .jsonPath("$.id").doesNotExist()
+      .jsonPath("$.isDeleted").doesNotExist()
       .jsonPath("$.description").isEqualTo("description")
       .jsonPath("$.status").isEqualTo("status")
       .jsonPath("$.stepOrder").isEqualTo(1)
       .jsonPath("$.reference").isEqualTo(stepRef.toString())
-      .jsonPath("$.createdBy").isEqualTo("TODO")
+      .jsonPath("$.createdBy").isEqualTo("test-user")
       .jsonPath("$.createdAt").isNotEmpty()
-      .jsonPath("$.updatedBy").isEqualTo("TODO")
+      .jsonPath("$.updatedBy").isEqualTo("test-user")
       .jsonPath("$.updatedAt").isNotEmpty()
   }
 
@@ -239,7 +240,8 @@ class StepControllerTest : IntegrationTestBase() {
           {
             "description":"description2",
             "stepOrder": 2,
-            "status": "status2"
+            "status": "status2",
+            "reasonForChange": "reason for change"
           }
         """.trimIndent(),
       )
@@ -250,6 +252,17 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.description").isEqualTo("description2")
       .jsonPath("$.stepOrder").isEqualTo(2)
       .jsonPath("$.status").isEqualTo("status2")
+
+    val reasonForChangeOnHistoryRecord =
+      databaseClient.sql(
+        """ select reason_for_change from step_history where step_id =
+        | (select step_id from step where reference = :reference)
+        """.trimMargin(),
+      )
+        .bind("reference", step)
+        .fetch().one().map { it["reason_for_change"] as String }.block()
+
+    assertThat(reasonForChangeOnHistoryRecord).isEqualTo("reason for change")
   }
 
   @Test
@@ -268,7 +281,8 @@ class StepControllerTest : IntegrationTestBase() {
           {
             "description":"description2",
             "stepOrder": 2,
-            "status": "status2"
+            "status": "status2",
+            "reasonForChange": "a reason"
           }
         """.trimIndent(),
       )

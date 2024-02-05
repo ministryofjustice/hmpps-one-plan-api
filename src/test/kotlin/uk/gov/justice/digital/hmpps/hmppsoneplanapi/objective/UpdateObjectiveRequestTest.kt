@@ -4,24 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class ObjectiveRequestTest {
-  @Test
-  fun mapsToEntity() {
-    val entity = ObjectiveRequest(
-      title = "title",
-      targetCompletionDate = LocalDate.of(2024, 2, 1),
-      status = "status",
-      note = "note",
-      outcome = "outcome",
-    ).buildEntity()
-
-    assertThat(entity.title).isEqualTo("title")
-    assertThat(entity.targetCompletionDate).isEqualTo("2024-02-01")
-    assertThat(entity.status).isEqualTo("status")
-    assertThat(entity.note).isEqualTo("note")
-    assertThat(entity.outcome).isEqualTo("outcome")
-  }
-
+class UpdateObjectiveRequestTest {
   @Test
   fun `updates entity`() {
     val original = ObjectiveEntity(
@@ -32,12 +15,13 @@ class ObjectiveRequestTest {
       outcome = "outcome",
     )
 
-    val updated = ObjectiveRequest(
+    val updated = UpdateObjectiveRequest(
       title = "title2",
       targetCompletionDate = LocalDate.of(2024, 2, 2),
       status = "status2",
       note = "note2",
       outcome = "outcome2",
+      reasonForChange = "reason for change",
     ).updateEntity(original)
 
     assertThat(updated.title).isEqualTo("title2")

@@ -135,7 +135,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `PUT plan updates`() {
+  fun `PUT updates the objective`() {
     val planKey = givenAPlan()
     val objectiveReference = givenAnObjective(planKey)
 
@@ -154,7 +154,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
                 "targetCompletionDate": "2024-02-02",
                 "status":"status2",
                 "note":"note2",
-                "outcome":"outcome2"
+                "outcome":"outcome2",
+                "reasonForChange": "reason for change"
         }
         """.trimIndent(),
       )
@@ -167,6 +168,17 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.status").isEqualTo("status2")
       .jsonPath("$.note").isEqualTo("note2")
       .jsonPath("$.outcome").isEqualTo("outcome2")
+
+    val reasonForChangeOnHistoryRecord =
+      databaseClient.sql(
+        """ select reason_for_change from objective_history where objective_id =
+        | (select objective_id from objective where reference = :reference)
+        """.trimMargin(),
+      )
+        .bind("reference", objectiveReference)
+        .fetch().one().map { it["reason_for_change"] as String }.block()
+
+    assertThat(reasonForChangeOnHistoryRecord).isEqualTo("reason for change")
   }
 
   @Test

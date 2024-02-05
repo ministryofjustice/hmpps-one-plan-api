@@ -54,7 +54,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   suspend fun createObjective(
     @PathVariable(value = "prisonNumber") prisonNumber: String,
     @PathVariable(value = "reference") planReference: UUID,
-    @RequestBody request: ObjectiveRequest,
+    @RequestBody request: CreateObjectiveRequest,
   ): CreateEntityResponse {
     val entity = service.createObjective(PlanKey(prisonNumber, planReference), request)
     return CreateEntityResponse(entity.reference)
@@ -154,7 +154,7 @@ class ObjectiveController(private val service: ObjectiveService) {
     @PathVariable(value = "prisonNumber") prisonNumber: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody request: ObjectiveRequest,
+    @RequestBody request: UpdateObjectiveRequest,
   ): ObjectiveEntity {
     return service.updateObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference), request)
   }

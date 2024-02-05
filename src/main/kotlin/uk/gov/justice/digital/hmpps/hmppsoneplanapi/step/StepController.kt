@@ -59,7 +59,7 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "prisonNumber") prisonNumber: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody request: StepRequest,
+    @RequestBody request: CreateStepRequest,
   ): CreateEntityResponse {
     val entity = service.createStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), request)
     return CreateEntityResponse(entity.reference)
@@ -194,8 +194,8 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
-    @RequestBody stepRequest: StepRequest,
+    @RequestBody updateStepRequest: UpdateStepRequest,
   ): StepEntity {
-    return service.updateStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference, stepRequest)
+    return service.updateStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference, updateStepRequest)
   }
 }

@@ -6,6 +6,7 @@
 .idea/
 .gradle/
 build/
+**/http-client.private.env.json
 
 # CMake
 cmake-build-debug/

@@ -4,6 +4,12 @@ Authorization: Basic elite2apiclient clientsecret
 
 > {% client.global.set("auth_token", response.body["access_token"]); %}
 
+### Get an auth token from dev
+POST https://sign-in-dev.hmpps.service.justice.gov.uk/auth/oauth/token?grant_type=client_credentials&username={{authUser}}&password={{authPassword}}
+Authorization: Basic {{clientId}} {{clientSecret}}
+
+> {% client.global.set("auth_token", response.body["access_token"]); %}
+
 ### Create a plan
 POST {{base.url}}/person/123/plans
 content-type: application/json

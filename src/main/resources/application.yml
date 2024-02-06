@@ -5,7 +5,7 @@ info.app:
 api:
   base:
     url:
-      oauth: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+      oauth: https://sign-in-dev.hmpps.service.justice.gov.uk
 
 spring:
   application:
@@ -40,6 +40,12 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${api.base.url.oauth}/auth/.well-known/jwks.json
+      authorizationserver:
+        endpoint:
+          oidc:
+            user-info-uri: ${api.base.url.oauth}/auth
+
+
 
 
 server:

@@ -22,7 +22,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping
-@Tag(name = "Objective", description = "Manage Objectives")
+@Tag(name = "Steps", description = "Manage Steps")
 class StepController(private val service: StepService) {
   @Operation(
     summary = "Create a Step for a given Objective, that's part of a given Plan",

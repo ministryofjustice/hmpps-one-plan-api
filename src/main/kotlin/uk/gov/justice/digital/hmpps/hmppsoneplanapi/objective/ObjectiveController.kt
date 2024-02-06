@@ -50,13 +50,13 @@ class ObjectiveController(private val service: ObjectiveService) {
       ),
     ],
   )
-  @PostMapping("/person/{prisonNumber}/plans/{reference}/objectives")
+  @PostMapping("/person/{crn}/plans/{reference}/objectives")
   suspend fun createObjective(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "reference") planReference: UUID,
     @RequestBody request: CreateObjectiveRequest,
   ): CreateEntityResponse {
-    val entity = service.createObjective(PlanKey(prisonNumber, planReference), request)
+    val entity = service.createObjective(PlanKey(crn, planReference), request)
     return CreateEntityResponse(entity.reference)
   }
 
@@ -84,13 +84,13 @@ class ObjectiveController(private val service: ObjectiveService) {
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}")
   suspend fun getObjective(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): ObjectiveEntity {
-    return service.getObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference))
+    return service.getObjective(ObjectiveKey(crn, planReference, objectiveReference))
   }
 
   @Operation(
@@ -117,12 +117,12 @@ class ObjectiveController(private val service: ObjectiveService) {
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives")
+  @GetMapping("/person/{crn}/plans/{planReference}/objectives")
   suspend fun getObjectives(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
   ): Flow<ObjectiveEntity> {
-    return service.getObjectives(PlanKey(prisonNumber, planReference))
+    return service.getObjectives(PlanKey(crn, planReference))
   }
 
   @Operation(
@@ -149,14 +149,14 @@ class ObjectiveController(private val service: ObjectiveService) {
       ),
     ],
   )
-  @PutMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  @PutMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}")
   suspend fun putObjective(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody request: UpdateObjectiveRequest,
   ): ObjectiveEntity {
-    return service.updateObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference), request)
+    return service.updateObjective(ObjectiveKey(crn, planReference, objectiveReference), request)
   }
 
   @Operation(
@@ -183,13 +183,13 @@ class ObjectiveController(private val service: ObjectiveService) {
       ),
     ],
   )
-  @DeleteMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}")
+  @DeleteMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}")
   suspend fun deleteObjective(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+    @PathVariable(value = "crn") crn: String,
   ): ResponseEntity<Nothing> {
-    service.deleteObjective(ObjectiveKey(prisonNumber, planReference, objectiveReference))
+    service.deleteObjective(ObjectiveKey(crn, planReference, objectiveReference))
     return ResponseEntity.noContent().build()
   }
 }

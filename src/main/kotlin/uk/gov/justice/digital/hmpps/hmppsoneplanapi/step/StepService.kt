@@ -65,8 +65,8 @@ class StepService(
 }
 
 fun stepNotFound(objectiveKey: ObjectiveKey, stepReference: UUID): NotFoundException {
-  val (prisonNumber, planReference, objectiveReference) = objectiveKey
+  val (crn, planReference, objectiveReference) = objectiveKey
   return NotFoundException(
-    "/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference/steps/$stepReference",
+    "/person/$crn/plans/$planReference/objectives/$objectiveReference/steps/$stepReference",
   )
 }

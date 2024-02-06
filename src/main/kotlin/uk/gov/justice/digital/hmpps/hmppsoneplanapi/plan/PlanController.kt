@@ -24,7 +24,7 @@ import java.util.UUID
 class PlanController(private val planRepository: PlanRepository, private val planService: PlanService) {
 
   @Operation(
-    summary = "Create a Plan for the person identified by the given prison number",
+    summary = "Create a Plan for the person identified by the given CRN (Case Reference Number)",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -43,15 +43,15 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       ),
     ],
   )
-  @PostMapping("/person/{prisonNumber}/plans")
+  @PostMapping("/person/{crn}/plans")
   suspend fun createPlan(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @RequestBody planRequest: CreatePlanRequest,
   ): CreateEntityResponse {
     val entity = planRepository.save(
       PlanEntity(
         type = planRequest.planType,
-        prisonNumber = prisonNumber,
+        caseReferenceNumber = crn,
       ),
     )
     return CreateEntityResponse(entity.reference)
@@ -81,12 +81,12 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans/{reference}")
+  @GetMapping("/person/{crn}/plans/{reference}")
   suspend fun getPlan(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "reference") reference: UUID,
   ): PlanEntity? {
-    return planService.getByKey(PlanKey(prisonNumber, reference))
+    return planService.getByKey(PlanKey(crn, reference))
   }
 
   @Operation(
@@ -108,11 +108,11 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans")
+  @GetMapping("/person/{crn}/plans")
   suspend fun getAllPlans(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
   ): Flow<PlanEntity> {
-    return planRepository.findByPrisonNumberAndIsDeletedIsFalse(prisonNumber)
+    return planRepository.findByCaseReferenceNumberAndIsDeletedIsFalse(crn)
   }
 
   @Operation(
@@ -139,14 +139,14 @@ class PlanController(private val planRepository: PlanRepository, private val pla
       ),
     ],
   )
-  @DeleteMapping("/person/{prisonNumber}/plans/{reference}")
+  @DeleteMapping("/person/{crn}/plans/{reference}")
   suspend fun deletePlan(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "reference") reference: UUID,
   ): ResponseEntity<Nothing> {
-    val countUpdated = planRepository.updateMarkDeleted(prisonNumber, reference)
+    val countUpdated = planRepository.updateMarkDeleted(crn, reference)
     if (countUpdated != 1) {
-      throw planNotFound(prisonNumber, reference)
+      throw planNotFound(crn, reference)
     }
     return ResponseEntity.noContent().build()
   }

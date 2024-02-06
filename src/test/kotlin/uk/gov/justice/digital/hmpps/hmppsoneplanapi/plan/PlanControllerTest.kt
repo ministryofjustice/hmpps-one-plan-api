@@ -29,7 +29,7 @@ class PlanControllerTest : IntegrationTestBase() {
   fun `Can GET a Plan`() {
     val (_, planReference) = givenAPlan("123")
 
-    getPlan(prisonNumber = "123", planReference)
+    getPlan(crn = "123", planReference)
       .expectStatus().isOk
       .expectBody()
       .jsonPath("$.type").isEqualTo("PERSONAL_LEARNING")
@@ -47,9 +47,9 @@ class PlanControllerTest : IntegrationTestBase() {
       .expectStatus().isNotFound()
   }
 
-  private fun getPlan(prisonNumber: String, planReference: UUID): WebTestClient.ResponseSpec =
+  private fun getPlan(crn: String, planReference: UUID): WebTestClient.ResponseSpec =
     authedWebTestClient.get()
-      .uri("person/{prisonNumber}/plans/{reference}", prisonNumber, planReference)
+      .uri("person/{crn}/plans/{reference}", crn, planReference)
       .exchange()
 
   @Test
@@ -59,18 +59,18 @@ class PlanControllerTest : IntegrationTestBase() {
 
   @Test
   fun `Can GET all plans for a person`() {
-    val prisonNumber = "get-all"
-    givenAPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
-    givenAPlan(prisonNumber, PlanType.SENTENCE)
-    givenAPlan(prisonNumber, PlanType.RESETTLEMENT)
+    val crn = "get-all"
+    givenAPlan(crn, PlanType.PERSONAL_LEARNING)
+    givenAPlan(crn, PlanType.SENTENCE)
+    givenAPlan(crn, PlanType.RESETTLEMENT)
 
-    getAllExpectingCount(prisonNumber, 3)
+    getAllExpectingCount(crn, 3)
   }
 
   @Test
   fun `PATCH is not allowed`() {
     authedWebTestClient.patch()
-      .uri("person/{prisonNumber}/plans", "456")
+      .uri("person/{crn}/plans", "456")
       .exchange()
       .expectStatus()
       .isEqualTo(HttpStatus.METHOD_NOT_ALLOWED)
@@ -79,7 +79,7 @@ class PlanControllerTest : IntegrationTestBase() {
   @Test
   fun `PUT is not allowed`() {
     authedWebTestClient.put()
-      .uri("person/{prisonNumber}/plans", "456")
+      .uri("person/{crn}/plans", "456")
       .exchange()
       .expectStatus()
       .isEqualTo(HttpStatus.METHOD_NOT_ALLOWED)
@@ -87,30 +87,30 @@ class PlanControllerTest : IntegrationTestBase() {
 
   @Test
   fun `Can DELETE a plan, making it no long visible`() {
-    val prisonNumber = "delete"
-    val (_, planReference) = givenAPlan(prisonNumber, PlanType.PERSONAL_LEARNING)
+    val crn = "delete"
+    val (_, planReference) = givenAPlan(crn, PlanType.PERSONAL_LEARNING)
 
     authedWebTestClient.delete()
-      .uri("person/{prisonNumber}/plans/{plan}", prisonNumber, planReference.toString())
+      .uri("person/{crn}/plans/{plan}", crn, planReference.toString())
       .exchange()
       .expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
       .expectBody().isEmpty()
 
     val isDeletedInDb =
-      databaseClient.sql(""" select is_deleted from plan where reference = :reference and prison_number = :pnumber """)
+      databaseClient.sql(""" select is_deleted from plan where reference = :reference and crn = :crn """)
         .bind("reference", planReference)
-        .bind("pnumber", prisonNumber)
+        .bind("crn", crn)
         .fetch().one().map { it["is_deleted"] as Boolean }.block()
     assertThat(isDeletedInDb!!).describedAs("Db is_deleted flag should be true").isTrue()
 
-    getAllExpectingCount(prisonNumber, 0)
-    getPlan(prisonNumber, planReference)
+    getAllExpectingCount(crn, 0)
+    getPlan(crn, planReference)
       .expectStatus().isNotFound()
   }
 
-  private fun getAllExpectingCount(prisonNumber: String, count: Int) {
+  private fun getAllExpectingCount(crn: String, count: Int) {
     authedWebTestClient.get()
-      .uri("person/{prisonNumber}/plans", prisonNumber)
+      .uri("person/{crn}/plans", crn)
       .exchange()
       .expectStatus().isOk()
       .expectBody()

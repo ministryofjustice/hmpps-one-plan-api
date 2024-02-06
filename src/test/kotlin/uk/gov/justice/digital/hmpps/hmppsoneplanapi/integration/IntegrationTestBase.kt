@@ -58,8 +58,8 @@ abstract class IntegrationTestBase {
     }
   }
 
-  fun givenAPlan(prisonNumber: String = "123", type: PlanType = PlanType.PERSONAL_LEARNING): PlanKey {
-    val reference = authedWebTestClient.post().uri("/person/{prisonNumber}/plans", prisonNumber)
+  fun givenAPlan(crn: String = "123", type: PlanType = PlanType.PERSONAL_LEARNING): PlanKey {
+    val reference = authedWebTestClient.post().uri("/person/{crn}/plans", crn)
       .bodyValue(CreatePlanRequest(planType = type))
       .exchange()
       .expectStatus()
@@ -68,19 +68,19 @@ abstract class IntegrationTestBase {
       .returnResult()
       .responseBody!!
       .reference
-    return PlanKey(prisonNumber, reference)
+    return PlanKey(crn, reference)
   }
 
   fun givenPlanIsDeleted(planKey: PlanKey) {
     authedWebTestClient.delete()
-      .uri("/person/{number}/plans/{ref}", planKey.prisonNumber, planKey.reference)
+      .uri("/person/{number}/plans/{ref}", planKey.caseReferenceNumber, planKey.reference)
       .exchange()
       .expectStatus()
       .isNoContent()
   }
 
   fun givenAnObjective(
-    prisonNumber: String = "123",
+    crn: String = "123",
     type: PlanType = PlanType.PERSONAL_LEARNING,
     title: String = "title",
     targetCompletionDate: LocalDate = LocalDate.of(2024, 2, 1),
@@ -88,9 +88,9 @@ abstract class IntegrationTestBase {
     note: String = "note",
     outcome: String = "outcome",
   ): ObjectiveKey {
-    val (_, planReference) = givenAPlan(prisonNumber, type)
+    val (_, planReference) = givenAPlan(crn, type)
     val objectiveReference =
-      authedWebTestClient.post().uri("/person/{prisonNumber}/plans/{pRef}/objectives", prisonNumber, planReference)
+      authedWebTestClient.post().uri("/person/{crn}/plans/{pRef}/objectives", crn, planReference)
         .bodyValue(
           CreateObjectiveRequest(
             title = title,
@@ -107,6 +107,6 @@ abstract class IntegrationTestBase {
         .returnResult()
         .responseBody!!
         .reference
-    return ObjectiveKey(prisonNumber, planReference, objectiveReference)
+    return ObjectiveKey(crn, planReference, objectiveReference)
   }
 }

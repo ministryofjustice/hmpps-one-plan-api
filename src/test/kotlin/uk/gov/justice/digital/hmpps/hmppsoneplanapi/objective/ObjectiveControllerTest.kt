@@ -27,10 +27,10 @@ class ObjectiveControllerTest : IntegrationTestBase() {
 
   @Test
   fun `Creates an objective on POST`() {
-    val (prisonNumber, planReference) = givenAPlan()
+    val (crn, planReference) = givenAPlan()
 
     authedWebTestClient.post()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", prisonNumber, planReference)
+      .uri("/person/{crn}/plans/{pReference}/objectives", crn, planReference)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(requestBody)
       .exchange()
@@ -43,7 +43,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Test
   fun `404 on create objective if plan not found`() {
     authedWebTestClient.post()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
+      .uri("/person/{crn}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(requestBody)
       .exchange()
@@ -54,7 +54,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Test
   fun `401 on create objective if not authenticated`() {
     webTestClient.post()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
+      .uri("/person/{crn}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(requestBody)
       .exchange()
@@ -88,15 +88,15 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     objectiveReference: UUID,
   ): WebTestClient.ResponseSpec = authedWebTestClient.get()
     .uri(
-      "/person/{pNumber}/plans/{pReference}/objectives/{objReference}",
-      planKey.prisonNumber,
+      "/person/{crn}/plans/{pReference}/objectives/{objReference}",
+      planKey.caseReferenceNumber,
       planKey.reference,
       objectiveReference,
     ).exchange()
 
   fun givenAnObjective(planKey: PlanKey): UUID {
     val exchangeResult = authedWebTestClient.post()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
+      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(requestBody)
       .exchange()
@@ -141,8 +141,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
 
     authedWebTestClient.put()
       .uri(
-        "/person/{pNumber}/plans/{pReference}/objectives/{obj}",
-        planKey.prisonNumber,
+        "/person/{crn}/plans/{pReference}/objectives/{obj}",
+        planKey.caseReferenceNumber,
         planKey.reference,
         objectiveReference,
       )
@@ -202,8 +202,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     objectiveReference: UUID,
   ): WebTestClient.ResponseSpec = authedWebTestClient.delete()
     .uri(
-      "/person/{pNumber}/plans/{pReference}/objectives/{obj}",
-      planKey.prisonNumber,
+      "/person/{crn}/plans/{pReference}/objectives/{obj}",
+      planKey.caseReferenceNumber,
       planKey.reference,
       objectiveReference,
     ).exchange()
@@ -229,7 +229,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val objectiveReferenceB = givenAnObjective(planKey)
 
     authedWebTestClient.get()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
+      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
       .exchange()
       .expectStatus()
       .isOk()
@@ -245,7 +245,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val planKey = givenAPlan()
 
     authedWebTestClient.get()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", planKey.prisonNumber, planKey.reference)
+      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
       .exchange()
       .expectStatus()
       .isOk()
@@ -256,7 +256,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Test
   fun `404 on GET all when a plan does not exist`() {
     authedWebTestClient.get()
-      .uri("/person/{pNumber}/plans/{pReference}/objectives", "pie", UUID.randomUUID())
+      .uri("/person/{crn}/plans/{pReference}/objectives", "pie", UUID.randomUUID())
       .exchange()
       .expectStatus()
       .isNotFound()

@@ -29,9 +29,9 @@ class ObjectiveService(
   }
 
   suspend fun getObjective(objectiveKey: ObjectiveKey): ObjectiveEntity {
-    val (prisonNumber, planReference, objectiveReference) = objectiveKey
-    return objectiveRepository.getObjective(prisonNumber, planReference, objectiveKey.objectiveReference)
-      ?: throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")
+    val (crn, planReference, objectiveReference) = objectiveKey
+    return objectiveRepository.getObjective(crn, planReference, objectiveKey.objectiveReference)
+      ?: throw NotFoundException("/person/$crn/plans/$planReference/objectives/$objectiveReference")
   }
 
   @Transactional
@@ -59,10 +59,10 @@ class ObjectiveService(
 
   @Transactional
   suspend fun deleteObjective(objectiveKey: ObjectiveKey) {
-    val (prisonNumber, planReference, objectiveReference) = objectiveKey
-    val count = objectiveRepository.markObjectiveDeleted(prisonNumber, planReference, objectiveReference)
+    val (crn, planReference, objectiveReference) = objectiveKey
+    val count = objectiveRepository.markObjectiveDeleted(crn, planReference, objectiveReference)
     if (count != 1) {
-      throw NotFoundException("/person/$prisonNumber/plans/$planReference/objectives/$objectiveReference")
+      throw NotFoundException("/person/$crn/plans/$planReference/objectives/$objectiveReference")
     }
   }
 

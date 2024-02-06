@@ -7,10 +7,10 @@ import java.util.UUID
 @Service
 class PlanService(private val planRepository: PlanRepository) {
   suspend fun getByKey(planKey: PlanKey): PlanEntity {
-    val (prisonNumber, reference) = planKey
-    return planRepository.findByPrisonNumberAndReferenceAndIsDeletedIsFalse(prisonNumber, reference)
-      ?: throw planNotFound(prisonNumber, reference)
+    val (crn, reference) = planKey
+    return planRepository.findByCaseReferenceNumberAndReferenceAndIsDeletedIsFalse(crn, reference)
+      ?: throw planNotFound(crn, reference)
   }
 }
 
-fun planNotFound(prisonNumber: String, reference: UUID) = NotFoundException("/person/$prisonNumber/plans/$reference")
+fun planNotFound(crn: String, reference: UUID) = NotFoundException("/person/$crn/plans/$reference")

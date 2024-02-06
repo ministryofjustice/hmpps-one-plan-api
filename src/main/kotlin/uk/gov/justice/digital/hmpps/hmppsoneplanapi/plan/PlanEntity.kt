@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.domain.Persistable
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
 import java.time.ZonedDateTime
@@ -21,7 +22,8 @@ data class PlanEntity(
   @InsertOnlyProperty
   val reference: UUID = UUID.randomUUID(),
   @InsertOnlyProperty
-  val prisonNumber: String,
+  @Column("crn")
+  val caseReferenceNumber: String,
   val type: PlanType,
 
   @InsertOnlyProperty
@@ -50,4 +52,4 @@ enum class PlanType {
   RESETTLEMENT,
 }
 
-data class PlanKey(val prisonNumber: String, val reference: UUID)
+data class PlanKey(val caseReferenceNumber: String, val reference: UUID)

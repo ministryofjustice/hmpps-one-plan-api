@@ -54,14 +54,14 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @PostMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps")
+  @PostMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")
   suspend fun createStep(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody request: CreateStepRequest,
   ): CreateEntityResponse {
-    val entity = service.createStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), request)
+    val entity = service.createStep(ObjectiveKey(crn, planReference, objectiveReference), request)
     return CreateEntityResponse(entity.reference)
   }
 
@@ -89,14 +89,14 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun getStep(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
   ): StepEntity =
-    service.getStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference)
+    service.getStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference)
 
   @Operation(
     summary = "Get all steps for an objective, empty array if there are none.",
@@ -122,12 +122,12 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @GetMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps")
+  @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")
   suspend fun getSteps(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-  ): Flow<StepEntity> = service.getSteps(ObjectiveKey(prisonNumber, planReference, objectiveReference))
+  ): Flow<StepEntity> = service.getSteps(ObjectiveKey(crn, planReference, objectiveReference))
 
   @Operation(
     summary = "Remove a Step",
@@ -153,14 +153,14 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @DeleteMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  @DeleteMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun deleteStep(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
   ): ResponseEntity<Nothing> {
-    service.deleteStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference)
+    service.deleteStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference)
     return ResponseEntity.noContent().build()
   }
 
@@ -188,14 +188,14 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @PutMapping("/person/{prisonNumber}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  @PutMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun updateStep(
-    @PathVariable(value = "prisonNumber") prisonNumber: String,
+    @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
     @RequestBody updateStepRequest: UpdateStepRequest,
   ): StepEntity {
-    return service.updateStep(ObjectiveKey(prisonNumber, planReference, objectiveReference), stepReference, updateStepRequest)
+    return service.updateStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference, updateStepRequest)
   }
 }

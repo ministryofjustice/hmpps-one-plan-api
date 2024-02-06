@@ -56,7 +56,7 @@ data class ObjectiveEntity(
 }
 
 data class ObjectiveKey(
-  val prisonNumber: String,
+  val caseReferenceNumber: String,
   val planReference: UUID,
   val objectiveReference: UUID,
 )

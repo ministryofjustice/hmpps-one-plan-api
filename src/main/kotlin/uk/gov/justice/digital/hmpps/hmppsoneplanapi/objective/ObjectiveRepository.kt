@@ -16,7 +16,7 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
             and l.plan_id = (
                 select id from plan p
                     where p.reference=:planReference
-                    and p.prison_number = :prisonNumber
+                    and p.crn = :crn
                     and p.is_deleted = false
             )
 
@@ -24,7 +24,7 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
     and o.is_deleted = false
   """,
   )
-  suspend fun getObjective(prisonNumber: String, planReference: UUID, objectiveReference: UUID): ObjectiveEntity?
+  suspend fun getObjective(crn: String, planReference: UUID, objectiveReference: UUID): ObjectiveEntity?
 
   @Modifying
   @Query(
@@ -36,12 +36,12 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
          and l.plan_id = (
                 select id from plan p
                     where p.reference=:planReference
-                    and p.prison_number = :prisonNumber
+                    and p.crn = :crn
             )
       )
     """,
   )
-  suspend fun markObjectiveDeleted(prisonNumber: String, planReference: UUID, objectiveReference: UUID): Int
+  suspend fun markObjectiveDeleted(crn: String, planReference: UUID, objectiveReference: UUID): Int
 
   @Query(
     """

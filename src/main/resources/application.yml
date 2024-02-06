@@ -40,13 +40,6 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${api.base.url.oauth}/auth/.well-known/jwks.json
-      authorizationserver:
-        endpoint:
-          oidc:
-            user-info-uri: ${api.base.url.oauth}/auth
-
-
-
 
 server:
   port: 8080

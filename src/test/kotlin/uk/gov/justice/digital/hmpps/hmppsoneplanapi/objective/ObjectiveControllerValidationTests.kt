@@ -47,6 +47,31 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     }
 
     @Test
+    fun `400 when status is null`() {
+      val body = createRequestBuilder(status = null)
+      post(body).value {
+        assertThat(it.userMessage).isEqualTo("status: is required")
+      }
+    }
+
+    @Test
+    fun `400 when status is too long`() {
+      val aLotOfAs = "a".repeat(51)
+      val body = createRequestBuilder(status = aLotOfAs)
+      post(body).value {
+        assertThat(it.userMessage).isEqualTo("status: size must be between 1 and 50")
+      }
+    }
+
+    @Test
+    fun `400 when status is blank`() {
+      val body = createRequestBuilder(status = "      \n")
+      post(body).value {
+        assertThat(it.userMessage).isEqualTo("status: must not be blank")
+      }
+    }
+
+    @Test
     fun `400 when target date is formatted incorrectly`() {
       val body = createRequestBuilder(targetCompletionDate = "not a date")
       post(body).value {
@@ -108,6 +133,31 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
         val body = updateRequestBuilder(title = null)
         put(body).value {
           assertThat(it.userMessage).isEqualTo("title: is required")
+        }
+      }
+
+      @Test
+      fun `400 when status is null`() {
+        val body = updateRequestBuilder(status = null)
+        put(body).value {
+          assertThat(it.userMessage).isEqualTo("status: is required")
+        }
+      }
+
+      @Test
+      fun `400 when status is too long`() {
+        val aLotOfAs = "a".repeat(51)
+        val body = updateRequestBuilder(status = aLotOfAs)
+        put(body).value {
+          assertThat(it.userMessage).isEqualTo("status: size must be between 1 and 50")
+        }
+      }
+
+      @Test
+      fun `400 when status is blank`() {
+        val body = updateRequestBuilder(status = "      \n")
+        put(body).value {
+          assertThat(it.userMessage).isEqualTo("status: must not be blank")
         }
       }
 

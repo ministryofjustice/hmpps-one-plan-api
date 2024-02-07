@@ -155,7 +155,7 @@ class ObjectiveController(private val service: ObjectiveService) {
     @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody request: UpdateObjectiveRequest,
+    @RequestBody @Valid request: UpdateObjectiveRequest,
   ): ObjectiveEntity {
     return service.updateObjective(ObjectiveKey(crn, planReference, objectiveReference), request)
   }

@@ -8,7 +8,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.WebfluxTestBase
-import java.time.LocalDate
 import java.util.UUID
 
 @WebFluxTest(controllers = [ObjectiveController::class])
@@ -42,6 +41,14 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     }
   }
 
+  @Test
+  fun `400 when target date is formatted incorrectly`() {
+    val body = createRequestBuilder(targetCompletionDate = "not a date")
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("targetCompletionDate: should be a date in format yyyy-MM-dd")
+    }
+  }
+
   private fun post(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.post()
       .uri("/person/123/plans/{ref}/objectives", UUID.randomUUID())
@@ -54,7 +61,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
 
   private fun createRequestBuilder(
     title: String? = "title",
-    targetCompletionDate: LocalDate? = LocalDate.of(2024, 2, 6),
+    targetCompletionDate: String? = "2022-02-06",
     status: String? = "status",
     note: String? = "note",
     outcome: String? = "outcome",

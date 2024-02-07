@@ -14,6 +14,8 @@ data class UpdateObjectiveRequest(
   val status: String,
   val note: String,
   val outcome: String,
+  @field:NotBlank
+  @field:Size(min = 1, max = 250)
   val reasonForChange: String,
 ) {
   fun updateEntity(objectiveEntity: ObjectiveEntity): ObjectiveEntity = objectiveEntity.copy(

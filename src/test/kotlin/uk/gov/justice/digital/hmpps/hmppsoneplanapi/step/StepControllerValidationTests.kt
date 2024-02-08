@@ -64,10 +64,35 @@ class StepControllerValidationTests : WebfluxTestBase() {
     }
   }
 
+  @Test
+  fun `Post - 400 when staffTask is not present`() {
+    val body = createRequestBuilder(staffTask = null)
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("staffTask: is required")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when staffTask is not a boolean string`() {
+    val body = createRequestBuilder(staffTask = "gunk")
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("staffTask: should be a boolean true|false")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when staffTask is not a boolean`() {
+    val body = createRequestBuilder(staffTask = 4.1)
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("staffTask: should be a boolean true|false")
+    }
+  }
+
   private fun createRequestBuilder(
-    description: String? = "description",
-    stepOrder: String? = "1",
-    status: String? = "status",
+    description: Any? = "description",
+    stepOrder: Any? = "1",
+    status: Any? = "status",
+    staffTask: Any? = "false",
   ): String {
     return objectMapper
       .writeValueAsString(
@@ -75,6 +100,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
           "description" to description,
           "status" to status,
           "stepOrder" to stepOrder,
+          "staffTask" to staffTask,
         ).filter { it.value != null },
       )
   }

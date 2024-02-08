@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.config
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
@@ -24,30 +23,36 @@ class HmppsOnePlanApiExceptionHandler(
   @ExceptionHandler(ServerWebInputException::class)
   fun handleMissingParameter(e: ServerWebInputException): ResponseEntity<ErrorResponse> {
     val cause = e.cause?.cause
-    if (cause is MismatchedInputException && cause.message?.contains("non-nullable") == true) {
-      val message = "${variablePath(cause)}: is required"
-      return ResponseEntity
-        .status(BAD_REQUEST)
-        .body(
-          ErrorResponse(
-            status = BAD_REQUEST,
-            userMessage = message,
-            developerMessage = message,
-          ),
-        ).also { log.info("Missing value: {}", e.message) }
-    } else if (cause is InvalidFormatException && cause.targetType == LocalDate::class.java) {
-      val message = "${variablePath(cause)}: should be a date in format yyyy-MM-dd"
-      return ResponseEntity
-        .status(BAD_REQUEST)
-        .body(
-          ErrorResponse(
-            status = BAD_REQUEST,
-            userMessage = message,
-            developerMessage = message,
-          ),
-        ).also { log.info("Bad date: {}", e.message) }
+    return when {
+      cause is MismatchedInputException -> handleMismatchedInputCause(e, cause)
+      else -> handleResponseStatusException(e)
     }
-    return handleResponseStatusException(e)
+  }
+
+  private fun handleMismatchedInputCause(e: ServerWebInputException, cause: MismatchedInputException): ResponseEntity<ErrorResponse> {
+    val message = "${variablePath(cause)}: ${mismatchedInputMessage(cause)}"
+    log.info("Mismatched input: {}", e.message)
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = message,
+          developerMessage = cause.originalMessage,
+        ),
+      )
+  }
+
+  private fun mismatchedInputMessage(cause: MismatchedInputException): String {
+    if (cause.message?.contains("missing", ignoreCase = true) == true) {
+      return "is required"
+    }
+
+    return when (cause.targetType) {
+      LocalDate::class.java -> "should be a date in format yyyy-MM-dd"
+      Boolean::class.java -> "should be a boolean true|false"
+      else -> "is invalid"
+    }
   }
 
   private fun variablePath(cause: MismatchedInputException) =

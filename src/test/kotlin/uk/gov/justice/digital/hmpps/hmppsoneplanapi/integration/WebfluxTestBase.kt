@@ -8,10 +8,16 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.JsonConfig
 
 @WebFluxTest
 @ActiveProfiles("test")
-@Import(JwtAuthTestOverride::class)
+@Import(
+  value = [
+    JwtAuthTestOverride::class,
+    JsonConfig::class,
+  ],
+)
 abstract class WebfluxTestBase {
 
   @Autowired

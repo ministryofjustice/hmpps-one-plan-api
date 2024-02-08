@@ -197,7 +197,7 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
-    @RequestBody updateStepRequest: UpdateStepRequest,
+    @RequestBody @Valid updateStepRequest: UpdateStepRequest,
   ): StepEntity {
     return service.updateStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference, updateStepRequest)
   }

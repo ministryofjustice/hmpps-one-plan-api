@@ -9,6 +9,8 @@ data class CreateStepRequest(
   @field:Size(min = 1, max = 512)
   val description: String,
   val stepOrder: Int,
+  @field:NotBlank
+  @field:Size(min = 1, max = 50)
   val status: String,
 ) {
   fun buildEntity(objectiveId: UUID): StepEntity = StepEntity(

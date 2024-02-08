@@ -40,6 +40,30 @@ class StepControllerValidationTests : WebfluxTestBase() {
     }
   }
 
+  @Test
+  fun `Post - 400 when status field is too long`() {
+    val body = createRequestBuilder(status = "B".repeat(51))
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("status: size must be between 1 and 50")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when status field is null`() {
+    val body = createRequestBuilder(status = null)
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("status: is required")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when status field is blank`() {
+    val body = createRequestBuilder(status = "\n   ")
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("status: must not be blank")
+    }
+  }
+
   private fun createRequestBuilder(
     description: String? = "description",
     stepOrder: String? = "1",

@@ -26,6 +26,8 @@ data class StepEntity(
   val description: String,
   val stepOrder: Int,
   val status: String,
+  val staffNote: String?,
+  val staffTask: Boolean,
 
   @InsertOnlyProperty
   @CreatedBy

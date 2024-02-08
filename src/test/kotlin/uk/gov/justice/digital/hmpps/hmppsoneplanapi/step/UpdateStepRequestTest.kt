@@ -12,19 +12,25 @@ class UpdateStepRequestTest {
       description = "desc",
       stepOrder = 1,
       status = "status",
+      staffNote = "Notational",
+      staffTask = true,
     )
 
     val updated = UpdateStepRequest(
-      "desc2",
-      2,
-      "status2",
-      "reason for change",
+      description = "desc2",
+      stepOrder = 2,
+      status = "status2",
+      reasonForChange = "reason for change",
+      staffNote = null,
+      staffTask = false,
     ).updateEntity(original)
 
     assertThat(updated.objectiveId).isEqualTo(original.objectiveId)
     assertThat(updated.status).isEqualTo("status2")
     assertThat(updated.stepOrder).isEqualTo(2)
     assertThat(updated.description).isEqualTo("desc2")
+    assertThat(updated.staffNote).isNull()
+    assertThat(updated.staffTask).isFalse()
     assertThat(updated.isNew).describedAs("Should be flagged as an update").isFalse()
   }
 }

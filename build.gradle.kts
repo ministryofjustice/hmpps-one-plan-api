@@ -19,6 +19,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+  implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
@@ -34,6 +35,8 @@ dependencies {
   testImplementation("org.assertj:assertj-core:3.25.2")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.4")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.4")
+  testImplementation("io.mockk:mockk:1.13.9")
+  testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 kotlin {

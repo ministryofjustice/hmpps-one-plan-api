@@ -24,10 +24,10 @@ data class ObjectiveEntity(
   val reference: UUID = UUID.randomUUID(),
 
   val title: String,
-  val targetCompletionDate: LocalDate,
+  val targetCompletionDate: LocalDate?,
   val status: String,
-  val note: String,
-  val outcome: String,
+  val note: String?,
+  val outcome: String?,
 
   @InsertOnlyProperty
   @CreatedBy

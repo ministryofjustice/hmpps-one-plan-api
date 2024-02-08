@@ -1,30 +1,79 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.config
 
-import jakarta.validation.ValidationException
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import org.slf4j.LoggerFactory
+import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.server.ServerWebInputException
+import java.time.LocalDate
+import java.util.Locale
 
 @RestControllerAdvice
-class HmppsOnePlanApiExceptionHandler {
-  @ExceptionHandler(ValidationException::class)
-  fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity
-    .status(BAD_REQUEST)
-    .body(
-      ErrorResponse(
-        status = BAD_REQUEST,
-        userMessage = "Validation failure: ${e.message}",
-        developerMessage = e.message,
-      ),
-    ).also { log.info("Validation exception: {}", e.message) }
+class HmppsOnePlanApiExceptionHandler(
+  private val messageSource: MessageSource,
+) {
+
+  @ExceptionHandler(ServerWebInputException::class)
+  fun handleMissingParameter(e: ServerWebInputException): ResponseEntity<ErrorResponse> {
+    val cause = e.cause?.cause
+    if (cause is MismatchedInputException && cause.message?.contains("non-nullable") == true) {
+      val message = "${variablePath(cause)}: is required"
+      return ResponseEntity
+        .status(BAD_REQUEST)
+        .body(
+          ErrorResponse(
+            status = BAD_REQUEST,
+            userMessage = message,
+            developerMessage = message,
+          ),
+        ).also { log.info("Missing value: {}", e.message) }
+    } else if (cause is InvalidFormatException && cause.targetType == LocalDate::class.java) {
+      val message = "${variablePath(cause)}: should be a date in format yyyy-MM-dd"
+      return ResponseEntity
+        .status(BAD_REQUEST)
+        .body(
+          ErrorResponse(
+            status = BAD_REQUEST,
+            userMessage = message,
+            developerMessage = message,
+          ),
+        ).also { log.info("Bad date: {}", e.message) }
+    }
+    return handleResponseStatusException(e)
+  }
+
+  private fun variablePath(cause: MismatchedInputException) =
+    cause.path.joinToString(".") { it.fieldName }
+
+  @ExceptionHandler(WebExchangeBindException::class)
+  fun handleValidationException(e: WebExchangeBindException): ResponseEntity<ErrorResponse> {
+    if (e.reason != "Validation failure") {
+      return handleResponseStatusException(e)
+    }
+    val message: String = e.bindingResult.fieldErrors
+      .joinToString { fe -> "${fe.field}: ${messageSource.getMessage(fe, Locale.getDefault())}" }
+
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = message,
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Validation exception: {}", e.message) }
+  }
 
   @ExceptionHandler(ResponseStatusException::class)
-  suspend fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ErrorResponse> = ResponseEntity
+  fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ErrorResponse> = ResponseEntity
     .status(e.statusCode)
     .body(
       ErrorResponse(

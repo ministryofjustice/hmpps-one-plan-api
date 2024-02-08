@@ -5,15 +5,16 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
@@ -21,7 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import java.util.UUID
 
 @RestController
-@RequestMapping
+@Validated
 @Tag(name = "Objective", description = "Manage Objectives")
 class ObjectiveController(private val service: ObjectiveService) {
 
@@ -54,7 +55,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   suspend fun createObjective(
     @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "reference") planReference: UUID,
-    @RequestBody request: CreateObjectiveRequest,
+    @RequestBody @Valid request: CreateObjectiveRequest,
   ): CreateEntityResponse {
     val entity = service.createObjective(PlanKey(crn, planReference), request)
     return CreateEntityResponse(entity.reference)
@@ -154,7 +155,7 @@ class ObjectiveController(private val service: ObjectiveService) {
     @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody request: UpdateObjectiveRequest,
+    @RequestBody @Valid request: UpdateObjectiveRequest,
   ): ObjectiveEntity {
     return service.updateObjective(ObjectiveKey(crn, planReference, objectiveReference), request)
   }

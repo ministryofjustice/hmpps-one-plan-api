@@ -15,13 +15,20 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Autowired
   private lateinit var databaseClient: DatabaseClient
 
-  val requestBody = """
+  private val requestBody = """
         {
                 "title":"title",
                 "targetCompletionDate": "2024-02-01",
                 "status":"status",
                 "note":"note",
                 "outcome":"outcome"
+        }
+  """.trimIndent()
+
+  private val minimalRequestBody = """
+        {
+                "title":"title",
+                "status":"status"
         }
   """.trimIndent()
 
@@ -33,6 +40,21 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .uri("/person/{crn}/plans/{pReference}/objectives", crn, planReference)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(requestBody)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.reference").value { ref: String -> assertThat(ref).hasSize(36) }
+  }
+
+  @Test
+  fun `Creates minimal objective on POST`() {
+    val (crn, planReference) = givenAPlan()
+
+    authedWebTestClient.post()
+      .uri("/person/{crn}/plans/{pReference}/objectives", crn, planReference)
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(minimalRequestBody)
       .exchange()
       .expectStatus()
       .isOk()
@@ -83,6 +105,27 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.updatedAt").isNotEmpty()
   }
 
+  @Test
+  fun `GET Minimal objective`() {
+    val planKey = givenAPlan()
+    val objectiveReference = givenAnObjective(planKey = planKey, body = minimalRequestBody)
+
+    getObjective(planKey, objectiveReference)
+      .expectStatus().isOk()
+      .expectBody()
+      .jsonPath("$.id").doesNotExist()
+      .jsonPath("$.title").isEqualTo("title")
+      .jsonPath("$.targetCompletionDate").isEmpty()
+      .jsonPath("$.status").isEqualTo("status")
+      .jsonPath("$.note").isEmpty()
+      .jsonPath("$.outcome").isEmpty()
+      .jsonPath("$.reference").isEqualTo(objectiveReference.toString())
+      .jsonPath("$.createdBy").isEqualTo("test-user")
+      .jsonPath("$.createdAt").isNotEmpty()
+      .jsonPath("$.updatedBy").isEqualTo("test-user")
+      .jsonPath("$.updatedAt").isNotEmpty()
+  }
+
   private fun getObjective(
     planKey: PlanKey,
     objectiveReference: UUID,
@@ -94,11 +137,11 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       objectiveReference,
     ).exchange()
 
-  fun givenAnObjective(planKey: PlanKey): UUID {
+  fun givenAnObjective(planKey: PlanKey, body: String = requestBody): UUID {
     val exchangeResult = authedWebTestClient.post()
       .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(requestBody)
+      .bodyValue(body)
       .exchange()
       .expectStatus().isOk()
       .expectBody(CreateEntityResponse::class.java)
@@ -172,13 +215,44 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val reasonForChangeOnHistoryRecord =
       databaseClient.sql(
         """ select reason_for_change from objective_history where objective_id =
-        | (select objective_id from objective where reference = :reference)
+        | (select id from objective where reference = :reference)
         """.trimMargin(),
       )
         .bind("reference", objectiveReference)
         .fetch().one().map { it["reason_for_change"] as String }.block()
 
     assertThat(reasonForChangeOnHistoryRecord).isEqualTo("reason for change")
+  }
+
+  @Test
+  fun `PUT with minimal update body`() {
+    val planKey = givenAPlan()
+    val objectiveReference = givenAnObjective(planKey)
+    val minimalUpdateBody = """
+        {
+                "title":"title",
+                "status":"status",
+                "reasonForChange": "Just felt like it"
+        }
+    """.trimIndent()
+
+    authedWebTestClient.put()
+      .uri(
+        "/person/{crn}/plans/{pReference}/objectives/{obj}",
+        planKey.caseReferenceNumber,
+        planKey.reference,
+        objectiveReference,
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(minimalUpdateBody)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.title").isEqualTo("title")
+      .jsonPath("$.targetCompletionDate").isEmpty()
+      .jsonPath("$.note").isEmpty()
+      .jsonPath("$.outcome").isEmpty()
   }
 
   @Test

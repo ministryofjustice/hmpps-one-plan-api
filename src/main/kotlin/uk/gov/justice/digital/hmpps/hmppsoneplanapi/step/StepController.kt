@@ -5,8 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,6 +25,7 @@ import java.util.UUID
 @RestController
 @RequestMapping
 @Tag(name = "Steps", description = "Manage Steps")
+@Validated
 class StepController(private val service: StepService) {
   @Operation(
     summary = "Create a Step for a given Objective, that's part of a given Plan",
@@ -59,7 +62,7 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody request: CreateStepRequest,
+    @RequestBody @Valid request: CreateStepRequest,
   ): CreateEntityResponse {
     val entity = service.createStep(ObjectiveKey(crn, planReference, objectiveReference), request)
     return CreateEntityResponse(entity.reference)

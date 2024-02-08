@@ -96,14 +96,6 @@ class StepControllerValidationTests : WebfluxTestBase() {
       assertThat(it.userMessage).isEqualTo("staffNote: size must be between 0 and 512")
     }
   }
-
-  @Test
-  fun `Put - 400 when description field is too long`() {
-    val body = createRequestBuilder(description = "B".repeat(513))
-    post(body).value {
-      assertThat(it.userMessage).isEqualTo("description: size must be between 1 and 512")
-    }
-  }
   // </editor-fold>
 
   private fun createRequestBuilder(
@@ -136,6 +128,14 @@ class StepControllerValidationTests : WebfluxTestBase() {
       .expectBody(ErrorResponse::class.java)
 
   // <editor-fold desc="PUT">
+  @Test
+  fun `Put - 400 when description field is too long`() {
+    val body = updateRequestBuilder(description = "B".repeat(513))
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("description: size must be between 1 and 512")
+    }
+  }
+
   @Test
   fun `Put - 400 when description field is null`() {
     val body = updateRequestBuilder(description = null)
@@ -205,6 +205,30 @@ class StepControllerValidationTests : WebfluxTestBase() {
     val body = updateRequestBuilder(staffNote = "C".repeat(513))
     put(body).value {
       assertThat(it.userMessage).isEqualTo("staffNote: size must be between 0 and 512")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when reasonForChange field is too long`() {
+    val body = updateRequestBuilder(reasonForChange = "C".repeat(251))
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: size must be between 1 and 250")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when reasonForChange field is null`() {
+    val body = updateRequestBuilder(reasonForChange = null)
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: is required")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when reasonForChange field is blank`() {
+    val body = updateRequestBuilder(reasonForChange = "\n   ")
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: must not be blank")
     }
   }
   // </editor-fold>

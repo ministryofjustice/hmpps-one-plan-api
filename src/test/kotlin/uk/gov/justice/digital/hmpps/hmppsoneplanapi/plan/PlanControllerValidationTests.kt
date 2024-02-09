@@ -28,6 +28,18 @@ class PlanControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
+  fun `400 on POST when plan type is missing`() {
+    post("crn123", requestBuilder(type = null))
+      .value { assertThat(it.userMessage).isEqualTo("planType: is required") }
+  }
+
+  @Test
+  fun `400 on POST when plan type is not one of the allowed values`() {
+    post("crn123", requestBuilder(type = "ICE_CREAM"))
+      .value { assertThat(it.userMessage).isEqualTo("planType: should be one of [PERSONAL_LEARNING, SENTENCE, RESETTLEMENT]") }
+  }
+
+  @Test
   fun `400 on GET when UUID is invalid`() {
     authedWebTestClient.get()
       .uri("/person/123/plans/not-a-uuid")

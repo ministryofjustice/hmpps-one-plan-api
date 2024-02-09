@@ -78,9 +78,11 @@ class HmppsOnePlanApiExceptionHandler(
       return "is required"
     }
 
-    return when (cause.targetType) {
-      LocalDate::class.java -> "should be a date in format yyyy-MM-dd"
-      Boolean::class.java -> "should be a boolean true|false"
+    val type = cause.targetType
+    return when {
+      type == LocalDate::class.java -> "should be a date in format yyyy-MM-dd"
+      type == Boolean::class.java -> "should be a boolean true|false"
+      type.isEnum -> "should be one of [${type.enumConstants.joinToString { it.toString() }}]"
       else -> "is invalid"
     }
   }

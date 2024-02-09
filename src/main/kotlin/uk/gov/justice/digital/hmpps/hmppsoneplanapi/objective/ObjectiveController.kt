@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.Crn
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import java.util.UUID
@@ -54,7 +55,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   )
   @PostMapping("/person/{crn}/plans/{reference}/objectives")
   suspend fun createObjective(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "reference") planReference: UUID,
     @RequestBody @Valid request: CreateObjectiveRequest,
   ): CreateEntityResponse {
@@ -88,7 +89,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   )
   @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}")
   suspend fun getObjective(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): ObjectiveEntity {
@@ -121,7 +122,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   )
   @GetMapping("/person/{crn}/plans/{planReference}/objectives")
   suspend fun getObjectives(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
   ): Flow<ObjectiveEntity> {
     return service.getObjectives(PlanKey(crn, planReference))
@@ -153,7 +154,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   )
   @PutMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}")
   suspend fun putObjective(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody @Valid request: UpdateObjectiveRequest,
@@ -189,7 +190,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   suspend fun deleteObjective(
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
   ): ResponseEntity<Nothing> {
     service.deleteObjective(ObjectiveKey(crn, planReference, objectiveReference))
     return ResponseEntity.noContent().build()

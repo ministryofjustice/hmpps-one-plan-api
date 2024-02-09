@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.Crn
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import java.util.UUID
@@ -60,7 +61,7 @@ class StepController(private val service: StepService) {
   )
   @PostMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")
   suspend fun createStep(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody @Valid request: CreateStepRequest,
@@ -95,7 +96,7 @@ class StepController(private val service: StepService) {
   )
   @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun getStep(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
@@ -128,7 +129,7 @@ class StepController(private val service: StepService) {
   )
   @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")
   suspend fun getSteps(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
   ): Flow<StepEntity> = service.getSteps(ObjectiveKey(crn, planReference, objectiveReference))
@@ -159,7 +160,7 @@ class StepController(private val service: StepService) {
   )
   @DeleteMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun deleteStep(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
@@ -194,7 +195,7 @@ class StepController(private val service: StepService) {
   )
   @PutMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun updateStep(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.Crn
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import java.util.UUID
 
@@ -48,7 +49,7 @@ class PlanController(private val planService: PlanService) {
   )
   @PostMapping("/person/{crn}/plans")
   suspend fun createPlan(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @RequestBody planRequest: CreatePlanRequest,
   ): CreateEntityResponse {
     val entity = planService.createPlan(crn, planRequest)
@@ -81,7 +82,7 @@ class PlanController(private val planService: PlanService) {
   )
   @GetMapping("/person/{crn}/plans/{planReference}")
   suspend fun getPlan(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") planReference: UUID,
   ): PlanEntity? {
     return planService.getByKey(PlanKey(crn, planReference))
@@ -108,7 +109,7 @@ class PlanController(private val planService: PlanService) {
   )
   @GetMapping("/person/{crn}/plans")
   suspend fun getAllPlans(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
   ): Flow<PlanEntity> {
     return planService.findAllByCrn(crn)
   }
@@ -139,7 +140,7 @@ class PlanController(private val planService: PlanService) {
   )
   @DeleteMapping("/person/{crn}/plans/{planReference}")
   suspend fun deletePlan(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @PathVariable(value = "planReference") reference: UUID,
   ): ResponseEntity<Nothing> {
     planService.markPlanDeleted(crn, reference)

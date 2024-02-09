@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.config
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
@@ -29,7 +30,10 @@ class HmppsOnePlanApiExceptionHandler(
     }
   }
 
-  private fun handleMismatchedInputCause(e: ServerWebInputException, cause: MismatchedInputException): ResponseEntity<ErrorResponse> {
+  private fun handleMismatchedInputCause(
+    e: ServerWebInputException,
+    cause: MismatchedInputException,
+  ): ResponseEntity<ErrorResponse> {
     val message = "${variablePath(cause)}: ${mismatchedInputMessage(cause)}"
     log.info("Mismatched input: {}", e.message)
     return ResponseEntity
@@ -59,7 +63,7 @@ class HmppsOnePlanApiExceptionHandler(
     cause.path.joinToString(".") { it.fieldName }
 
   @ExceptionHandler(WebExchangeBindException::class)
-  fun handleValidationException(e: WebExchangeBindException): ResponseEntity<ErrorResponse> {
+  fun handleBindValidationException(e: WebExchangeBindException): ResponseEntity<ErrorResponse> {
     if (e.reason != "Validation failure") {
       return handleResponseStatusException(e)
     }
@@ -75,6 +79,22 @@ class HmppsOnePlanApiExceptionHandler(
           developerMessage = e.message,
         ),
       ).also { log.info("Validation exception: {}", e.message) }
+  }
+
+  @ExceptionHandler(ConstraintViolationException::class)
+  fun handleConstraintViolationException(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
+    val message = e.constraintViolations.joinToString { violation ->
+      "${violation.propertyPath.drop(1).joinToString(".") { it.name }}: ${violation.message}"
+    }
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = message,
+          developerMessage = e.message,
+        ),
+      ).also { log.info("Validation exception: {}", e.message, e) }
   }
 
   @ExceptionHandler(ResponseStatusException::class)

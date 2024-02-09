@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,7 +24,8 @@ import java.util.UUID
 @RestController
 @RequestMapping
 @Tag(name = "Plan", description = "Manage plans")
-class PlanController(private val planRepository: PlanRepository, private val planService: PlanService) {
+@Validated
+class PlanController(private val planService: PlanService) {
 
   @Operation(
     summary = "Create a Plan for the person identified by the given CRN (Case Reference Number)",
@@ -45,15 +49,10 @@ class PlanController(private val planRepository: PlanRepository, private val pla
   )
   @PostMapping("/person/{crn}/plans")
   suspend fun createPlan(
-    @PathVariable(value = "crn") crn: String,
+    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
     @RequestBody planRequest: CreatePlanRequest,
   ): CreateEntityResponse {
-    val entity = planRepository.save(
-      PlanEntity(
-        type = planRequest.planType,
-        caseReferenceNumber = crn,
-      ),
-    )
+    val entity = planService.createPlan(crn, planRequest)
     return CreateEntityResponse(entity.reference)
   }
 
@@ -112,7 +111,7 @@ class PlanController(private val planRepository: PlanRepository, private val pla
   suspend fun getAllPlans(
     @PathVariable(value = "crn") crn: String,
   ): Flow<PlanEntity> {
-    return planRepository.findByCaseReferenceNumberAndIsDeletedIsFalse(crn)
+    return planService.findAllByCrn(crn)
   }
 
   @Operation(
@@ -144,10 +143,7 @@ class PlanController(private val planRepository: PlanRepository, private val pla
     @PathVariable(value = "crn") crn: String,
     @PathVariable(value = "reference") reference: UUID,
   ): ResponseEntity<Nothing> {
-    val countUpdated = planRepository.updateMarkDeleted(crn, reference)
-    if (countUpdated != 1) {
-      throw planNotFound(crn, reference)
-    }
+    planService.markPlanDeleted(crn, reference)
     return ResponseEntity.noContent().build()
   }
 }

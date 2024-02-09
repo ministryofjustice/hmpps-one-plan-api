@@ -21,7 +21,9 @@ class StepControllerTest : IntegrationTestBase() {
         {
                 "description":"description",
                 "stepOrder": 1,
-                "status": "status"
+                "status": "status",
+                "staffTask": false,
+                "staffNote": "staff note"
         }
   """.trimIndent()
 
@@ -58,6 +60,8 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.isDeleted").doesNotExist()
       .jsonPath("$.description").isEqualTo("description")
       .jsonPath("$.status").isEqualTo("status")
+      .jsonPath("$.staffTask").isEqualTo(false)
+      .jsonPath("$.staffNote").isEqualTo("staff note")
       .jsonPath("$.stepOrder").isEqualTo(1)
       .jsonPath("$.reference").isEqualTo(stepRef.toString())
       .jsonPath("$.createdBy").isEqualTo("test-user")
@@ -241,7 +245,8 @@ class StepControllerTest : IntegrationTestBase() {
             "description":"description2",
             "stepOrder": 2,
             "status": "status2",
-            "reasonForChange": "reason for change"
+            "reasonForChange": "reason for change",
+            "staffTask": true
           }
         """.trimIndent(),
       )
@@ -252,6 +257,7 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.description").isEqualTo("description2")
       .jsonPath("$.stepOrder").isEqualTo(2)
       .jsonPath("$.status").isEqualTo("status2")
+      .jsonPath("$.staffTask").isEqualTo(true)
 
     val reasonForChangeOnHistoryRecord =
       databaseClient.sql(
@@ -282,7 +288,8 @@ class StepControllerTest : IntegrationTestBase() {
             "description":"description2",
             "stepOrder": 2,
             "status": "status2",
-            "reasonForChange": "a reason"
+            "reasonForChange": "a reason",
+            "staffTask": false
           }
         """.trimIndent(),
       )

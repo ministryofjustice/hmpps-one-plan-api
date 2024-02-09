@@ -80,12 +80,12 @@ class PlanController(private val planService: PlanService) {
       ),
     ],
   )
-  @GetMapping("/person/{crn}/plans/{reference}")
+  @GetMapping("/person/{crn}/plans/{planReference}")
   suspend fun getPlan(
     @PathVariable(value = "crn") crn: String,
-    @PathVariable(value = "reference") reference: UUID,
+    @PathVariable(value = "planReference") planReference: UUID,
   ): PlanEntity? {
-    return planService.getByKey(PlanKey(crn, reference))
+    return planService.getByKey(PlanKey(crn, planReference))
   }
 
   @Operation(
@@ -138,10 +138,10 @@ class PlanController(private val planService: PlanService) {
       ),
     ],
   )
-  @DeleteMapping("/person/{crn}/plans/{reference}")
+  @DeleteMapping("/person/{crn}/plans/{planReference}")
   suspend fun deletePlan(
     @PathVariable(value = "crn") crn: String,
-    @PathVariable(value = "reference") reference: UUID,
+    @PathVariable(value = "planReference") reference: UUID,
   ): ResponseEntity<Nothing> {
     planService.markPlanDeleted(crn, reference)
     return ResponseEntity.noContent().build()

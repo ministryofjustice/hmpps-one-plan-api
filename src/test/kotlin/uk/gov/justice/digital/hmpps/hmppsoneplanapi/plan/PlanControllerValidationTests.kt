@@ -27,6 +27,19 @@ class PlanControllerValidationTests : WebfluxTestBase() {
       .value { assertThat(it.userMessage).isEqualTo("crn: must not be blank") }
   }
 
+  @Test
+  fun `400 on GET when UUID is invalid`() {
+    authedWebTestClient.get()
+      .uri("/person/123/plans/not-a-uuid")
+      .exchange()
+      .expectStatus()
+      .isBadRequest()
+      .expectBody(ErrorResponse::class.java)
+      .value {
+        assertThat(it.userMessage).isEqualTo("planReference: should be a valid UUID")
+      }
+  }
+
   private fun requestBuilder(type: Any? = "PERSONAL_LEARNING"): String =
     objectMapper.writeValueAsString(
       mapOf(

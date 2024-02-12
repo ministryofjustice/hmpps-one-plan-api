@@ -70,8 +70,8 @@ Authorization: Bearer {{auth_token}}
 
 {
   "description":"description",
-  "stepOrder": 1,
-  "status": "status"
+  "status": "status",
+  "staffTask": false
 }
 > {% client.global.set("stepReference", response.body["reference"]); %}
 
@@ -86,7 +86,7 @@ Authorization: Bearer {{auth_token}}
 
 {
   "description":"description2",
-  "stepOrder": 2,
   "status": "status2",
+  "staffTask": false,
   "reasonForChange": "2"
 }

@@ -9,7 +9,7 @@ import java.util.UUID
 interface StepRepository : CoroutineCrudRepository<StepEntity, UUID> {
   suspend fun findByReferenceAndObjectiveIdAndIsDeletedIsFalse(reference: UUID, objectiveId: UUID): StepEntity?
 
-  suspend fun findAllByObjectiveIdAndIsDeletedIsFalse(objectiveId: UUID): Flow<StepEntity>
+  suspend fun findAllByObjectiveIdAndIsDeletedIsFalseOrderByStepOrder(objectiveId: UUID): Flow<StepEntity>
 
   @Modifying
   @Query(
@@ -23,4 +23,11 @@ interface StepRepository : CoroutineCrudRepository<StepEntity, UUID> {
     objectiveId: UUID,
     stepReference: UUID,
   ): Int
+
+  @Query(
+    """
+      select coalesce((select max(step_order) + 1 from step where objective_id = :objectiveId), 1)
+    """,
+  )
+  suspend fun nextStepId(objectiveId: UUID): Int
 }

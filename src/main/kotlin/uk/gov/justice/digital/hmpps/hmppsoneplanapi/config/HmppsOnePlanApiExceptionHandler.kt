@@ -147,7 +147,7 @@ class HmppsOnePlanApiExceptionHandler(
         userMessage = "unexpected error, please retry",
         developerMessage = e.message,
       ),
-    ).also { log.info("Duplicate status exception, {}", e.message) }
+    ).also { log.info("Duplicate key exception, {}", e.message) }
 
   @ExceptionHandler(Exception::class)
   fun handleException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity

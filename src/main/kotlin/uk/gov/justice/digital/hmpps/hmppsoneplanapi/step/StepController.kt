@@ -57,6 +57,11 @@ class StepController(private val service: StepService) {
         description = "Plan or Objective not found",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
+      ApiResponse(
+        responseCode = "418",
+        description = "Unique constraint violation, please retry",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
   )
   @PostMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")

@@ -1,9 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.step
 
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.coEvery
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.dao.DuplicateKeyException
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
@@ -268,4 +271,19 @@ class StepControllerValidationTests : WebfluxTestBase() {
       .expectStatus()
       .isBadRequest()
       .expectBody(ErrorResponse::class.java)
+
+  @Test
+  fun `422 when a unique constraint violation happens`() {
+    coEvery { stepService.createStep(any(), any()) }.throws(DuplicateKeyException("No!"))
+
+    authedWebTestClient.post()
+      .uri("/person/123/plans/{ref}/objectives/{oRef}/steps", UUID.randomUUID(), UUID.randomUUID())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(createRequestBuilder())
+      .exchange()
+      .expectStatus()
+      .isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+      .expectBody(ErrorResponse::class.java)
+      .value { assertThat(it.userMessage).isEqualTo("unexpected error, please retry") }
+  }
 }

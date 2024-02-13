@@ -5,9 +5,11 @@ import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
 import org.springframework.context.MessageSource
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -135,6 +137,17 @@ class HmppsOnePlanApiExceptionHandler(
         developerMessage = e.message,
       ),
     ).also { log.info("Response status exception, {}", e.message, e) }
+
+  @ExceptionHandler(DuplicateKeyException::class)
+  fun handleDuplicateKeyException(e: DuplicateKeyException): ResponseEntity<ErrorResponse> = ResponseEntity
+    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+    .body(
+      ErrorResponse(
+        status = UNPROCESSABLE_ENTITY.value(),
+        userMessage = "unexpected error, please retry",
+        developerMessage = e.message,
+      ),
+    ).also { log.info("Duplicate key exception, {}", e.message) }
 
   @ExceptionHandler(Exception::class)
   fun handleException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity

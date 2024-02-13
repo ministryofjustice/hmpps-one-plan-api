@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveService
@@ -18,9 +19,11 @@ class StepService(
   private val stepRepository: StepRepository,
   private val objectMapper: ObjectMapper,
 ) {
+  @Transactional
   suspend fun createStep(objectiveKey: ObjectiveKey, request: CreateStepRequest): StepEntity {
     val objective = objectiveService.getObjective(objectiveKey)
-    val step = request.buildEntity(objective.id)
+    val stepOrder = stepRepository.nextStepId(objective.id)
+    val step = request.buildEntity(objective.id, stepOrder)
     return entityTemplate.insert(step).awaitSingle()
   }
 
@@ -32,7 +35,7 @@ class StepService(
 
   suspend fun getSteps(objectiveKey: ObjectiveKey): Flow<StepEntity> {
     val objective = objectiveService.getObjective(objectiveKey)
-    return stepRepository.findAllByObjectiveIdAndIsDeletedIsFalse(objective.id)
+    return stepRepository.findAllByObjectiveIdAndIsDeletedIsFalseOrderByStepOrder(objective.id)
   }
 
   suspend fun deleteStep(objectiveKey: ObjectiveKey, stepReference: UUID) {

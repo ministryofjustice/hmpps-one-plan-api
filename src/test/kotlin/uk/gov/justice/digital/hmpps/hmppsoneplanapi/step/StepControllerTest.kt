@@ -20,7 +20,6 @@ class StepControllerTest : IntegrationTestBase() {
   val requestBody = """
         {
                 "description":"description",
-                "stepOrder": 1,
                 "status": "status",
                 "staffTask": false,
                 "staffNote": "staff note"
@@ -122,13 +121,14 @@ class StepControllerTest : IntegrationTestBase() {
     val stepReferenceB = givenAStep(objectiveKey)
 
     getAllSteps(objectiveKey)
-      .expectBody()
-      .jsonPath("$.[*].reference")
-      .value { refs: List<String> ->
-        assertThat(refs)
-          .containsExactlyInAnyOrder(stepReferenceA.toString(), stepReferenceB.toString())
-      }
+      .expectBodyList(RefAndStepOrder::class.java)
+      .contains(
+        RefAndStepOrder(stepReferenceA.toString(), 1),
+        RefAndStepOrder(stepReferenceB.toString(), 2),
+      )
   }
+
+  data class RefAndStepOrder(val reference: String, val stepOrder: Int)
 
   @Test
   fun `GET All Steps gives empty array when none are created`() {
@@ -243,7 +243,6 @@ class StepControllerTest : IntegrationTestBase() {
         """
           {
             "description":"description2",
-            "stepOrder": 2,
             "status": "status2",
             "reasonForChange": "reason for change",
             "staffTask": true
@@ -255,7 +254,7 @@ class StepControllerTest : IntegrationTestBase() {
       .isOk()
       .expectBody()
       .jsonPath("$.description").isEqualTo("description2")
-      .jsonPath("$.stepOrder").isEqualTo(2)
+      .jsonPath("$.stepOrder").isEqualTo(1)
       .jsonPath("$.status").isEqualTo("status2")
       .jsonPath("$.staffTask").isEqualTo(true)
 
@@ -286,7 +285,6 @@ class StepControllerTest : IntegrationTestBase() {
         """
           {
             "description":"description2",
-            "stepOrder": 2,
             "status": "status2",
             "reasonForChange": "a reason",
             "staffTask": false

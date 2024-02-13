@@ -37,6 +37,12 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.4")
   testImplementation("io.mockk:mockk:1.13.9")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
+
+  constraints {
+    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3") {
+      because("CVE-2023-52428")
+    }
+  }
 }
 
 kotlin {

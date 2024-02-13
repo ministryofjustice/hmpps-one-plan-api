@@ -18,7 +18,6 @@ class UpdateStepRequestTest {
 
     val updated = UpdateStepRequest(
       description = "desc2",
-      stepOrder = 2,
       status = "status2",
       reasonForChange = "reason for change",
       staffNote = null,
@@ -27,7 +26,7 @@ class UpdateStepRequestTest {
 
     assertThat(updated.objectiveId).isEqualTo(original.objectiveId)
     assertThat(updated.status).isEqualTo("status2")
-    assertThat(updated.stepOrder).isEqualTo(2)
+    assertThat(updated.stepOrder).isEqualTo(1)
     assertThat(updated.description).isEqualTo("desc2")
     assertThat(updated.staffNote).isNull()
     assertThat(updated.staffTask).isFalse()

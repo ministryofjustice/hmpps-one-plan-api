@@ -96,7 +96,7 @@ class StepControllerTest : IntegrationTestBase() {
       .isNotFound()
   }
 
-  fun givenAStep(objectiveKey: ObjectiveKey): UUID {
+  fun givenAStep(objectiveKey: ObjectiveKey, body: String = requestBody): UUID {
     val exchangeResult = authedWebTestClient.post()
       .uri(
         "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps",
@@ -105,7 +105,7 @@ class StepControllerTest : IntegrationTestBase() {
         objectiveKey.objectiveReference,
       )
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(requestBody)
+      .bodyValue(body)
       .exchange()
       .expectStatus().isOk()
       .expectBody(CreateEntityResponse::class.java)
@@ -230,26 +230,15 @@ class StepControllerTest : IntegrationTestBase() {
     val objective = givenAnObjective()
     val step = givenAStep(objective)
 
-    authedWebTestClient.put()
-      .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{obj}/steps/{step}",
-        objective.caseReferenceNumber,
-        objective.planReference,
-        objective.objectiveReference,
-        step,
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        """
-          {
-            "description":"description2",
-            "status": "COMPLETED",
-            "reasonForChange": "reason for change",
-            "staffTask": true
-          }
-        """.trimIndent(),
-      )
-      .exchange()
+    val body = """
+                    {
+                      "description":"description2",
+                      "status": "COMPLETED",
+                      "reasonForChange": "reason for change",
+                      "staffTask": true
+                    }
+    """.trimIndent()
+    putStep(objective, step, body)
       .expectStatus()
       .isOk()
       .expectBody()
@@ -269,6 +258,22 @@ class StepControllerTest : IntegrationTestBase() {
 
     assertThat(reasonForChangeOnHistoryRecord).isEqualTo("reason for change")
   }
+
+  private fun putStep(
+    objective: ObjectiveKey,
+    step: UUID,
+    body: String,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.put()
+    .uri(
+      "/person/{crn}/plans/{pReference}/objectives/{obj}/steps/{step}",
+      objective.caseReferenceNumber,
+      objective.planReference,
+      objective.objectiveReference,
+      step,
+    )
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
 
   @Test
   fun `404 on PUT if Step does not exist`() {
@@ -308,5 +313,25 @@ class StepControllerTest : IntegrationTestBase() {
       ).exchange()
       .expectStatus()
       .isUnauthorized()
+  }
+
+  @Test
+  fun `400 When try to update a COMPLETED step`() {
+    val requestBody = """
+        {
+                "description":"a completed step",
+                "status": "COMPLETED",
+                "staffTask": true,
+                "reasonForChange": "This is actually unreasonable"
+        }
+    """.trimIndent()
+    val objectiveKey = givenAnObjective()
+    val stepRef = givenAStep(objectiveKey, requestBody)
+
+    putStep(objectiveKey, stepRef, requestBody)
+      .expectStatus()
+      .isBadRequest()
+      .expectBody()
+      .jsonPath("$.userMessage").isEqualTo("cannot update completed step")
   }
 }

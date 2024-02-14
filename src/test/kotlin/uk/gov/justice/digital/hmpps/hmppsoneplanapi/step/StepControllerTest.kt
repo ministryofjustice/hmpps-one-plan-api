@@ -332,6 +332,6 @@ class StepControllerTest : IntegrationTestBase() {
       .expectStatus()
       .isBadRequest()
       .expectBody()
-      .jsonPath("$.userMessage").isEqualTo("cannot update completed step")
+      .jsonPath("$.userMessage").isEqualTo("cannot update completed Step")
   }
 }

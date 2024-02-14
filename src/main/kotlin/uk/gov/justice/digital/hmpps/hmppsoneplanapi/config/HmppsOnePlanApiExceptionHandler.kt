@@ -156,7 +156,7 @@ class HmppsOnePlanApiExceptionHandler(
     .body(
       ErrorResponse(
         status = BAD_REQUEST.value(),
-        userMessage = "cannot update completed step",
+        userMessage = "cannot update completed ${e.type.simpleName?.removeSuffix("Entity")}",
         developerMessage = e.message,
       ),
     ).also { log.info("Update not allowed: {}", e.message) }

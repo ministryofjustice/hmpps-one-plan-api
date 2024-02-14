@@ -20,7 +20,7 @@ class StepControllerTest : IntegrationTestBase() {
   val requestBody = """
         {
                 "description":"description",
-                "status": "status",
+                "status": "IN_PROGRESS",
                 "staffTask": false,
                 "staffNote": "staff note"
         }
@@ -58,7 +58,7 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.id").doesNotExist()
       .jsonPath("$.isDeleted").doesNotExist()
       .jsonPath("$.description").isEqualTo("description")
-      .jsonPath("$.status").isEqualTo("status")
+      .jsonPath("$.status").isEqualTo("IN_PROGRESS")
       .jsonPath("$.staffTask").isEqualTo(false)
       .jsonPath("$.staffNote").isEqualTo("staff note")
       .jsonPath("$.stepOrder").isEqualTo(1)
@@ -243,7 +243,7 @@ class StepControllerTest : IntegrationTestBase() {
         """
           {
             "description":"description2",
-            "status": "status2",
+            "status": "COMPLETED",
             "reasonForChange": "reason for change",
             "staffTask": true
           }
@@ -255,7 +255,7 @@ class StepControllerTest : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$.description").isEqualTo("description2")
       .jsonPath("$.stepOrder").isEqualTo(1)
-      .jsonPath("$.status").isEqualTo("status2")
+      .jsonPath("$.status").isEqualTo("COMPLETED")
       .jsonPath("$.staffTask").isEqualTo(true)
 
     val reasonForChangeOnHistoryRecord =
@@ -285,7 +285,7 @@ class StepControllerTest : IntegrationTestBase() {
         """
           {
             "description":"description2",
-            "status": "status2",
+            "status": "COMPLETED",
             "reasonForChange": "a reason",
             "staffTask": false
           }

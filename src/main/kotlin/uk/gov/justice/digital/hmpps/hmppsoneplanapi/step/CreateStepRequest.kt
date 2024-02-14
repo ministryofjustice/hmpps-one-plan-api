@@ -8,9 +8,7 @@ data class CreateStepRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 512)
   val description: String,
-  @field:NotBlank
-  @field:Size(min = 1, max = 50)
-  val status: String,
+  val status: StepStatus,
   @field:Size(min = 0, max = 512)
   val staffNote: String?,
   val staffTask: Boolean,

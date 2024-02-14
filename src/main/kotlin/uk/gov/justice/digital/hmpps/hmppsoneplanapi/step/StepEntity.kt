@@ -25,7 +25,7 @@ data class StepEntity(
 
   val description: String,
   val stepOrder: Int,
-  val status: String,
+  val status: StepStatus,
   val staffNote: String?,
   val staffTask: Boolean,
 
@@ -55,4 +55,9 @@ data class StepEntity(
     isNew = false
     return this
   }
+}
+
+enum class StepStatus {
+  IN_PROGRESS,
+  COMPLETED,
 }

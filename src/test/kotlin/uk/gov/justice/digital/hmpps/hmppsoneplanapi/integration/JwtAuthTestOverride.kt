@@ -29,7 +29,7 @@ class JwtAuthTestOverride {
       subject = "test-user",
       scope = listOf(),
       expiryTime = Duration.ofHours(1L),
-      roles = listOf(),
+      roles = listOf("ROLE_ONE_PLAN_EDIT"),
     )
     return "Bearer $token"
   }

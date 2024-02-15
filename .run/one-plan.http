@@ -1,5 +1,5 @@
 ### Get an auth token from local docker hmpps-auth
-POST http://localhost:9090/auth/oauth/token?grant_type=password&username=AUTH_USER&password=password123456
+POST http://localhost:9090/auth/oauth/token?grant_type=password&username=ONE_PLAN_USER&password=password123456
 Authorization: Basic elite2apiclient clientsecret
 
 > {% client.global.set("auth_token", response.body["access_token"]); %}
@@ -37,7 +37,7 @@ Authorization: Bearer {{auth_token}}
 {
   "title":"title",
   "targetCompletionDate": "2024-02-01",
-  "status":"status",
+  "status":"IN_PROGRESS",
   "note":"note",
   "outcome":"outcome"
 }
@@ -56,7 +56,7 @@ Authorization: Bearer {{auth_token}}
 {
   "title":"title2",
   "targetCompletionDate": "2024-02-02",
-  "status":"status2",
+  "status":"COMPLETED",
   "note":"note2",
   "outcome":"outcome2",
   "reasonForChange": "The reason that it changed"
@@ -70,7 +70,7 @@ Authorization: Bearer {{auth_token}}
 
 {
   "description":"description",
-  "status": "status",
+  "status": "IN_PROGRESS",
   "staffTask": false
 }
 > {% client.global.set("stepReference", response.body["reference"]); %}
@@ -86,7 +86,7 @@ Authorization: Bearer {{auth_token}}
 
 {
   "description":"description2",
-  "status": "status2",
+  "status": "COMPLETED",
   "staffTask": false,
   "reasonForChange": "2"
 }

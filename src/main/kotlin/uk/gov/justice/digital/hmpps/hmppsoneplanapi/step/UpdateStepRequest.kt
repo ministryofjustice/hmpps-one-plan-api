@@ -7,9 +7,7 @@ data class UpdateStepRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 512)
   val description: String,
-  @field:NotBlank
-  @field:Size(min = 1, max = 50)
-  val status: String,
+  val status: StepStatus,
   @field:NotBlank
   @field:Size(min = 1, max = 250)
   val reasonForChange: String,

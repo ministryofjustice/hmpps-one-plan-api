@@ -12,6 +12,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.CreateObjectiveRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveStatus
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.CreatePlanRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanType
@@ -87,7 +88,7 @@ abstract class IntegrationTestBase {
     type: PlanType = PlanType.PERSONAL_LEARNING,
     title: String = "title",
     targetCompletionDate: LocalDate = LocalDate.of(2024, 2, 1),
-    status: String = "status",
+    status: ObjectiveStatus = ObjectiveStatus.IN_PROGRESS,
     note: String = "note",
     outcome: String = "outcome",
   ): ObjectiveKey {

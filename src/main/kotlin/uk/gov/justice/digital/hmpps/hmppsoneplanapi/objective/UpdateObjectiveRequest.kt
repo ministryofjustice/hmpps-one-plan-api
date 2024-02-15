@@ -9,9 +9,7 @@ data class UpdateObjectiveRequest(
   @field:Size(min = 1, max = 512)
   val title: String,
   val targetCompletionDate: LocalDate?,
-  @field:NotBlank
-  @field:Size(min = 1, max = 50)
-  val status: String,
+  val status: ObjectiveStatus,
   val note: String?,
   val outcome: String?,
   @field:NotBlank

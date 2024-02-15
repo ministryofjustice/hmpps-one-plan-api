@@ -11,21 +11,21 @@ class UpdateStepRequestTest {
       objectiveId = UUID.randomUUID(),
       description = "desc",
       stepOrder = 1,
-      status = "status",
+      status = StepStatus.IN_PROGRESS,
       staffNote = "Notational",
       staffTask = true,
     )
 
     val updated = UpdateStepRequest(
       description = "desc2",
-      status = "status2",
+      status = StepStatus.COMPLETED,
       reasonForChange = "reason for change",
       staffNote = null,
       staffTask = false,
     ).updateEntity(original)
 
     assertThat(updated.objectiveId).isEqualTo(original.objectiveId)
-    assertThat(updated.status).isEqualTo("status2")
+    assertThat(updated.status).isEqualTo(StepStatus.COMPLETED)
     assertThat(updated.stepOrder).isEqualTo(1)
     assertThat(updated.description).isEqualTo("desc2")
     assertThat(updated.staffNote).isNull()

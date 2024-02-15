@@ -2,10 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import com.ninjasquad.springmockk.MockkBean
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DynamicTest
-import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestFactory
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -19,39 +16,40 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   @MockkBean
   private lateinit var objectiveService: ObjectiveService
 
-  @TestFactory
-  fun `Mandatory string fields`(): Iterable<DynamicTest> {
-    val cases = listOf(
-      postTest("title", 512) { s -> createRequestBuilder(title = s) },
-      postTest("status", 50) { s -> createRequestBuilder(status = s) },
-      putTest("title", 512) { s -> updateRequestBuilder(title = s) },
-      putTest("status", 50) { s -> updateRequestBuilder(status = s) },
-      putTest("reasonForChange", 250) { s -> updateRequestBuilder(reasonForChange = s) },
-    )
-    return cases.flatMap { case ->
-      val (prefix, field, _, jsonBuilder, requestRunner) = case
-      listOf(
-        dynamicTest("$prefix - 400 when $field is too long") {
-          val aLotOfAs = "a".repeat(1000)
-          val body = jsonBuilder(aLotOfAs)
-          requestRunner(body).value {
-            assertThat(it.userMessage).isEqualTo("$field: size must be between 1 and ${case.maxLength}")
-          }
-        },
-        dynamicTest("$prefix - 400 when $field is blank") {
-          val body = jsonBuilder("      \n")
-          requestRunner(body).value {
-            assertThat(it.userMessage).isEqualTo("$field: must not be blank")
-          }
-        },
-        dynamicTest("$prefix - 400 when $field is null") {
-          val body = jsonBuilder(null)
-          requestRunner(body).value {
-            assertThat(it.userMessage).isEqualTo("$field: is required")
-          }
-        },
-      )
+  @Test
+  fun `Post - 400 when title field is too long`() {
+    val body = createRequestBuilder(title = "A".repeat(513))
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("title: size must be between 1 and 512")
     }
+  }
+
+  @Test
+  fun `Post - 400 when title field is null`() {
+    val body = createRequestBuilder(title = null)
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("title: is required")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when title field is blank`() {
+    val body = createRequestBuilder(title = "\n   ")
+    post(body).value {
+      assertThat(it.userMessage).isEqualTo("title: must not be blank")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when status type is missing`() {
+    post(createRequestBuilder(status = null))
+      .value { assertThat(it.userMessage).isEqualTo("status: is required") }
+  }
+
+  @Test
+  fun `Post - 400 when status is not one of the allowed values`() {
+    post(createRequestBuilder(status = "BATMAN"))
+      .value { assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]") }
   }
 
   @Test
@@ -70,23 +68,65 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     }
   }
 
-  private fun postTest(field: String, maxLength: Int, jsonBuilder: (String?) -> String): MandatoryStringCase =
-    MandatoryStringCase(
-      testPrefix = "POST",
-      field = field,
-      maxLength = maxLength,
-      jsonBuilder = jsonBuilder,
-      requestRunner = ::post,
-    )
+  @Test
+  fun `Put - 400 when status type is missing`() {
+    put(updateRequestBuilder(status = null))
+      .value { assertThat(it.userMessage).isEqualTo("status: is required") }
+  }
 
-  private fun putTest(field: String, maxLength: Int, jsonBuilder: (String?) -> String): MandatoryStringCase =
-    MandatoryStringCase(
-      testPrefix = "PUT",
-      field = field,
-      maxLength = maxLength,
-      jsonBuilder = jsonBuilder,
-      requestRunner = ::put,
-    )
+  @Test
+  fun `Put - 400 when status is not one of the allowed values`() {
+    put(updateRequestBuilder(status = "BATMAN"))
+      .value { assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]") }
+  }
+
+  @Test
+  fun `Put - 400 when title field is too long`() {
+    val body = updateRequestBuilder(title = "Z".repeat(513))
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("title: size must be between 1 and 512")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when title field is null`() {
+    val body = updateRequestBuilder(title = null)
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("title: is required")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when title field is blank`() {
+    val body = updateRequestBuilder(title = "\n   ")
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("title: must not be blank")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when reasonForChange field is too long`() {
+    val body = updateRequestBuilder(reasonForChange = "X".repeat(251))
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: size must be between 1 and 250")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when reasonForChange field is null`() {
+    val body = updateRequestBuilder(reasonForChange = null)
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: is required")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when reasonForChange field is blank`() {
+    val body = updateRequestBuilder(reasonForChange = "\n   ")
+    put(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: must not be blank")
+    }
+  }
 
   private fun post(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.post()
@@ -101,7 +141,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   private fun createRequestBuilder(
     title: String? = "title",
     targetCompletionDate: String? = "2022-02-06",
-    status: String? = "status",
+    status: String? = "IN_PROGRESS",
     note: String? = "note",
     outcome: String? = "outcome",
   ): String {
@@ -130,7 +170,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   private fun updateRequestBuilder(
     title: String? = "title",
     targetCompletionDate: String? = "2022-02-06",
-    status: String? = "status",
+    status: String? = "IN_PROGRESS",
     note: String? = "note",
     outcome: String? = "outcome",
     reasonForChange: String? = "reasonForChange",
@@ -148,10 +188,3 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
       )
   }
 }
-data class MandatoryStringCase(
-  val testPrefix: String,
-  val field: String,
-  val maxLength: Int,
-  val jsonBuilder: (String?) -> String,
-  val requestRunner: (String) -> WebTestClient.BodySpec<ErrorResponse, *>,
-)

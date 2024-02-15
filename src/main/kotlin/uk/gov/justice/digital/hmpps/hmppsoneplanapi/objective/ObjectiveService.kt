@@ -7,6 +7,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.UpdateNotAllowedException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanService
 import java.time.ZonedDateTime
@@ -37,12 +38,19 @@ class ObjectiveService(
   @Transactional
   suspend fun updateObjective(objectiveKey: ObjectiveKey, request: UpdateObjectiveRequest): ObjectiveEntity {
     val objective = getObjective(objectiveKey)
+    checkObjectiveCanBeUpdated(objective)
     val updated = request.updateEntity(objective)
 
     val saveResult = entityTemplate.insert(buildHistory(objective, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated))
       .awaitSingle()
     return saveResult.t2
+  }
+
+  private fun checkObjectiveCanBeUpdated(objective: ObjectiveEntity) {
+    if (objective.status == ObjectiveStatus.COMPLETED) {
+      throw UpdateNotAllowedException(ObjectiveEntity::class, objective.reference)
+    }
   }
 
   private fun buildHistory(original: ObjectiveEntity, updated: ObjectiveEntity, reasonForChange: String): ObjectiveHistory {

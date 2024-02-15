@@ -45,14 +45,6 @@ class StepControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
-  fun `Post - 400 when status field is too long`() {
-    val body = createRequestBuilder(status = "B".repeat(51))
-    post(body).value {
-      assertThat(it.userMessage).isEqualTo("status: size must be between 1 and 50")
-    }
-  }
-
-  @Test
   fun `Post - 400 when status field is null`() {
     val body = createRequestBuilder(status = null)
     post(body).value {
@@ -61,10 +53,10 @@ class StepControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
-  fun `Post - 400 when status field is blank`() {
-    val body = createRequestBuilder(status = "\n   ")
+  fun `Post - 400 when status field is not one of allowed values`() {
+    val body = createRequestBuilder(status = "MOOSE")
     post(body).value {
-      assertThat(it.userMessage).isEqualTo("status: must not be blank")
+      assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]")
     }
   }
 
@@ -104,7 +96,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   private fun createRequestBuilder(
     description: Any? = "description",
     stepOrder: Any? = "1",
-    status: Any? = "status",
+    status: Any? = "IN_PROGRESS",
     staffTask: Any? = "false",
     staffNote: Any? = null,
   ): String {
@@ -156,14 +148,6 @@ class StepControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
-  fun `Put - 400 when status field is too long`() {
-    val body = updateRequestBuilder(status = "B".repeat(51))
-    put(body).value {
-      assertThat(it.userMessage).isEqualTo("status: size must be between 1 and 50")
-    }
-  }
-
-  @Test
   fun `Put - 400 when status field is null`() {
     val body = updateRequestBuilder(status = null)
     put(body).value {
@@ -172,10 +156,10 @@ class StepControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
-  fun `Put - 400 when status field is blank`() {
-    val body = updateRequestBuilder(status = "\n   ")
+  fun `Put - 400 when status field is not one of allowed values`() {
+    val body = updateRequestBuilder(status = "EGG")
     put(body).value {
-      assertThat(it.userMessage).isEqualTo("status: must not be blank")
+      assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]")
     }
   }
 
@@ -239,7 +223,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   private fun updateRequestBuilder(
     description: Any? = "description",
     stepOrder: Any? = "1",
-    status: Any? = "status",
+    status: Any? = "COMPLETED",
     staffTask: Any? = "false",
     staffNote: Any? = null,
     reasonForChange: Any? = "reason for change",

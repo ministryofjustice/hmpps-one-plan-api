@@ -19,7 +19,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
         {
                 "title":"title",
                 "targetCompletionDate": "2024-02-01",
-                "status":"status",
+                "status":"IN_PROGRESS",
                 "note":"note",
                 "outcome":"outcome"
         }
@@ -28,7 +28,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   private val minimalRequestBody = """
         {
                 "title":"title",
-                "status":"status"
+                "status":"IN_PROGRESS"
         }
   """.trimIndent()
 
@@ -95,7 +95,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.id").doesNotExist()
       .jsonPath("$.title").isEqualTo("title")
       .jsonPath("$.targetCompletionDate").isEqualTo("2024-02-01")
-      .jsonPath("$.status").isEqualTo("status")
+      .jsonPath("$.status").isEqualTo("IN_PROGRESS")
       .jsonPath("$.note").isEqualTo("note")
       .jsonPath("$.outcome").isEqualTo("outcome")
       .jsonPath("$.reference").isEqualTo(objectiveReference.toString())
@@ -116,7 +116,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.id").doesNotExist()
       .jsonPath("$.title").isEqualTo("title")
       .jsonPath("$.targetCompletionDate").isEmpty()
-      .jsonPath("$.status").isEqualTo("status")
+      .jsonPath("$.status").isEqualTo("IN_PROGRESS")
       .jsonPath("$.note").isEmpty()
       .jsonPath("$.outcome").isEmpty()
       .jsonPath("$.reference").isEqualTo(objectiveReference.toString())
@@ -182,33 +182,24 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val planKey = givenAPlan()
     val objectiveReference = givenAnObjective(planKey)
 
-    authedWebTestClient.put()
-      .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{obj}",
-        planKey.caseReferenceNumber,
-        planKey.reference,
-        objectiveReference,
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        """
+    val requestBody = """
         {
                 "title":"title2",
                 "targetCompletionDate": "2024-02-02",
-                "status":"status2",
+                "status": "COMPLETED",
                 "note":"note2",
                 "outcome":"outcome2",
                 "reasonForChange": "reason for change"
         }
-        """.trimIndent(),
-      )
-      .exchange()
+    """.trimIndent()
+
+    putObjective(planKey, objectiveReference, requestBody)
       .expectStatus()
       .isOk()
       .expectBody()
       .jsonPath("$.title").isEqualTo("title2")
       .jsonPath("$.targetCompletionDate").isEqualTo("2024-02-02")
-      .jsonPath("$.status").isEqualTo("status2")
+      .jsonPath("$.status").isEqualTo("COMPLETED")
       .jsonPath("$.note").isEqualTo("note2")
       .jsonPath("$.outcome").isEqualTo("outcome2")
 
@@ -231,21 +222,12 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val minimalUpdateBody = """
         {
                 "title":"title",
-                "status":"status",
+                "status":"COMPLETED",
                 "reasonForChange": "Just felt like it"
         }
     """.trimIndent()
 
-    authedWebTestClient.put()
-      .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{obj}",
-        planKey.caseReferenceNumber,
-        planKey.reference,
-        objectiveReference,
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(minimalUpdateBody)
-      .exchange()
+    putObjective(planKey, objectiveReference, minimalUpdateBody)
       .expectStatus()
       .isOk()
       .expectBody()
@@ -254,6 +236,21 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.note").isEmpty()
       .jsonPath("$.outcome").isEmpty()
   }
+
+  private fun putObjective(
+    planKey: PlanKey,
+    objectiveReference: UUID,
+    requestBody: String,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.put()
+    .uri(
+      "/person/{crn}/plans/{pReference}/objectives/{obj}",
+      planKey.caseReferenceNumber,
+      planKey.reference,
+      objectiveReference,
+    )
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(requestBody)
+    .exchange()
 
   @Test
   fun `DELETE Objective marks as is_deleted`() {
@@ -334,5 +331,23 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .exchange()
       .expectStatus()
       .isNotFound()
+  }
+
+  @Test
+  fun `400 When try to update a COMPLETED objective`() {
+    val requestBody = """
+        {
+                "title":"Random change",
+                "status":"IN_PROGRESS",
+                "reasonForChange": "Just felt like it"
+        }
+    """.trimIndent()
+    val (caseReferenceNumber, planReference, objectiveReference) = givenAnObjective(status = ObjectiveStatus.COMPLETED)
+
+    putObjective(PlanKey(caseReferenceNumber, planReference), objectiveReference, requestBody)
+      .expectStatus()
+      .isBadRequest()
+      .expectBody()
+      .jsonPath("$.userMessage").isEqualTo("cannot update completed Objective")
   }
 }

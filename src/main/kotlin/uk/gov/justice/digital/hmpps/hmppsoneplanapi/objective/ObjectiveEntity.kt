@@ -25,7 +25,7 @@ data class ObjectiveEntity(
 
   val title: String,
   val targetCompletionDate: LocalDate?,
-  val status: String,
+  val status: ObjectiveStatus,
   val note: String?,
   val outcome: String?,
 
@@ -60,3 +60,8 @@ data class ObjectiveKey(
   val planReference: UUID,
   val objectiveReference: UUID,
 )
+
+enum class ObjectiveStatus {
+  IN_PROGRESS,
+  COMPLETED,
+}

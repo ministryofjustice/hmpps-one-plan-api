@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebInputException
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.UpdateNotAllowedException
 import java.time.LocalDate
 import java.util.Locale
 import java.util.UUID
@@ -148,6 +149,17 @@ class HmppsOnePlanApiExceptionHandler(
         developerMessage = e.message,
       ),
     ).also { log.info("Duplicate key exception, {}", e.message) }
+
+  @ExceptionHandler(UpdateNotAllowedException::class)
+  fun handleUpdateNotAllowed(e: UpdateNotAllowedException): ResponseEntity<ErrorResponse> = ResponseEntity
+    .status(BAD_REQUEST)
+    .body(
+      ErrorResponse(
+        status = BAD_REQUEST.value(),
+        userMessage = "cannot update completed ${e.type.simpleName?.removeSuffix("Entity")}",
+        developerMessage = e.message,
+      ),
+    ).also { log.info("Update not allowed: {}", e.message) }
 
   @ExceptionHandler(Exception::class)
   fun handleException(e: Exception): ResponseEntity<ErrorResponse> = ResponseEntity

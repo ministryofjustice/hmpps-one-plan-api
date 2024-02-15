@@ -10,14 +10,14 @@ class CreateObjectiveRequestTest {
     val entity = CreateObjectiveRequest(
       title = "title",
       targetCompletionDate = LocalDate.of(2024, 2, 1),
-      status = "status",
+      status = ObjectiveStatus.IN_PROGRESS,
       note = "note",
       outcome = "outcome",
     ).buildEntity()
 
     assertThat(entity.title).isEqualTo("title")
     assertThat(entity.targetCompletionDate).isEqualTo("2024-02-01")
-    assertThat(entity.status).isEqualTo("status")
+    assertThat(entity.status).isEqualTo(ObjectiveStatus.IN_PROGRESS)
     assertThat(entity.note).isEqualTo("note")
     assertThat(entity.outcome).isEqualTo("outcome")
   }

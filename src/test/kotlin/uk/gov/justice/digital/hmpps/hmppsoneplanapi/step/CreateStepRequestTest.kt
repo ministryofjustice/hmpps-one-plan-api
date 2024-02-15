@@ -10,13 +10,13 @@ class CreateStepRequestTest {
     val id = UUID.randomUUID()
     val entity = CreateStepRequest(
       description = "desc",
-      status = "status",
+      status = StepStatus.IN_PROGRESS,
       staffNote = "staff note",
       staffTask = true,
     ).buildEntity(id, 1)
 
     assertThat(entity.objectiveId).isEqualTo(id)
-    assertThat(entity.status).isEqualTo("status")
+    assertThat(entity.status).isEqualTo(StepStatus.IN_PROGRESS)
     assertThat(entity.stepOrder).isEqualTo(1)
     assertThat(entity.description).isEqualTo("desc")
     assertThat(entity.staffNote).isEqualTo("staff note")

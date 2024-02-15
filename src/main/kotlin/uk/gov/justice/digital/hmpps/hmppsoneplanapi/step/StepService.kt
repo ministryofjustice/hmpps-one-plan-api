@@ -7,6 +7,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.UpdateNotAllowedException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveService
 import java.time.ZonedDateTime
@@ -48,10 +49,17 @@ class StepService(
 
   suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: UpdateStepRequest): StepEntity {
     val step = getStep(objectiveKey, stepReference)
+    checkStepCanBeUpdated(step)
     val updated = request.updateEntity(step)
     val result = entityTemplate.insert(buildHistory(step, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated)).awaitSingle()
     return result.t2
+  }
+
+  private fun checkStepCanBeUpdated(step: StepEntity) {
+    if (step.status == StepStatus.COMPLETED) {
+      throw UpdateNotAllowedException(StepEntity::class, step.reference)
+    }
   }
 
   private fun buildHistory(original: StepEntity, updated: StepEntity, reasonForChange: String): StepHistory {

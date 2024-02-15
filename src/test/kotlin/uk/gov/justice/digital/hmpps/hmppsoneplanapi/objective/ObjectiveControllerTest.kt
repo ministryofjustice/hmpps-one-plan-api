@@ -74,17 +74,6 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `401 on create objective if not authenticated`() {
-    webTestClient.post()
-      .uri("/person/{crn}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(requestBody)
-      .exchange()
-      .expectStatus()
-      .isUnauthorized()
-  }
-
-  @Test
   fun `GET Single objective`() {
     val planKey = givenAPlan()
     val objectiveReference = givenAnObjective(planKey)

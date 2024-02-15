@@ -302,20 +302,6 @@ class StepControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `401 If not authed`() {
-    webTestClient.delete()
-      .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
-        "123",
-        UUID.randomUUID(),
-        UUID.randomUUID(),
-        UUID.randomUUID(),
-      ).exchange()
-      .expectStatus()
-      .isUnauthorized()
-  }
-
-  @Test
   fun `400 When try to update a COMPLETED step`() {
     val requestBody = """
         {

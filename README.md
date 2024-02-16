@@ -9,9 +9,23 @@
 `One Plan` stores a person's Plan and Objective data
 
 # Running locally
-## From the shell
-* Start the database with `docker compose -f docker-compose-local.yml up -d`
+
+## Using the dev environement for auth
+* Start the database with `docker compose -f docker-compose-local.yml up -d db`
 * start with `gradle bootrun` (it will automatically use the `local` profile)
+
+
+## Running With Local auth
+We can run `hmpps-auth` in a local container for fully isolated testing
+* Start the databases and hmpss-auth with `docker compose -f docker-compose-local.yml up -d`
+
+* To create one plan specific user/roles in the local auth db run
+```shell
+./.run/setup-user-role.sh
+```
+* start the app with the `local-auth` profile active
+
+```gradle bootrun -Pprofiles=local,local-auth```
 
 # pre-commit
 To save you from the linter failing your build due to formatting, you can enable pre commit git hooks

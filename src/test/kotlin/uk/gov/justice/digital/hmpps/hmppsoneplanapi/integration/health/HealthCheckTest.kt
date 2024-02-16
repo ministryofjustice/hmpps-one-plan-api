@@ -11,7 +11,7 @@ class HealthCheckTest : IntegrationTestBase() {
 
   @Test
   fun `Health page reports ok`() {
-    webTestClient.get()
+    notAuthedWebTestClient.get()
       .uri("/health")
       .exchange()
       .expectStatus()

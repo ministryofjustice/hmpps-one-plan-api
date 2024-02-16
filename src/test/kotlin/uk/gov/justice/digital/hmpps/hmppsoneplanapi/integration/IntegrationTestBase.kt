@@ -23,7 +23,7 @@ import java.time.LocalDate
 abstract class IntegrationTestBase {
 
   @Autowired
-  lateinit var webTestClient: WebTestClient
+  lateinit var notAuthedWebTestClient: WebTestClient
   lateinit var authedWebTestClient: WebTestClient
 
   @Autowired
@@ -32,7 +32,7 @@ abstract class IntegrationTestBase {
   @BeforeEach
   fun setupAuth() {
     if (!::authedWebTestClient.isInitialized) {
-      authedWebTestClient = webTestClient
+      authedWebTestClient = notAuthedWebTestClient
         .mutateWith { builder, _, _ ->
           builder.defaultHeader(
             HttpHeaders.AUTHORIZATION,
@@ -48,9 +48,6 @@ abstract class IntegrationTestBase {
     @JvmStatic
     @DynamicPropertySource
     fun properties(registry: DynamicPropertyRegistry) {
-      println(pgContainer.jdbcUrl)
-      println(pgContainer.username)
-      println(pgContainer.password)
       pgContainer.run {
         registry.add("spring.flyway.url", pgContainer::getJdbcUrl)
         registry.add("spring.flyway.user", pgContainer::getUsername)

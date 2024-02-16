@@ -11,8 +11,23 @@ services:
       - POSTGRES_PASSWORD=one-plan
       - POSTGRES_USER=one-plan
       - POSTGRES_DB=one-plan
+  auth-db:
+    image: postgres:16.1
+    networks:
+      - hmpps
+    container_name: auth-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin_password
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=auth-db
+
   hmpps-auth:
     image: quay.io/hmpps/hmpps-auth:latest
+    depends_on:
+      - auth-db
     networks:
       - hmpps
     container_name: hmpps-auth-one-plan-api
@@ -21,7 +36,8 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/auth/health" ]
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres
       - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
 networks:
   hmpps:

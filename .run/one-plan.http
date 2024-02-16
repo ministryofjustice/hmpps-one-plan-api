@@ -5,10 +5,17 @@ Authorization: Basic elite2apiclient clientsecret
 > {% client.global.set("auth_token", response.body["access_token"]); %}
 
 ### Get an auth token from dev
-POST https://sign-in-dev.hmpps.service.justice.gov.uk/auth/oauth/token?grant_type=client_credentials&username={{authUser}}&password={{authPassword}}
-Authorization: Basic {{clientId}} {{clientSecret}}
+// @no-redirect
+POST https://sign-in-dev.hmpps.service.justice.gov.uk/auth/sign-in
+content-type: application/x-www-form-urlencoded
 
-> {% client.global.set("auth_token", response.body["access_token"]); %}
+redirect_uri=&username={{authUser}}&password={{authPassword}}
+> {%
+
+    const cookie = response.headers.valueOf('Set-Cookie');
+    const token = cookie.split(';')[0].split('=')[1]
+    client.global.set("auth_token", token);
+%}
 
 ### Create a plan
 POST {{base.url}}/person/123/plans

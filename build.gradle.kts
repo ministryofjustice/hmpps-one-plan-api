@@ -58,5 +58,5 @@ tasks {
 }
 
 tasks.named<BootRun>("bootRun") {
-  systemProperty("spring.profiles.active", "local")
+  systemProperty("spring.profiles.active", project.findProperty("profiles")?.toString() ?: "local")
 }

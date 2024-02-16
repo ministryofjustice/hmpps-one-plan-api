@@ -14,8 +14,3 @@ spring:
     enabled: true
     user: one-plan
     password: one-plan
-
-api:
-  base:
-    url:
-      oauth: http://localhost:9090

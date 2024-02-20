@@ -21,13 +21,24 @@ class ObjectiveService(
   private val objectMapper: ObjectMapper,
 ) {
   @Transactional
-  suspend fun createObjective(caseReferenceNumber: CaseReferenceNumber, request: CreateObjectiveRequest): ObjectiveEntity {
-//    val plan = planService.getByKey(planKey)
-    val objective = request.buildEntity(caseReferenceNumber)
-//    val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
+  suspend fun createObjective(crn: CaseReferenceNumber, request: CreateObjectiveRequest): ObjectiveEntity {
+    val objective = request.buildEntity(crn)
     val savedObjective = entityTemplate.insert(objective).awaitSingle()
-//    entityTemplate.insert(link).awaitSingle()
+
+    if (request.planReference != null) {
+      val plan = planService.getByKey(PlanKey(crn.value, request.planReference))
+      val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
+      entityTemplate.insert(link).awaitSingle()
+    }
+
+    createPlanLinkIfRequired(request, savedObjective)
     return savedObjective
+  }
+
+  private fun createPlanLinkIfRequired(request: CreateObjectiveRequest, savedObjective: ObjectiveEntity) {
+    if (request.planReference == null) {
+      return
+    }
   }
 
   suspend fun getObjective(objectiveKey: ObjectiveKey): ObjectiveEntity {

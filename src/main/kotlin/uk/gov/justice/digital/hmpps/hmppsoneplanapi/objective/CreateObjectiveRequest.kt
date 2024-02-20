@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.LocalDate
+import java.util.UUID
 
 data class CreateObjectiveRequest(
   @field:NotBlank
@@ -13,6 +15,8 @@ data class CreateObjectiveRequest(
   val status: ObjectiveStatus,
   val note: String?,
   val outcome: String?,
+  @Schema(description = "Optional plan reference to add objective to", required = false)
+  val planReference: UUID? = null,
 ) {
   fun buildEntity(crn: CaseReferenceNumber): ObjectiveEntity = ObjectiveEntity(
     title = title,

@@ -36,7 +36,7 @@ GET {{base.url}}/person/123/plans
 Authorization: Bearer {{auth_token}}
 
 ### Create objective
-POST {{base.url}}/person/123/plans/{{planReference}}/objectives
+POST {{base.url}}/person/123/objectives
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -49,13 +49,29 @@ Authorization: Bearer {{auth_token}}
 }
 > {% client.global.set("objectiveReference", response.body["reference"]); %}
 
+
+### Create objective with plan reference
+POST {{base.url}}/person/123/objectives
+content-type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "title":"title",
+  "targetCompletionDate": "2024-02-01",
+  "status":"IN_PROGRESS",
+  "note":"note",
+  "outcome":"outcome",
+  "planReference": "{{planReference}}"
+}
+> {% client.global.set("objectiveReference", response.body["reference"]); %}
+
 ### Get Objective
-GET {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}
+GET {{base.url}}/person/123/objectives/{{objectiveReference}}
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
 ### Update objective
-PUT {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}
+PUT {{base.url}}/person/123/objectives/{{objectiveReference}}
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -70,7 +86,7 @@ Authorization: Bearer {{auth_token}}
 > {% client.global.set("objectiveReference", response.body["reference"]); %}
 
 ### Create Step
-POST {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}/steps
+POST {{base.url}}/person/123/objectives/{{objectiveReference}}/steps
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -82,11 +98,11 @@ Authorization: Bearer {{auth_token}}
 > {% client.global.set("stepReference", response.body["reference"]); %}
 
 ### Get Step
-GET {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}/steps/{{stepReference}}
+GET {{base.url}}/person/123/objectives/{{objectiveReference}}/steps/{{stepReference}}
 Authorization: Bearer {{auth_token}}
 
 ### Update Step
-PUT {{base.url}}/person/123/plans/{{planReference}}/objectives/{{objectiveReference}}/steps/{{stepReference}}
+PUT {{base.url}}/person/123/objectives/{{objectiveReference}}/steps/{{stepReference}}
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 

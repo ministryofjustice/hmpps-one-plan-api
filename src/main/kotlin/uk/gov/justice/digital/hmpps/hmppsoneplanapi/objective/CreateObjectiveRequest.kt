@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.LocalDate
 
 data class CreateObjectiveRequest(
@@ -13,7 +14,7 @@ data class CreateObjectiveRequest(
   val note: String?,
   val outcome: String?,
 ) {
-  fun buildEntity(crn: String): ObjectiveEntity = ObjectiveEntity(
+  fun buildEntity(crn: CaseReferenceNumber): ObjectiveEntity = ObjectiveEntity(
     title = title,
     targetCompletionDate = targetCompletionDate,
     status = status,

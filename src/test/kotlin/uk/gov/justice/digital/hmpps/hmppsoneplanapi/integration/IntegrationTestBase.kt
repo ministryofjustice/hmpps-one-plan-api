@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.CreateObjectiveRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
@@ -89,9 +90,8 @@ abstract class IntegrationTestBase {
     note: String = "note",
     outcome: String = "outcome",
   ): ObjectiveKey {
-    val (_, planReference) = givenAPlan(crn, type)
     val objectiveReference =
-      authedWebTestClient.post().uri("/person/{crn}/plans/{pRef}/objectives", crn, planReference)
+      authedWebTestClient.post().uri("/person/{crn}/objectives", crn)
         .bodyValue(
           CreateObjectiveRequest(
             title = title,
@@ -108,6 +108,6 @@ abstract class IntegrationTestBase {
         .returnResult()
         .responseBody!!
         .reference
-    return ObjectiveKey(crn, planReference, objectiveReference)
+    return ObjectiveKey(CaseReferenceNumber(crn), objectiveReference)
   }
 }

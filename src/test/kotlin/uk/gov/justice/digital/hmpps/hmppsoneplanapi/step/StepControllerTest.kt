@@ -28,13 +28,12 @@ class StepControllerTest : IntegrationTestBase() {
 
   @Test
   fun `Creates a step on POST`() {
-    val (crn, planReference, objectiveReference) = givenAnObjective()
+    val (crn, objectiveReference) = givenAnObjective()
 
     authedWebTestClient.post()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps",
+        "/person/{crn}/objectives/{oReference}/steps",
         crn,
-        planReference,
         objectiveReference,
       )
       .contentType(MediaType.APPLICATION_JSON)
@@ -74,9 +73,8 @@ class StepControllerTest : IntegrationTestBase() {
     stepRef: UUID,
   ): WebTestClient.ResponseSpec = authedWebTestClient.get()
     .uri(
-      "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+      "/person/{crn}/objectives/{oReference}/steps/{stepRef}",
       objectiveKey.caseReferenceNumber,
-      objectiveKey.planReference,
       objectiveKey.objectiveReference,
       stepRef,
     )
@@ -86,9 +84,8 @@ class StepControllerTest : IntegrationTestBase() {
   fun `404 when step does not exist`() {
     authedWebTestClient.get()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+        "/person/{crn}/objectives/{oReference}/steps/{stepRef}",
         "abc",
-        UUID.randomUUID(),
         UUID.randomUUID(),
         UUID.randomUUID(),
       ).exchange()
@@ -99,9 +96,8 @@ class StepControllerTest : IntegrationTestBase() {
   fun givenAStep(objectiveKey: ObjectiveKey, body: String = requestBody): UUID {
     val exchangeResult = authedWebTestClient.post()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps",
+        "/person/{crn}/objectives/{oReference}/steps",
         objectiveKey.caseReferenceNumber,
-        objectiveKey.planReference,
         objectiveKey.objectiveReference,
       )
       .contentType(MediaType.APPLICATION_JSON)
@@ -142,9 +138,8 @@ class StepControllerTest : IntegrationTestBase() {
   private fun getAllSteps(objectiveKey: ObjectiveKey): WebTestClient.ResponseSpec =
     authedWebTestClient.get()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps",
+        "/person/{crn}/objectives/{oReference}/steps",
         objectiveKey.caseReferenceNumber,
-        objectiveKey.planReference,
         objectiveKey.objectiveReference,
       ).exchange()
       .expectStatus().isOk()
@@ -153,7 +148,7 @@ class StepControllerTest : IntegrationTestBase() {
   fun `GET All Steps gives 404 when objective does not exist`() {
     authedWebTestClient.get()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps",
+        "/person/{crn}/objectives/{oReference}/steps",
         "123",
         UUID.randomUUID(),
         UUID.randomUUID(),
@@ -186,9 +181,8 @@ class StepControllerTest : IntegrationTestBase() {
   ) {
     authedWebTestClient.delete()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+        "/person/{crn}/objectives/{oReference}/steps/{stepRef}",
         objectiveKey.caseReferenceNumber,
-        objectiveKey.planReference,
         objectiveKey.objectiveReference,
         stepReference,
       ).exchange()
@@ -215,7 +209,7 @@ class StepControllerTest : IntegrationTestBase() {
   fun `DELETE 404 when Step does not exist`() {
     authedWebTestClient.delete()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{oReference}/steps/{stepRef}",
+        "/person/{crn}/objectives/{oReference}/steps/{stepRef}",
         "123",
         UUID.randomUUID(),
         UUID.randomUUID(),
@@ -265,9 +259,8 @@ class StepControllerTest : IntegrationTestBase() {
     body: String,
   ): WebTestClient.ResponseSpec = authedWebTestClient.put()
     .uri(
-      "/person/{crn}/plans/{pReference}/objectives/{obj}/steps/{step}",
+      "/person/{crn}/objectives/{obj}/steps/{step}",
       objective.caseReferenceNumber,
-      objective.planReference,
       objective.objectiveReference,
       step,
     )
@@ -279,9 +272,8 @@ class StepControllerTest : IntegrationTestBase() {
   fun `404 on PUT if Step does not exist`() {
     authedWebTestClient.put()
       .uri(
-        "/person/{crn}/plans/{pReference}/objectives/{obj}/steps/{step}",
+        "/person/{crn}/objectives/{obj}/steps/{step}",
         "123",
-        UUID.randomUUID(),
         UUID.randomUUID(),
         UUID.randomUUID(),
       )

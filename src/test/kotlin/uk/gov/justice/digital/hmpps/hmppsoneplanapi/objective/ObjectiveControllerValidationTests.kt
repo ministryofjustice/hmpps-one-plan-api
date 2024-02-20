@@ -49,14 +49,22 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   @Test
   fun `Post - 400 when status is not one of the allowed values`() {
     post(createRequestBuilder(status = "BATMAN"))
-      .value { assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]") }
+      .value { assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]") }
   }
 
   @Test
   fun `Post - 400 when target date is formatted incorrectly`() {
     val body = createRequestBuilder(targetCompletionDate = "not a date")
     post(body).value {
-      assertThat(it.userMessage).isEqualTo("targetCompletionDate: should be a date in format yyyy-MM-dd")
+      assertThat(it.userMessage).isEqualTo("targetCompletionDate: must be a date in format yyyy-MM-dd")
+    }
+  }
+
+  @Test
+  fun `Post - 400 when crn too long`() {
+    val body = createRequestBuilder()
+    post(body, crn = "1".repeat(11)).value {
+      assertThat(it.userMessage).isEqualTo("crn: must be not blank and between and no more than 10 characters")
     }
   }
 
@@ -64,7 +72,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   fun `Put - 400 when target date is formatted incorrectly`() {
     val body = updateRequestBuilder(targetCompletionDate = "not a date")
     put(body).value {
-      assertThat(it.userMessage).isEqualTo("targetCompletionDate: should be a date in format yyyy-MM-dd")
+      assertThat(it.userMessage).isEqualTo("targetCompletionDate: must be a date in format yyyy-MM-dd")
     }
   }
 
@@ -77,7 +85,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   @Test
   fun `Put - 400 when status is not one of the allowed values`() {
     put(updateRequestBuilder(status = "BATMAN"))
-      .value { assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]") }
+      .value { assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]") }
   }
 
   @Test
@@ -128,9 +136,9 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     }
   }
 
-  private fun post(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
+  private fun post(body: String, crn: String = "123"): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.post()
-      .uri("/person/123/plans/{ref}/objectives", UUID.randomUUID())
+      .uri("/person/{crn}/objectives", crn, UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(body)
       .exchange()
@@ -159,7 +167,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
 
   private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.put()
-      .uri("/person/123/plans/{pRef}/objectives/{oRef}", UUID.randomUUID(), UUID.randomUUID())
+      .uri("/person/123/objectives/{oRef}", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(body)
       .exchange()

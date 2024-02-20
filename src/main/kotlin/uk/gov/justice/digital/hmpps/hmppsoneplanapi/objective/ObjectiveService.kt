@@ -6,6 +6,7 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.UpdateNotAllowedException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
@@ -20,19 +21,19 @@ class ObjectiveService(
   private val objectMapper: ObjectMapper,
 ) {
   @Transactional
-  suspend fun createObjective(planKey: PlanKey, request: CreateObjectiveRequest): ObjectiveEntity {
-    val plan = planService.getByKey(planKey)
-    val objective = request.buildEntity(planKey.caseReferenceNumber)
-    val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
+  suspend fun createObjective(caseReferenceNumber: CaseReferenceNumber, request: CreateObjectiveRequest): ObjectiveEntity {
+//    val plan = planService.getByKey(planKey)
+    val objective = request.buildEntity(caseReferenceNumber)
+//    val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
     val savedObjective = entityTemplate.insert(objective).awaitSingle()
-    entityTemplate.insert(link).awaitSingle()
+//    entityTemplate.insert(link).awaitSingle()
     return savedObjective
   }
 
   suspend fun getObjective(objectiveKey: ObjectiveKey): ObjectiveEntity {
-    val (crn, planReference, objectiveReference) = objectiveKey
-    return objectiveRepository.getObjective(crn, planReference, objectiveKey.objectiveReference)
-      ?: throw NotFoundException("/person/$crn/plans/$planReference/objectives/$objectiveReference")
+    val (crn, objectiveReference) = objectiveKey
+    return objectiveRepository.getObjective(crn, objectiveKey.objectiveReference)
+      ?: throw NotFoundException("/person/$crn/objectives/$objectiveReference")
   }
 
   @Transactional
@@ -67,10 +68,10 @@ class ObjectiveService(
 
   @Transactional
   suspend fun deleteObjective(objectiveKey: ObjectiveKey) {
-    val (crn, planReference, objectiveReference) = objectiveKey
-    val count = objectiveRepository.markObjectiveDeleted(crn, planReference, objectiveReference)
+    val (crn, objectiveReference) = objectiveKey
+    val count = objectiveRepository.markObjectiveDeleted(crn, objectiveReference)
     if (count != 1) {
-      throw NotFoundException("/person/$crn/plans/$planReference/objectives/$objectiveReference")
+      throw NotFoundException("/person/$crn/objectives/$objectiveReference")
     }
   }
 

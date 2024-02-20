@@ -11,6 +11,7 @@ import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -24,7 +25,7 @@ data class ObjectiveEntity(
   @InsertOnlyProperty
   val reference: UUID = UUID.randomUUID(),
   @Column("crn")
-  val caseReferenceNumber: String,
+  val caseReferenceNumber: CaseReferenceNumber,
 
   val title: String,
   val targetCompletionDate: LocalDate?,
@@ -59,8 +60,7 @@ data class ObjectiveEntity(
 }
 
 data class ObjectiveKey(
-  val caseReferenceNumber: String,
-  val planReference: UUID,
+  val caseReferenceNumber: CaseReferenceNumber,
   val objectiveReference: UUID,
 )
 

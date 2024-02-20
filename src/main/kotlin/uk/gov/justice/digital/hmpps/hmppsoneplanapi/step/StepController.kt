@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -19,7 +18,9 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.Crn
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import java.util.UUID
@@ -30,7 +31,7 @@ import java.util.UUID
 @Validated
 class StepController(private val service: StepService) {
   @Operation(
-    summary = "Create a Step for a given Objective, that's part of a given Plan",
+    summary = "Create a Step for a given Objective",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -54,7 +55,7 @@ class StepController(private val service: StepService) {
       ),
       ApiResponse(
         responseCode = "404",
-        description = "Plan or Objective not found",
+        description = "Objective not found",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
       ApiResponse(
@@ -64,14 +65,13 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @PostMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")
+  @PostMapping("/person/{crn}/objectives/{objectiveReference}/steps")
   suspend fun createStep(
-    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
-    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody @Valid request: CreateStepRequest,
   ): CreateEntityResponse {
-    val entity = service.createStep(ObjectiveKey(crn, planReference, objectiveReference), request)
+    val entity = service.createStep(ObjectiveKey(crn, objectiveReference), request)
     return CreateEntityResponse(entity.reference)
   }
 
@@ -94,19 +94,18 @@ class StepController(private val service: StepService) {
       ),
       ApiResponse(
         responseCode = "404",
-        description = "Step, Objective or Plan not found",
+        description = "Step or Objective not found",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
   )
-  @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  @GetMapping("/person/{crn}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun getStep(
-    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
-    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
   ): StepEntity =
-    service.getStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference)
+    service.getStep(ObjectiveKey(crn, objectiveReference), stepReference)
 
   @Operation(
     summary = "Get all steps for an objective, empty array if there are none.",
@@ -132,12 +131,11 @@ class StepController(private val service: StepService) {
       ),
     ],
   )
-  @GetMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps")
+  @GetMapping("/person/{crn}/objectives/{objectiveReference}/steps")
   suspend fun getSteps(
-    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
-    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-  ): Flow<StepEntity> = service.getSteps(ObjectiveKey(crn, planReference, objectiveReference))
+  ): Flow<StepEntity> = service.getSteps(ObjectiveKey(crn, objectiveReference))
 
   @Operation(
     summary = "Remove a Step",
@@ -158,19 +156,18 @@ class StepController(private val service: StepService) {
       ),
       ApiResponse(
         responseCode = "404",
-        description = "Step, Objective or Plan not found",
+        description = "Step or Objective not found",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
   )
-  @DeleteMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  @DeleteMapping("/person/{crn}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun deleteStep(
-    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
-    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
   ): ResponseEntity<Nothing> {
-    service.deleteStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference)
+    service.deleteStep(ObjectiveKey(crn, objectiveReference), stepReference)
     return ResponseEntity.noContent().build()
   }
 
@@ -193,19 +190,18 @@ class StepController(private val service: StepService) {
       ),
       ApiResponse(
         responseCode = "404",
-        description = "Step, Objective or Plan not found",
+        description = "Step or Objective not found",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
   )
-  @PutMapping("/person/{crn}/plans/{planReference}/objectives/{objectiveReference}/steps/{stepReference}")
+  @PutMapping("/person/{crn}/objectives/{objectiveReference}/steps/{stepReference}")
   suspend fun updateStep(
-    @PathVariable(value = "crn") @NotBlank @Size(min = 1, max = 10) crn: String,
-    @PathVariable(value = "planReference") planReference: UUID,
+    @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
     @RequestBody @Valid updateStepRequest: UpdateStepRequest,
   ): StepEntity {
-    return service.updateStep(ObjectiveKey(crn, planReference, objectiveReference), stepReference, updateStepRequest)
+    return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, updateStepRequest)
   }
 }

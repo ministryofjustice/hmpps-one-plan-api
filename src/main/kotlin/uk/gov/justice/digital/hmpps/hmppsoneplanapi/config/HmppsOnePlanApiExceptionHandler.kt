@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.config
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
@@ -128,9 +127,6 @@ class HmppsOnePlanApiExceptionHandler(
         ),
       ).also { log.info("Validation exception: {}", e.message, e) }
   }
-
-  private fun getFieldName(violation: ConstraintViolation<*>) = violation.messageTemplate
-//    violation.propertyPath.drop(1).joinToString(".") { it.name }
 
   @ExceptionHandler(ResponseStatusException::class)
   fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ErrorResponse> = ResponseEntity

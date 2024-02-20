@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   val kotlinVersion = "1.9.22"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.2"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -22,19 +22,19 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-  implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+  implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
   implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
-  runtimeOnly("org.flywaydb:flyway-core:10.6.0")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:10.6.0")
+  runtimeOnly("org.flywaydb:flyway-core:10.8.1")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:10.8.1")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.1")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-  testImplementation("org.testcontainers:postgresql:1.19.3")
-  testImplementation("org.assertj:assertj-core:3.25.2")
-  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.4")
-  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.4")
+  testImplementation("org.testcontainers:postgresql:1.19.5")
+  testImplementation("org.assertj:assertj-core:3.25.3")
+  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.5")
+  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
   testImplementation("io.mockk:mockk:1.13.9")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
 

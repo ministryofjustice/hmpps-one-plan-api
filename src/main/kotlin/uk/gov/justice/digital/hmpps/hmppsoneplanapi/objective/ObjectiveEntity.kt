@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Transient
 import org.springframework.data.domain.Persistable
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -22,6 +23,8 @@ data class ObjectiveEntity(
   private val id: UUID = UUID.randomUUID(),
   @InsertOnlyProperty
   val reference: UUID = UUID.randomUUID(),
+  @Column("crn")
+  val caseReferenceNumber: String,
 
   val title: String,
   val targetCompletionDate: LocalDate?,

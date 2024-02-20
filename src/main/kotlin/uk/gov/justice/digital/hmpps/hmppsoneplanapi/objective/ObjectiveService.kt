@@ -22,7 +22,7 @@ class ObjectiveService(
   @Transactional
   suspend fun createObjective(planKey: PlanKey, request: CreateObjectiveRequest): ObjectiveEntity {
     val plan = planService.getByKey(planKey)
-    val objective = request.buildEntity()
+    val objective = request.buildEntity(planKey.caseReferenceNumber)
     val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
     val savedObjective = entityTemplate.insert(objective).awaitSingle()
     entityTemplate.insert(link).awaitSingle()

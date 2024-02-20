@@ -13,6 +13,7 @@ class UpdateObjectiveRequestTest {
       status = ObjectiveStatus.IN_PROGRESS,
       note = "note",
       outcome = "outcome",
+      caseReferenceNumber = "crn",
     )
 
     val updated = UpdateObjectiveRequest(

@@ -13,11 +13,12 @@ data class CreateObjectiveRequest(
   val note: String?,
   val outcome: String?,
 ) {
-  fun buildEntity(): ObjectiveEntity = ObjectiveEntity(
+  fun buildEntity(crn: String): ObjectiveEntity = ObjectiveEntity(
     title = title,
     targetCompletionDate = targetCompletionDate,
     status = status,
     note = note,
     outcome = outcome,
+    caseReferenceNumber = crn,
   )
 }

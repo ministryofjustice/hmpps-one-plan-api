@@ -8,6 +8,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.WebfluxTestBase
+import java.util.UUID
 
 @WebFluxTest(controllers = [PlanController::class])
 class PlanControllerValidationTests : WebfluxTestBase() {
@@ -51,6 +52,49 @@ class PlanControllerValidationTests : WebfluxTestBase() {
         assertThat(it.userMessage).isEqualTo("planReference: must be a valid UUID")
       }
   }
+
+  @Test
+  fun `400 when add objective is missing refs`() {
+    val body = "{}"
+    addObjectives(body)
+      .value {
+        assertThat(it.userMessage).isEqualTo("objectives: is required")
+      }
+  }
+
+  @Test
+  fun `400 when add objective has empty refs`() {
+    val body = """{
+        "objectives": []
+      |}
+    """.trimMargin()
+    addObjectives(body)
+      .value {
+        assertThat(it.userMessage).isEqualTo("objectives: must not be empty")
+      }
+  }
+
+  @Test
+  fun `400 when add objective has non UUID refs`() {
+    val body = """{
+        "objectives": [ 123, 456 ]
+      |}
+    """.trimMargin()
+    addObjectives(body)
+      .value {
+        assertThat(it.userMessage).isEqualTo("objectives.[0]: must be a valid UUID")
+      }
+  }
+
+  private fun addObjectives(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
+    authedWebTestClient.patch()
+      .uri("/person/123/plans/{ref}/objectives", UUID.randomUUID())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(body)
+      .exchange()
+      .expectStatus()
+      .isBadRequest()
+      .expectBody(ErrorResponse::class.java)
 
   private fun requestBuilder(type: Any? = "PERSONAL_LEARNING"): String =
     objectMapper.writeValueAsString(

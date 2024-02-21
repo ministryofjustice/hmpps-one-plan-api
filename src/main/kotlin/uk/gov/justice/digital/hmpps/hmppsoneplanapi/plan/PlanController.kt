@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -181,7 +182,7 @@ class PlanController(private val planService: PlanService) {
   suspend fun addObjectives(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "planReference") reference: UUID,
-    @RequestBody addObjectiveRequest: AddObjectivesRequest,
+    @RequestBody @Valid addObjectiveRequest: AddObjectivesRequest,
   ): ResponseEntity<Nothing> {
     planService.addObjectives(PlanKey(crn, reference), addObjectiveRequest.objectives)
     return ResponseEntity.noContent().build()

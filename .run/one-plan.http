@@ -25,6 +25,17 @@ Authorization: Bearer {{auth_token}}
   "planType": "PERSONAL_LEARNING"
 }
 
+### Create a plan with an objective ref
+POST {{base.url}}/person/123/plans
+content-type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "planType": "PERSONAL_LEARNING",
+  "objectives": ["{{objectiveReference}}"]
+}
+
+
 > {% client.global.set("planReference", response.body["reference"]); %}
 
 ### Get plan

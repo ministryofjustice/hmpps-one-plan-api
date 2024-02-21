@@ -70,12 +70,12 @@ abstract class IntegrationTestBase {
       .returnResult()
       .responseBody!!
       .reference
-    return PlanKey(crn, reference)
+    return PlanKey(CaseReferenceNumber(crn), reference)
   }
 
   fun givenPlanIsDeleted(planKey: PlanKey) {
     authedWebTestClient.delete()
-      .uri("/person/{number}/plans/{ref}", planKey.caseReferenceNumber, planKey.reference)
+      .uri("/person/{number}/plans/{ref}", planKey.crn, planKey.reference)
       .exchange()
       .expectStatus()
       .isNoContent()
@@ -83,7 +83,6 @@ abstract class IntegrationTestBase {
 
   fun givenAnObjective(
     crn: String = "123",
-    type: PlanType = PlanType.PERSONAL_LEARNING,
     title: String = "title",
     targetCompletionDate: LocalDate = LocalDate.of(2024, 2, 1),
     status: ObjectiveStatus = ObjectiveStatus.IN_PROGRESS,

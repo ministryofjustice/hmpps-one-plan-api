@@ -86,12 +86,13 @@ class HmppsOnePlanApiExceptionHandler(
       type == LocalDate::class.java -> "must be a date in format yyyy-MM-dd"
       type == Boolean::class.java -> "must be a boolean true|false"
       type.isEnum -> "must be one of [${type.enumConstants.joinToString { it.toString() }}]"
+      type == UUID::class.java -> "must be a valid UUID"
       else -> "is invalid"
     }
   }
 
   private fun variablePath(cause: MismatchedInputException) =
-    cause.path.joinToString(".") { it.fieldName }
+    cause.path.joinToString(".") { it.fieldName ?: "[${it.index}]" }
 
   @ExceptionHandler(WebExchangeBindException::class)
   fun handleBindValidationException(e: WebExchangeBindException): ResponseEntity<ErrorResponse> {
@@ -141,7 +142,7 @@ class HmppsOnePlanApiExceptionHandler(
 
   @ExceptionHandler(DuplicateKeyException::class)
   fun handleDuplicateKeyException(e: DuplicateKeyException): ResponseEntity<ErrorResponse> = ResponseEntity
-    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+    .status(UNPROCESSABLE_ENTITY)
     .body(
       ErrorResponse(
         status = UNPROCESSABLE_ENTITY.value(),

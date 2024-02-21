@@ -15,7 +15,7 @@ data class CreateObjectiveRequest(
   val status: ObjectiveStatus,
   val note: String?,
   val outcome: String?,
-  @Schema(description = "Optional plan reference to add objective to", required = false)
+  @field:Schema(description = "Optional plan reference to add objective to")
   val planReference: UUID? = null,
 ) {
   fun buildEntity(crn: CaseReferenceNumber): ObjectiveEntity = ObjectiveEntity(

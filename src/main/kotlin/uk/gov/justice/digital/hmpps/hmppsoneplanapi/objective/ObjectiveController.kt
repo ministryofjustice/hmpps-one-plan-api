@@ -120,7 +120,7 @@ class ObjectiveController(private val service: ObjectiveService) {
   )
   @GetMapping("/person/{crn}/plans/{planReference}/objectives")
   suspend fun getObjectives(
-    @PathVariable(value = "crn") @Crn crn: String,
+    @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "planReference") planReference: UUID,
   ): Flow<ObjectiveEntity> {
     return service.getObjectives(PlanKey(crn, planReference))

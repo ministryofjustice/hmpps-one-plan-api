@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import java.util.UUID
@@ -68,7 +71,70 @@ class PlanControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `PATCH is not allowed`() {
+  fun `Can create a plan with a link to an existing objectives`() {
+    val (caseReferenceNumber, objectiveReference1) = givenAnObjective(crn = "abc")
+    val (_, objectiveReference2) = givenAnObjective(crn = "abc")
+
+    val createPlanRequest = CreatePlanRequest(
+      planType = PlanType.PERSONAL_LEARNING,
+      objectives = listOf(objectiveReference1, objectiveReference2),
+    )
+    val planReference = postPlan(caseReferenceNumber, createPlanRequest)
+
+    runBlocking {
+      assertThat(countLinkedObjectives(planReference))
+        .describedAs("Should be 2 objectives linked to plan")
+        .isEqualTo(2L)
+    }
+  }
+
+  private fun postPlan(
+    caseReferenceNumber: CaseReferenceNumber,
+    createPlanRequest: CreatePlanRequest,
+  ) = authedWebTestClient.post()
+    .uri("/person/{crn}/plans", caseReferenceNumber)
+    .bodyValue(createPlanRequest)
+    .exchange()
+    .expectStatus()
+    .isOk()
+    .expectBody(CreateEntityResponse::class.java)
+    .returnResult()
+    .responseBody!!
+    .reference
+
+  private suspend fun countLinkedObjectives(planReference: UUID): Long? {
+    val sql = """ select count(*) as count from plan_objective_link where plan_id =
+          | (select id from plan where reference = :planRef)
+    """.trimMargin()
+    return databaseClient.sql(sql)
+      .bind("planRef", planReference)
+      .fetch().one().map { it["count"] as Long }
+      .awaitSingle()
+  }
+
+  @Test
+  fun `404 On create plan if a given objective does not exist`() {
+    val (caseReferenceNumber, objectiveReference1) = givenAnObjective(crn = "abc")
+
+    val notFoundId = UUID.randomUUID()
+    authedWebTestClient.post()
+      .uri("/person/{crn}/plans", caseReferenceNumber)
+      .bodyValue(
+        CreatePlanRequest(
+          planType = PlanType.PERSONAL_LEARNING,
+          objectives = listOf(objectiveReference1, notFoundId),
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isNotFound()
+      .expectBody()
+      .jsonPath("$.userMessage")
+      .value<String> { assertThat(it).contains(notFoundId.toString()) }
+  }
+
+  @Test
+  fun `PATCH is not allowed on plans`() {
     authedWebTestClient.patch()
       .uri("person/{crn}/plans", "456")
       .exchange()
@@ -106,6 +172,63 @@ class PlanControllerTest : IntegrationTestBase() {
     getAllExpectingCount(crn, 0)
     getPlan(crn, planReference)
       .expectStatus().isNotFound()
+  }
+
+  @Test
+  fun `Can link an objective to a plan`() {
+    val (crn, planReference) = givenAPlan(crn = "abcd")
+    val (_, objectiveReference) = givenAnObjective(crn = "abcd")
+
+    addObjectives(crn, planReference, listOf(objectiveReference))
+      .expectStatus()
+      .isNoContent()
+
+    runBlocking {
+      assertThat(countLinkedObjectives(planReference))
+        .describedAs("Should be an objective linked to plan")
+        .isEqualTo(1L)
+    }
+  }
+
+  @Test
+  fun `404 on link plan to objective when objective does not exist`() {
+    val (crn, planReference) = givenAPlan(crn = "abcd")
+    val (_, objectiveReference) = givenAnObjective(crn = "abcd")
+
+    addObjectives(crn, planReference, listOf(objectiveReference, UUID.randomUUID()))
+      .expectStatus()
+      .isNotFound()
+
+    runBlocking {
+      assertThat(countLinkedObjectives(planReference))
+        .describedAs("Should be no objectives linked to plan")
+        .isEqualTo(0L)
+    }
+  }
+  private fun addObjectives(
+    crn: CaseReferenceNumber,
+    planReference: UUID,
+    objectiveReferences: List<UUID>,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.patch()
+    .uri("/person/{crn}/plans/{planRef}/objectives", crn, planReference)
+    .bodyValue(
+      AddObjectivesRequest(
+        objectives = objectiveReferences,
+      ),
+    )
+    .exchange()
+
+  @Test
+  fun `Cannot add the same objective to a plan twice`() {
+    val (caseReferenceNumber, objectiveReference) = givenAnObjective()
+    val planReference = postPlan(
+      caseReferenceNumber,
+      CreatePlanRequest(planType = PlanType.SENTENCE, objectives = listOf(objectiveReference)),
+    )
+
+    addObjectives(caseReferenceNumber, planReference, listOf(objectiveReference))
+      .expectStatus()
+      .is4xxClientError()
   }
 
   private fun getAllExpectingCount(crn: String, count: Int) {

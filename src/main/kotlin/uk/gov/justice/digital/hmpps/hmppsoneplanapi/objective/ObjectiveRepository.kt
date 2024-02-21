@@ -18,6 +18,16 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
   )
   suspend fun getObjective(crn: CaseReferenceNumber, objectiveReference: UUID): ObjectiveEntity?
 
+  @Query(
+    """
+    select * from objective
+    where reference in (:objectiveReferences)
+    and crn = :crn
+    and is_deleted = false
+  """,
+  )
+  suspend fun getObjectives(crn: CaseReferenceNumber, objectiveReferences: Collection<UUID>): Flow<ObjectiveEntity>
+
   @Modifying
   @Query(
     """

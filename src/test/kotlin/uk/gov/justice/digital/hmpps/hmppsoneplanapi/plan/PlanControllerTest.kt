@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -65,6 +67,64 @@ class PlanControllerTest : IntegrationTestBase() {
     givenAPlan(crn, PlanType.RESETTLEMENT)
 
     getAllExpectingCount(crn, 3)
+  }
+
+  @Test
+  fun `Can create a plan with a link to an existing objectives`() {
+    val (caseReferenceNumber, objectiveReference1) = givenAnObjective(crn = "abc")
+    val (_, objectiveReference2) = givenAnObjective(crn = "abc")
+
+    val (planReference) = authedWebTestClient.post()
+      .uri("/person/{crn}/plans", caseReferenceNumber)
+      .bodyValue(
+        CreatePlanRequest(
+          planType = PlanType.PERSONAL_LEARNING,
+          objectives = listOf(objectiveReference1, objectiveReference2),
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody(CreateEntityResponse::class.java)
+      .returnResult()
+      .responseBody!!
+
+    runBlocking {
+      assertThat(countLinkedObjectives(planReference))
+        .describedAs("Should be 2 objectives linked to plan")
+        .isEqualTo(2L)
+    }
+  }
+
+  private suspend fun countLinkedObjectives(planReference: UUID): Long? {
+    val sql = """ select count(*) as count from plan_objective_link where plan_id =
+          | (select id from plan where reference = :planRef)
+    """.trimMargin()
+    return databaseClient.sql(sql)
+      .bind("planRef", planReference)
+      .fetch().one().map { it["count"] as Long }
+      .awaitSingle()
+  }
+
+  @Test
+  fun `404 On create plan if a given objective does not exist`() {
+    val (caseReferenceNumber, objectiveReference1) = givenAnObjective(crn = "abc")
+
+    val notFoundId = UUID.randomUUID()
+    authedWebTestClient.post()
+      .uri("/person/{crn}/plans", caseReferenceNumber)
+      .bodyValue(
+        CreatePlanRequest(
+          planType = PlanType.PERSONAL_LEARNING,
+          objectives = listOf(objectiveReference1, notFoundId),
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isNotFound()
+      .expectBody()
+      .jsonPath("$.userMessage")
+      .value<String> { assertThat(it).contains(notFoundId.toString()) }
   }
 
   @Test

@@ -31,14 +31,7 @@ class ObjectiveService(
       entityTemplate.insert(link).awaitSingle()
     }
 
-    createPlanLinkIfRequired(request, savedObjective)
     return savedObjective
-  }
-
-  private fun createPlanLinkIfRequired(request: CreateObjectiveRequest, savedObjective: ObjectiveEntity) {
-    if (request.planReference == null) {
-      return
-    }
   }
 
   suspend fun getObjective(objectiveKey: ObjectiveKey): ObjectiveEntity {

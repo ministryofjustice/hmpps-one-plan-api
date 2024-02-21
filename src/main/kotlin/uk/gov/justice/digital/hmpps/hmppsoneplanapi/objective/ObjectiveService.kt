@@ -26,7 +26,7 @@ class ObjectiveService(
     val savedObjective = entityTemplate.insert(objective).awaitSingle()
 
     if (request.planReference != null) {
-      val plan = planService.getByKey(PlanKey(crn.value, request.planReference))
+      val plan = planService.getByKey(PlanKey(crn, request.planReference))
       val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
       entityTemplate.insert(link).awaitSingle()
     }

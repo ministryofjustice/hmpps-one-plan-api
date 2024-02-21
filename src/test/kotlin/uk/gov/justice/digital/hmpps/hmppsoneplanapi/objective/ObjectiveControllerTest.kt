@@ -9,7 +9,6 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import java.util.UUID
 
 class ObjectiveControllerTest : IntegrationTestBase() {
@@ -68,7 +67,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     authedWebTestClient.post()
       .uri("/person/{crn}/objectives", "123")
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(createObjectiveAndLinkToPlan(PlanKey("123", UUID.randomUUID())))
+      .bodyValue(createObjectiveAndLinkToPlan(UUID.randomUUID()))
       .exchange()
       .expectStatus()
       .isNotFound()
@@ -257,11 +256,11 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Test
   fun `GET all objectives for a plan`() {
     val planKey = givenAPlan()
-    val objectiveReferenceA = givenAnObjective(crn = "123", body = createObjectiveAndLinkToPlan(planKey))
-    val objectiveReferenceB = givenAnObjective(crn = "123", body = createObjectiveAndLinkToPlan(planKey))
+    val objectiveReferenceA = givenAnObjective(crn = "123", body = createObjectiveAndLinkToPlan(planKey.reference))
+    val objectiveReferenceB = givenAnObjective(crn = "123", body = createObjectiveAndLinkToPlan(planKey.reference))
 
     authedWebTestClient.get()
-      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
+      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.crn, planKey.reference)
       .exchange()
       .expectStatus()
       .isOk()
@@ -272,14 +271,14 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       }
   }
 
-  private fun createObjectiveAndLinkToPlan(planKey: PlanKey): String = """
+  private fun createObjectiveAndLinkToPlan(planReference: UUID): String = """
             {
                     "title":"title",
                     "targetCompletionDate": "2024-02-01",
                     "status":"IN_PROGRESS",
                     "note":"note",
                     "outcome":"outcome",
-                    "planReference": "${planKey.reference}"
+                    "planReference": "$planReference"
             }
   """.trimIndent()
 
@@ -288,7 +287,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val planKey = givenAPlan()
 
     authedWebTestClient.get()
-      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
+      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.crn, planKey.reference)
       .exchange()
       .expectStatus()
       .isOk()

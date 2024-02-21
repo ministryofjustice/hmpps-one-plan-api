@@ -10,6 +10,7 @@ import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -52,4 +53,4 @@ enum class PlanType {
   RESETTLEMENT,
 }
 
-data class PlanKey(val caseReferenceNumber: String, val reference: UUID)
+data class PlanKey(val crn: CaseReferenceNumber, val reference: UUID)

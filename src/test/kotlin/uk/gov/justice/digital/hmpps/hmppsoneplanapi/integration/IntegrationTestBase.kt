@@ -70,12 +70,12 @@ abstract class IntegrationTestBase {
       .returnResult()
       .responseBody!!
       .reference
-    return PlanKey(crn, reference)
+    return PlanKey(CaseReferenceNumber(crn), reference)
   }
 
   fun givenPlanIsDeleted(planKey: PlanKey) {
     authedWebTestClient.delete()
-      .uri("/person/{number}/plans/{ref}", planKey.caseReferenceNumber, planKey.reference)
+      .uri("/person/{number}/plans/{ref}", planKey.crn, planKey.reference)
       .exchange()
       .expectStatus()
       .isNoContent()

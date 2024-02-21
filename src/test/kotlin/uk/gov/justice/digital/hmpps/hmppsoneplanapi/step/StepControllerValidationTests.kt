@@ -56,7 +56,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Post - 400 when status field is not one of allowed values`() {
     val body = createRequestBuilder(status = "MOOSE")
     post(body).value {
-      assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]")
+      assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]")
     }
   }
 
@@ -72,7 +72,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Post - 400 when staffTask is not a boolean string`() {
     val body = createRequestBuilder(staffTask = "gunk")
     post(body).value {
-      assertThat(it.userMessage).isEqualTo("staffTask: should be a boolean true|false")
+      assertThat(it.userMessage).isEqualTo("staffTask: must be a boolean true|false")
     }
   }
 
@@ -80,7 +80,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Post - 400 when staffTask is not a boolean`() {
     val body = createRequestBuilder(staffTask = 4.1)
     post(body).value {
-      assertThat(it.userMessage).isEqualTo("staffTask: should be a boolean true|false")
+      assertThat(it.userMessage).isEqualTo("staffTask: must be a boolean true|false")
     }
   }
 
@@ -114,7 +114,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
 
   private fun post(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.post()
-      .uri("/person/123/plans/{ref}/objectives/{oRef}/steps", UUID.randomUUID(), UUID.randomUUID())
+      .uri("/person/123/objectives/{oRef}/steps", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(body)
       .exchange()
@@ -159,7 +159,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Put - 400 when status field is not one of allowed values`() {
     val body = updateRequestBuilder(status = "EGG")
     put(body).value {
-      assertThat(it.userMessage).isEqualTo("status: should be one of [IN_PROGRESS, COMPLETED]")
+      assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]")
     }
   }
 
@@ -175,7 +175,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Put - 400 when staffTask is not a boolean string`() {
     val body = updateRequestBuilder(staffTask = "gunk")
     put(body).value {
-      assertThat(it.userMessage).isEqualTo("staffTask: should be a boolean true|false")
+      assertThat(it.userMessage).isEqualTo("staffTask: must be a boolean true|false")
     }
   }
 
@@ -183,7 +183,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Put - 400 when staffTask is not a boolean`() {
     val body = updateRequestBuilder(staffTask = 4.1)
     put(body).value {
-      assertThat(it.userMessage).isEqualTo("staffTask: should be a boolean true|false")
+      assertThat(it.userMessage).isEqualTo("staffTask: must be a boolean true|false")
     }
   }
 
@@ -244,8 +244,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
   private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.put()
       .uri(
-        "/person/123/plans/{ref}/objectives/{oRef}/steps/{sRef}",
-        UUID.randomUUID(),
+        "/person/123/objectives/{oRef}/steps/{sRef}",
         UUID.randomUUID(),
         UUID.randomUUID(),
       )
@@ -261,7 +260,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
     coEvery { stepService.createStep(any(), any()) }.throws(DuplicateKeyException("No!"))
 
     authedWebTestClient.post()
-      .uri("/person/123/plans/{ref}/objectives/{oRef}/steps", UUID.randomUUID(), UUID.randomUUID())
+      .uri("/person/123/objectives/{oRef}/steps", UUID.randomUUID(), UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(createRequestBuilder())
       .exchange()

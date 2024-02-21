@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
@@ -37,7 +38,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val (crn, planReference) = givenAPlan()
 
     authedWebTestClient.post()
-      .uri("/person/{crn}/plans/{pReference}/objectives", crn, planReference)
+      .uri("/person/{crn}/objectives", crn, planReference)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(requestBody)
       .exchange()
@@ -52,7 +53,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val (crn, planReference) = givenAPlan()
 
     authedWebTestClient.post()
-      .uri("/person/{crn}/plans/{pReference}/objectives", crn, planReference)
+      .uri("/person/{crn}/objectives", crn, planReference)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(minimalRequestBody)
       .exchange()
@@ -63,11 +64,11 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `404 on create objective if plan not found`() {
+  fun `404 on create objective if given plan not found`() {
     authedWebTestClient.post()
-      .uri("/person/{crn}/plans/{pReference}/objectives", "nobody", UUID.randomUUID())
+      .uri("/person/{crn}/objectives", "123")
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(requestBody)
+      .bodyValue(createObjectiveAndLinkToPlan(PlanKey("123", UUID.randomUUID())))
       .exchange()
       .expectStatus()
       .isNotFound()
@@ -75,10 +76,9 @@ class ObjectiveControllerTest : IntegrationTestBase() {
 
   @Test
   fun `GET Single objective`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey)
+    val objectiveReference = givenAnObjective("123")
 
-    getObjective(planKey, objectiveReference)
+    getObjective(CaseReferenceNumber("123"), objectiveReference)
       .expectStatus().isOk()
       .expectBody()
       .jsonPath("$.id").doesNotExist()
@@ -96,10 +96,9 @@ class ObjectiveControllerTest : IntegrationTestBase() {
 
   @Test
   fun `GET Minimal objective`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey = planKey, body = minimalRequestBody)
+    val objectiveReference = givenAnObjective(crn = "456", body = minimalRequestBody)
 
-    getObjective(planKey, objectiveReference)
+    getObjective(CaseReferenceNumber("456"), objectiveReference)
       .expectStatus().isOk()
       .expectBody()
       .jsonPath("$.id").doesNotExist()
@@ -116,19 +115,18 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   private fun getObjective(
-    planKey: PlanKey,
+    crn: CaseReferenceNumber,
     objectiveReference: UUID,
   ): WebTestClient.ResponseSpec = authedWebTestClient.get()
     .uri(
-      "/person/{crn}/plans/{pReference}/objectives/{objReference}",
-      planKey.caseReferenceNumber,
-      planKey.reference,
+      "/person/{crn}/objectives/{objReference}",
+      crn,
       objectiveReference,
     ).exchange()
 
-  fun givenAnObjective(planKey: PlanKey, body: String = requestBody): UUID {
+  fun givenAnObjective(crn: String, body: String = requestBody): UUID {
     val exchangeResult = authedWebTestClient.post()
-      .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
+      .uri("/person/{crn}/objectives", crn)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(body)
       .exchange()
@@ -140,36 +138,15 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `404 when plan does not exist`() {
-    getObjective(PlanKey("not-exist", UUID.randomUUID()), UUID.randomUUID())
-      .expectStatus()
-      .isNotFound()
-  }
-
-  @Test
   fun `404 when objective does not exist`() {
-    val aPlan = givenAPlan()
-
-    getObjective(aPlan, UUID.randomUUID())
-      .expectStatus()
-      .isNotFound()
-  }
-
-  @Test
-  fun `404 when plan is deleted`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey)
-    givenPlanIsDeleted(planKey)
-
-    getObjective(planKey, objectiveReference)
+    getObjective(CaseReferenceNumber("123"), UUID.randomUUID())
       .expectStatus()
       .isNotFound()
   }
 
   @Test
   fun `PUT updates the objective`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey)
+    val (crn, objectiveReference) = givenAnObjective()
 
     val requestBody = """
         {
@@ -182,7 +159,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
         }
     """.trimIndent()
 
-    putObjective(planKey, objectiveReference, requestBody)
+    putObjective(crn, objectiveReference, requestBody)
       .expectStatus()
       .isOk()
       .expectBody()
@@ -206,8 +183,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
 
   @Test
   fun `PUT with minimal update body`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey)
+    val (crn, objectiveReference) = givenAnObjective()
     val minimalUpdateBody = """
         {
                 "title":"title",
@@ -216,7 +192,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
         }
     """.trimIndent()
 
-    putObjective(planKey, objectiveReference, minimalUpdateBody)
+    putObjective(crn, objectiveReference, minimalUpdateBody)
       .expectStatus()
       .isOk()
       .expectBody()
@@ -227,14 +203,13 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   private fun putObjective(
-    planKey: PlanKey,
+    crn: CaseReferenceNumber,
     objectiveReference: UUID,
     requestBody: String,
   ): WebTestClient.ResponseSpec = authedWebTestClient.put()
     .uri(
-      "/person/{crn}/plans/{pReference}/objectives/{obj}",
-      planKey.caseReferenceNumber,
-      planKey.reference,
+      "/person/{crn}/objectives/{obj}",
+      crn,
       objectiveReference,
     )
     .contentType(MediaType.APPLICATION_JSON)
@@ -243,10 +218,9 @@ class ObjectiveControllerTest : IntegrationTestBase() {
 
   @Test
   fun `DELETE Objective marks as is_deleted`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey)
+    val (crn, objectiveReference) = givenAnObjective()
 
-    deleteObjective(planKey, objectiveReference)
+    deleteObjective(crn, objectiveReference)
       .expectStatus()
       .isNoContent()
 
@@ -258,26 +232,24 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   }
 
   private fun deleteObjective(
-    planKey: PlanKey,
+    crn: CaseReferenceNumber,
     objectiveReference: UUID,
   ): WebTestClient.ResponseSpec = authedWebTestClient.delete()
     .uri(
-      "/person/{crn}/plans/{pReference}/objectives/{obj}",
-      planKey.caseReferenceNumber,
-      planKey.reference,
+      "/person/{crn}/objectives/{obj}",
+      crn,
       objectiveReference,
     ).exchange()
 
   @Test
   fun `404 if try to GET deleted objective`() {
-    val planKey = givenAPlan()
-    val objectiveReference = givenAnObjective(planKey)
+    val (crn, objectiveReference) = givenAnObjective()
 
-    deleteObjective(planKey, objectiveReference)
+    deleteObjective(crn, objectiveReference)
       .expectStatus()
       .isNoContent()
 
-    getObjective(planKey, objectiveReference)
+    getObjective(crn, objectiveReference)
       .expectStatus()
       .isNotFound()
   }
@@ -285,8 +257,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   @Test
   fun `GET all objectives for a plan`() {
     val planKey = givenAPlan()
-    val objectiveReferenceA = givenAnObjective(planKey)
-    val objectiveReferenceB = givenAnObjective(planKey)
+    val objectiveReferenceA = givenAnObjective(crn = "123", body = createObjectiveAndLinkToPlan(planKey))
+    val objectiveReferenceB = givenAnObjective(crn = "123", body = createObjectiveAndLinkToPlan(planKey))
 
     authedWebTestClient.get()
       .uri("/person/{crn}/plans/{pReference}/objectives", planKey.caseReferenceNumber, planKey.reference)
@@ -299,6 +271,17 @@ class ObjectiveControllerTest : IntegrationTestBase() {
         assertThat(refs).containsExactlyInAnyOrder(objectiveReferenceA.toString(), objectiveReferenceB.toString())
       }
   }
+
+  private fun createObjectiveAndLinkToPlan(planKey: PlanKey): String = """
+            {
+                    "title":"title",
+                    "targetCompletionDate": "2024-02-01",
+                    "status":"IN_PROGRESS",
+                    "note":"note",
+                    "outcome":"outcome",
+                    "planReference": "${planKey.reference}"
+            }
+  """.trimIndent()
 
   @Test
   fun `Empty array on GET all when a plan has no objectives`() {
@@ -331,9 +314,9 @@ class ObjectiveControllerTest : IntegrationTestBase() {
                 "reasonForChange": "Just felt like it"
         }
     """.trimIndent()
-    val (caseReferenceNumber, planReference, objectiveReference) = givenAnObjective(status = ObjectiveStatus.COMPLETED)
+    val (caseReferenceNumber, objectiveReference) = givenAnObjective(status = ObjectiveStatus.COMPLETED)
 
-    putObjective(PlanKey(caseReferenceNumber, planReference), objectiveReference, requestBody)
+    putObjective(caseReferenceNumber, objectiveReference, requestBody)
       .expectStatus()
       .isBadRequest()
       .expectBody()

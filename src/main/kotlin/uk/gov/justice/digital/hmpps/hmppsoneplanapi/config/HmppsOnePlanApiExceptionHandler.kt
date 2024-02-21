@@ -42,7 +42,7 @@ class HmppsOnePlanApiExceptionHandler(
     cause: TypeMismatchException,
   ): ResponseEntity<ErrorResponse> {
     val detail = when (cause.requiredType) {
-      UUID::class.java -> "should be a valid UUID"
+      UUID::class.java -> "must be a valid UUID"
       else -> "invalid value given"
     }
 
@@ -83,9 +83,9 @@ class HmppsOnePlanApiExceptionHandler(
 
     val type = cause.targetType
     return when {
-      type == LocalDate::class.java -> "should be a date in format yyyy-MM-dd"
-      type == Boolean::class.java -> "should be a boolean true|false"
-      type.isEnum -> "should be one of [${type.enumConstants.joinToString { it.toString() }}]"
+      type == LocalDate::class.java -> "must be a date in format yyyy-MM-dd"
+      type == Boolean::class.java -> "must be a boolean true|false"
+      type.isEnum -> "must be one of [${type.enumConstants.joinToString { it.toString() }}]"
       else -> "is invalid"
     }
   }
@@ -115,7 +115,7 @@ class HmppsOnePlanApiExceptionHandler(
   @ExceptionHandler(ConstraintViolationException::class)
   fun handleConstraintViolationException(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
     val message = e.constraintViolations.joinToString { violation ->
-      "${violation.propertyPath.drop(1).joinToString(".") { it.name }}: ${violation.message}"
+      violation.message
     }
     return ResponseEntity
       .status(BAD_REQUEST)

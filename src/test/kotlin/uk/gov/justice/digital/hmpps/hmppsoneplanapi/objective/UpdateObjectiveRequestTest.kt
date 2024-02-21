@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.LocalDate
 
 class UpdateObjectiveRequestTest {
@@ -13,6 +14,7 @@ class UpdateObjectiveRequestTest {
       status = ObjectiveStatus.IN_PROGRESS,
       note = "note",
       outcome = "outcome",
+      caseReferenceNumber = CaseReferenceNumber("crn"),
     )
 
     val updated = UpdateObjectiveRequest(

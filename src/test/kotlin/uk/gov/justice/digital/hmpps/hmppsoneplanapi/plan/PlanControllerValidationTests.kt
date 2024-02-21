@@ -18,13 +18,13 @@ class PlanControllerValidationTests : WebfluxTestBase() {
   @Test
   fun `400 on POST when crn is too long`() {
     post("12345678901", requestBuilder())
-      .value { assertThat(it.userMessage).isEqualTo("crn: size must be between 1 and 10") }
+      .value { assertThat(it.userMessage).isEqualTo("crn: must be not blank and between and no more than 10 characters") }
   }
 
   @Test
   fun `400 on POST when crn is blank`() {
     post("  ", requestBuilder())
-      .value { assertThat(it.userMessage).isEqualTo("crn: must not be blank") }
+      .value { assertThat(it.userMessage).isEqualTo("crn: must be not blank and between and no more than 10 characters") }
   }
 
   @Test
@@ -36,7 +36,7 @@ class PlanControllerValidationTests : WebfluxTestBase() {
   @Test
   fun `400 on POST when plan type is not one of the allowed values`() {
     post("crn123", requestBuilder(type = "ICE_CREAM"))
-      .value { assertThat(it.userMessage).isEqualTo("planType: should be one of [PERSONAL_LEARNING, SENTENCE, RESETTLEMENT]") }
+      .value { assertThat(it.userMessage).isEqualTo("planType: must be one of [PERSONAL_LEARNING, SENTENCE, RESETTLEMENT]") }
   }
 
   @Test
@@ -48,7 +48,7 @@ class PlanControllerValidationTests : WebfluxTestBase() {
       .isBadRequest()
       .expectBody(ErrorResponse::class.java)
       .value {
-        assertThat(it.userMessage).isEqualTo("planReference: should be a valid UUID")
+        assertThat(it.userMessage).isEqualTo("planReference: must be a valid UUID")
       }
   }
 

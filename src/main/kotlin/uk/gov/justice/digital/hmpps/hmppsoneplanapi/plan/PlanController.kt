@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -43,6 +44,11 @@ class PlanController(private val planService: PlanService) {
       ApiResponse(
         responseCode = "403",
         description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "One of the objectives given in the body does not exist",
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
@@ -144,6 +150,40 @@ class PlanController(private val planService: PlanService) {
     @PathVariable(value = "planReference") reference: UUID,
   ): ResponseEntity<Nothing> {
     planService.markPlanDeleted(crn, reference)
+    return ResponseEntity.noContent().build()
+  }
+
+  @Operation(
+    summary = "Adds an existing objective to a plan",
+    responses = [
+      ApiResponse(
+        responseCode = "204",
+        description = "Objective added to plan",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Plan or Objective not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PatchMapping("/person/{crn}/plans/{planReference}/objectives")
+  suspend fun addObjectives(
+    @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
+    @PathVariable(value = "planReference") reference: UUID,
+    @RequestBody addObjectiveRequest: AddObjectivesRequest,
+  ): ResponseEntity<Nothing> {
+    planService.addObjectives(PlanKey(crn, reference), addObjectiveRequest.objectives)
     return ResponseEntity.noContent().build()
   }
 }

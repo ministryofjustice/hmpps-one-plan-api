@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
@@ -49,11 +50,18 @@ class PlanService(
     )
 
     getObjectives(crn, planRequest.objectives).map { objective ->
-      val link = PlanObjectiveLink(planId = createdPlan.id, objectiveId = objective.id)
-      entityTemplate.insert(link).awaitSingle()
+      createPlanObjectiveLink(createdPlan, objective)
     }.collect()
 
     return createdPlan
+  }
+
+  private suspend fun createPlanObjectiveLink(
+    plan: PlanEntity,
+    objective: ObjectiveEntity,
+  ): PlanObjectiveLink? {
+    val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
+    return entityTemplate.insert(link).awaitSingle()
   }
 
   suspend fun getObjectives(crn: CaseReferenceNumber, references: Collection<UUID>): Flow<ObjectiveEntity> {
@@ -66,11 +74,23 @@ class PlanService(
     if (foundObjectives.count() != references.size) {
       val foundRefs = foundObjectives.map { it.reference }.toSet()
       val firstNotFound = references.first { it !in foundRefs }
-      throw NotFoundException("/person/$crn/objectives/$firstNotFound")
+      throw objectiveNotFound(crn, firstNotFound)
     }
 
     return foundObjectives
   }
+
+  @Transactional
+  suspend fun addObjectives(planKey: PlanKey, objectiveRefs: List<UUID>) {
+    val plan = getByKey(planKey)
+
+    objectiveRefs.asFlow()
+      .map { ref ->
+        val objective = objectiveRepository.getObjective(planKey.crn, ref) ?: throw objectiveNotFound(planKey.crn, ref)
+        createPlanObjectiveLink(plan, objective)
+      }.collect()
+  }
 }
 
 fun planNotFound(crn: CaseReferenceNumber, reference: UUID) = NotFoundException("/person/$crn/plans/$reference")
+fun objectiveNotFound(crn: CaseReferenceNumber, ref: UUID) = NotFoundException("/person/$crn/objectives/$ref")

@@ -128,7 +128,7 @@ class PlanControllerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `PATCH is not allowed`() {
+  fun `PATCH is not allowed on plans`() {
     authedWebTestClient.patch()
       .uri("person/{crn}/plans", "456")
       .exchange()
@@ -166,6 +166,29 @@ class PlanControllerTest : IntegrationTestBase() {
     getAllExpectingCount(crn, 0)
     getPlan(crn, planReference)
       .expectStatus().isNotFound()
+  }
+
+  @Test
+  fun `Can link an objective to a plan`() {
+    val (crn, planReference) = givenAPlan(crn = "abcd")
+    val (_, objectiveReference) = givenAnObjective(crn = "abcd")
+
+    authedWebTestClient.patch()
+      .uri("/person/{crn}/plans/{planRef}/objectives", crn, planReference)
+      .bodyValue(
+        AddObjectivesRequest(
+          objectives = listOf(objectiveReference),
+        ),
+      )
+      .exchange()
+      .expectStatus()
+      .isNoContent()
+
+    runBlocking {
+      assertThat(countLinkedObjectives(planReference))
+        .describedAs("Should be an objective linked to plan")
+        .isEqualTo(1L)
+    }
   }
 
   private fun getAllExpectingCount(crn: String, count: Int) {

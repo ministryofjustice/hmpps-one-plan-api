@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import java.util.UUID
@@ -74,20 +75,11 @@ class PlanControllerTest : IntegrationTestBase() {
     val (caseReferenceNumber, objectiveReference1) = givenAnObjective(crn = "abc")
     val (_, objectiveReference2) = givenAnObjective(crn = "abc")
 
-    val (planReference) = authedWebTestClient.post()
-      .uri("/person/{crn}/plans", caseReferenceNumber)
-      .bodyValue(
-        CreatePlanRequest(
-          planType = PlanType.PERSONAL_LEARNING,
-          objectives = listOf(objectiveReference1, objectiveReference2),
-        ),
-      )
-      .exchange()
-      .expectStatus()
-      .isOk()
-      .expectBody(CreateEntityResponse::class.java)
-      .returnResult()
-      .responseBody!!
+    val createPlanRequest = CreatePlanRequest(
+      planType = PlanType.PERSONAL_LEARNING,
+      objectives = listOf(objectiveReference1, objectiveReference2),
+    )
+    val planReference = postPlan(caseReferenceNumber, createPlanRequest)
 
     runBlocking {
       assertThat(countLinkedObjectives(planReference))
@@ -95,6 +87,20 @@ class PlanControllerTest : IntegrationTestBase() {
         .isEqualTo(2L)
     }
   }
+
+  private fun postPlan(
+    caseReferenceNumber: CaseReferenceNumber,
+    createPlanRequest: CreatePlanRequest,
+  ) = authedWebTestClient.post()
+    .uri("/person/{crn}/plans", caseReferenceNumber)
+    .bodyValue(createPlanRequest)
+    .exchange()
+    .expectStatus()
+    .isOk()
+    .expectBody(CreateEntityResponse::class.java)
+    .returnResult()
+    .responseBody!!
+    .reference
 
   private suspend fun countLinkedObjectives(planReference: UUID): Long? {
     val sql = """ select count(*) as count from plan_objective_link where plan_id =
@@ -173,14 +179,7 @@ class PlanControllerTest : IntegrationTestBase() {
     val (crn, planReference) = givenAPlan(crn = "abcd")
     val (_, objectiveReference) = givenAnObjective(crn = "abcd")
 
-    authedWebTestClient.patch()
-      .uri("/person/{crn}/plans/{planRef}/objectives", crn, planReference)
-      .bodyValue(
-        AddObjectivesRequest(
-          objectives = listOf(objectiveReference),
-        ),
-      )
-      .exchange()
+    addObjectives(crn, planReference, listOf(objectiveReference))
       .expectStatus()
       .isNoContent()
 
@@ -189,6 +188,47 @@ class PlanControllerTest : IntegrationTestBase() {
         .describedAs("Should be an objective linked to plan")
         .isEqualTo(1L)
     }
+  }
+
+  @Test
+  fun `404 on link plan to objective when objective does not exist`() {
+    val (crn, planReference) = givenAPlan(crn = "abcd")
+    val (_, objectiveReference) = givenAnObjective(crn = "abcd")
+
+    addObjectives(crn, planReference, listOf(objectiveReference, UUID.randomUUID()))
+      .expectStatus()
+      .isNotFound()
+
+    runBlocking {
+      assertThat(countLinkedObjectives(planReference))
+        .describedAs("Should be no objectives linked to plan")
+        .isEqualTo(0L)
+    }
+  }
+  private fun addObjectives(
+    crn: CaseReferenceNumber,
+    planReference: UUID,
+    objectiveReferences: List<UUID>,
+  ): WebTestClient.ResponseSpec = authedWebTestClient.patch()
+    .uri("/person/{crn}/plans/{planRef}/objectives", crn, planReference)
+    .bodyValue(
+      AddObjectivesRequest(
+        objectives = objectiveReferences,
+      ),
+    )
+    .exchange()
+
+  @Test
+  fun `Cannot add the same objective to a plan twice`() {
+    val (caseReferenceNumber, objectiveReference) = givenAnObjective()
+    val planReference = postPlan(
+      caseReferenceNumber,
+      CreatePlanRequest(planType = PlanType.SENTENCE, objectives = listOf(objectiveReference)),
+    )
+
+    addObjectives(caseReferenceNumber, planReference, listOf(objectiveReference))
+      .expectStatus()
+      .is4xxClientError()
   }
 
   private fun getAllExpectingCount(crn: String, count: Int) {

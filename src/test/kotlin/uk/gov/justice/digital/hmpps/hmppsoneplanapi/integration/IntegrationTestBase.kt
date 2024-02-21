@@ -83,7 +83,6 @@ abstract class IntegrationTestBase {
 
   fun givenAnObjective(
     crn: String = "123",
-    type: PlanType = PlanType.PERSONAL_LEARNING,
     title: String = "title",
     targetCompletionDate: LocalDate = LocalDate.of(2024, 2, 1),
     status: ObjectiveStatus = ObjectiveStatus.IN_PROGRESS,

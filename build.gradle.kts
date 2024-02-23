@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   val kotlinVersion = "1.9.22"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -31,18 +31,12 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.2")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-  testImplementation("org.testcontainers:postgresql:1.19.5")
+  testImplementation("org.testcontainers:postgresql:1.19.6")
   testImplementation("org.assertj:assertj-core:3.25.3")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.5")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
   testImplementation("io.mockk:mockk:1.13.9")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
-
-  constraints {
-    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3") {
-      because("CVE-2023-52428")
-    }
-  }
 }
 
 kotlin {

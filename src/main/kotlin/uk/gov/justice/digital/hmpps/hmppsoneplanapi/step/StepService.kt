@@ -38,7 +38,6 @@ class StepService(
     val objective = objectiveService.getObjective(objectiveKey)
     return stepRepository.findAllByObjectiveIdAndIsDeletedIsFalseOrderByStepOrder(objective.id)
   }
-
   suspend fun deleteStep(objectiveKey: ObjectiveKey, stepReference: UUID) {
     val objective = objectiveService.getObjective(objectiveKey)
     val count = stepRepository.markStepDeleted(objective.id, stepReference)

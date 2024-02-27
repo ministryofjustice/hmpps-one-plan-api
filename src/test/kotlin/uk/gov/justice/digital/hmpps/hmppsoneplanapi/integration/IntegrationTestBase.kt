@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -17,7 +18,10 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveStatus
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.CreatePlanRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanType
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.CreateStepRequest
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepStatus
 import java.time.LocalDate
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -108,5 +112,34 @@ abstract class IntegrationTestBase {
         .responseBody!!
         .reference
     return ObjectiveKey(CaseReferenceNumber(crn), objectiveReference)
+  }
+
+  fun givenAStep(
+    objectiveKey: ObjectiveKey,
+    description: String = "description",
+    status: StepStatus = StepStatus.IN_PROGRESS,
+    staffNote: String? = "note",
+    staffTask: Boolean = false,
+  ): UUID {
+    val exchangeResult = authedWebTestClient.post()
+      .uri(
+        "/person/{crn}/objectives/{oReference}/steps",
+        objectiveKey.caseReferenceNumber,
+        objectiveKey.objectiveReference,
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CreateStepRequest(
+          status = status,
+          staffTask = staffTask,
+          staffNote = staffNote,
+          description = description,
+        ),
+      )
+      .exchange()
+      .expectStatus().isOk()
+      .expectBody(CreateEntityResponse::class.java)
+      .returnResult()
+    return exchangeResult.responseBody!!.reference
   }
 }

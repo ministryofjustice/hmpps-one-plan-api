@@ -2,6 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactor.asFlux
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
@@ -82,5 +85,25 @@ class ObjectiveService(
   suspend fun getObjectives(planKey: PlanKey): Flow<ObjectiveEntity> {
     val plan = planService.getByKey(planKey)
     return objectiveRepository.findAllByPlanId(plan.id)
+  }
+
+  suspend fun getObjectives(crn: CaseReferenceNumber): Flow<Objective> {
+    return objectiveRepository.findAllByCrn(crn)
+      .map { buildObjective(it) }
+  }
+
+  suspend fun getObjectivesAndSteps(crn: CaseReferenceNumber): Flow<Objective> {
+    return objectiveRepository.findAllByCrnWithSteps(crn).asFlux()
+      .groupBy { it.objective.id }
+      .flatMap { group ->
+        group.collectList()
+          .map { stepAndObjectives ->
+            buildObjective(
+              stepAndObjectives.first().objective,
+              stepAndObjectives.mapNotNull { it.step }
+                .filter { !it.isDeleted },
+            )
+          }
+      }.asFlow()
   }
 }

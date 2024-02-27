@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 import io.r2dbc.spi.Row
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
-import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepEntity
 
@@ -13,7 +12,6 @@ data class ObjectiveAndStep(
 )
 
 @ReadingConverter
-@Component
 class StepAndObjectiveConverter : Converter<Row, ObjectiveAndStep> {
   override fun convert(source: Row): ObjectiveAndStep {
     val step = mapStep(source)

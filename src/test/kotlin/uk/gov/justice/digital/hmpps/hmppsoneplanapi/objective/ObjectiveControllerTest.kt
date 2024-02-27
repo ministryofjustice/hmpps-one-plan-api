@@ -9,6 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepEntity
 import java.util.UUID
 
 class ObjectiveControllerTest : IntegrationTestBase() {
@@ -91,6 +92,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.createdAt").isNotEmpty()
       .jsonPath("$.updatedBy").isEqualTo("test-user")
       .jsonPath("$.updatedAt").isNotEmpty()
+      .jsonPath("$.steps").doesNotExist()
   }
 
   @Test
@@ -320,5 +322,53 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .isBadRequest()
       .expectBody()
       .jsonPath("$.userMessage").isEqualTo("cannot update completed Objective")
+  }
+
+  @Test
+  fun `Get all objectives for a person`() {
+    givenAnObjective(crn = "569")
+    givenAnObjective(crn = "569")
+
+    authedWebTestClient.get()
+      .uri("/person/569/objectives")
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(2)
+      .jsonPath("$.[0].title").isNotEmpty()
+      .jsonPath("$.[0].targetCompletionDate").isNotEmpty()
+      .jsonPath("$.[0].status").isNotEmpty()
+      .jsonPath("$.[0].note").isNotEmpty()
+      .jsonPath("$.[0].outcome").isNotEmpty()
+      .jsonPath("$.[0].createdBy").isNotEmpty()
+      .jsonPath("$.[0].createdAt").isNotEmpty()
+      .jsonPath("$.[0].updatedAt").isNotEmpty()
+      .jsonPath("$.[0].updatedBy").isNotEmpty()
+  }
+
+  @Test
+  fun `Get all objectives for a person with steps`() {
+    val objectiveWithNoStepsRef = givenAnObjective(crn = "899")
+    val objectiveWithStepsRef = givenAnObjective(crn = "899")
+    val key = ObjectiveKey(CaseReferenceNumber("899"), objectiveWithStepsRef)
+    givenAStep(key)
+    givenAStep(key)
+
+    val response = authedWebTestClient.get()
+      .uri("/person/899/objectives?includeSteps=true")
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBodyList(Objective::class.java)
+      .hasSize(2)
+      .returnResult().responseBody!!
+
+    val objectiveWithSteps = response.find { it.reference == objectiveWithStepsRef }!!
+    assertThat(objectiveWithSteps.steps).hasSize(2)
+    assertThat(objectiveWithSteps.steps).extracting(StepEntity::staffNote, StepEntity::createdAt)
+      .doesNotContainNull()
+    val objectiveWithoutSteps = response.find { it.reference == objectiveWithNoStepsRef }!!
+    assertThat(objectiveWithoutSteps.steps).hasSize(0)
   }
 }

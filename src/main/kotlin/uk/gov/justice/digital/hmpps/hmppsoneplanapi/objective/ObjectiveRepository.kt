@@ -51,4 +51,50 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
     """,
   )
   suspend fun findAllByPlanId(id: UUID): Flow<ObjectiveEntity>
+
+  @Query(
+    """
+    select
+        s.id as step_id,
+        s.reference as step_reference,
+        s.description as step_description,
+        s.step_order,
+        s.staff_note,
+        s.staff_task,
+        s.status as step_status,
+        s.created_at as step_created_at,
+        s.created_by as step_created_by,
+        s.updated_at as step_updated_at,
+        s.updated_by as step_updated_by,
+
+        o.id as objective_id,
+        o.reference as objective_reference,
+        o.crn,
+        o.title as objective_title,
+        o.status as objective_status,
+        o.note,
+        o.outcome,
+        o.target_completion_date,
+        o.created_at as objective_created_at,
+        o.created_by as objective_created_by,
+        o.updated_at as objective_updated_at,
+        o.updated_by as objective_updated_by
+    from objective o
+    left outer join step s
+        on o.id = s.objective_id
+    where o.crn = :caseReferenceNumber
+    and o.is_deleted = false
+    order by o.created_at, o.id, s.step_order
+  """,
+  )
+  suspend fun findAllByCrnWithSteps(crn: CaseReferenceNumber): Flow<ObjectiveAndStep>
+
+  @Query(
+    """
+    select * from objective
+    where crn = :crn
+    and is_deleted = false
+  """,
+  )
+  suspend fun findAllByCrn(crn: CaseReferenceNumber): Flow<ObjectiveEntity>
 }

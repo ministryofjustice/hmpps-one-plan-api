@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepEntity
@@ -8,6 +9,8 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 data class Objective(
+  @JsonIgnore
+  val id: UUID?,
   val reference: UUID,
   val caseReferenceNumber: CaseReferenceNumber,
   val title: String,
@@ -25,6 +28,7 @@ data class Objective(
 )
 
 internal fun buildObjective(entity: ObjectiveEntity, steps: List<StepEntity>? = null): Objective = Objective(
+  id = entity.id,
   reference = entity.reference,
   caseReferenceNumber = entity.caseReferenceNumber,
   title = entity.title,

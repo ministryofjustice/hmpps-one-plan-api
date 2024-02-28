@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
@@ -27,7 +29,10 @@ import java.util.UUID
 @RequestMapping
 @Tag(name = "Plan", description = "Manage plans")
 @Validated
-class PlanController(private val planService: PlanService) {
+class PlanController(
+  private val planService: PlanService,
+  private val linkService: LinkService,
+) {
 
   @Operation(
     summary = "Create a Plan for the person identified by the given CRN (Case Reference Number)",
@@ -117,8 +122,13 @@ class PlanController(private val planService: PlanService) {
   @GetMapping("/person/{crn}/plans")
   suspend fun getAllPlans(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
-  ): Flow<PlanEntity> {
-    return planService.findAllByCrn(crn)
+    @RequestParam(value = "includeObjectivesAndSteps", required = false) includeObjectives: Boolean = false,
+  ): Flow<Plan> {
+    return if (includeObjectives) {
+      linkService.getAllPlansWithObjectivesAndSteps(crn)
+    } else {
+      planService.findAllByCrn(crn).map { buildPlan(it) }
+    }
   }
 
   @Operation(

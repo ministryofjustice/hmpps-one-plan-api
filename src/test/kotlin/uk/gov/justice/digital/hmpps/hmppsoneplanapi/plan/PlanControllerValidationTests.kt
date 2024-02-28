@@ -16,6 +16,9 @@ class PlanControllerValidationTests : WebfluxTestBase() {
   @MockkBean
   private lateinit var planService: PlanService
 
+  @MockkBean
+  private lateinit var linkService: LinkService
+
   @Test
   fun `400 on POST when crn is too long`() {
     post("12345678901", requestBuilder())

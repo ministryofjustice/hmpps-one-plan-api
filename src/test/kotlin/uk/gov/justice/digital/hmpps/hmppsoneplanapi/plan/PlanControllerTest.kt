@@ -240,4 +240,38 @@ class PlanControllerTest : IntegrationTestBase() {
       .jsonPath("$").isArray()
       .jsonPath("$.size()").isEqualTo(count)
   }
+
+  @Test
+  fun `Can get all plans with objective and steps`() {
+    val crn = "1479"
+    val planWithObjectives = givenAPlan(crn).reference
+    val planWithNoObjectives = givenAPlan(crn).reference
+
+    val objectiveWithSteps = givenAnObjective(crn = crn, planReference = planWithObjectives)
+    val objectiveWithNoSteps = givenAnObjective(crn = crn, planReference = planWithObjectives)
+
+    val step1 = givenAStep(objectiveWithSteps)
+    val step2 = givenAStep(objectiveWithSteps)
+
+    val plans = authedWebTestClient.get()
+      .uri("person/{crn}/plans?includeObjectivesAndSteps=true", crn)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBodyList(Plan::class.java)
+      .returnResult()
+      .responseBody!!
+
+    assertThat(plans).flatExtracting({ it.reference })
+      .containsExactlyInAnyOrder(planWithObjectives, planWithNoObjectives)
+    val resultWithNoObjectives = plans.find { it.reference == planWithNoObjectives }!!
+    assertThat(resultWithNoObjectives.objectives).isEmpty()
+    val resultWithObjectives = plans.find { it.reference == planWithObjectives }!!
+    assertThat(resultWithObjectives.objectives).flatExtracting({ it.reference })
+      .containsExactlyInAnyOrder(objectiveWithNoSteps.objectiveReference, objectiveWithSteps.objectiveReference)
+
+    val resultWithSteps = resultWithObjectives.objectives!!.find { it.reference == objectiveWithSteps.objectiveReference }!!
+    assertThat(resultWithSteps.steps).flatExtracting({ it.reference })
+      .containsExactlyInAnyOrder(step1, step2)
+  }
 }

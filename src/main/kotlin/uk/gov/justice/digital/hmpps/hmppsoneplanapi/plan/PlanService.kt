@@ -45,7 +45,7 @@ class PlanService(
     val createdPlan = planRepository.save(
       PlanEntity(
         type = planRequest.planType,
-        caseReferenceNumber = crn.value,
+        caseReferenceNumber = crn,
       ),
     )
 
@@ -90,6 +90,8 @@ class PlanService(
         createPlanObjectiveLink(plan, objective)
       }.collect()
   }
+
+  suspend fun findAllLinksByCrn(crn: CaseReferenceNumber): Flow<PlanObjectiveLink> = planRepository.findAllPlanLinks(crn)
 }
 
 fun planNotFound(crn: CaseReferenceNumber, reference: UUID) = NotFoundException("/person/$crn/plans/$reference")

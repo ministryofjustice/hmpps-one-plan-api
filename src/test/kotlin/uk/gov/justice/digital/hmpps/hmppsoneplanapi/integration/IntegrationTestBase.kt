@@ -92,6 +92,7 @@ abstract class IntegrationTestBase {
     status: ObjectiveStatus = ObjectiveStatus.IN_PROGRESS,
     note: String = "note",
     outcome: String = "outcome",
+    planReference: UUID? = null,
   ): ObjectiveKey {
     val objectiveReference =
       authedWebTestClient.post().uri("/person/{crn}/objectives", crn)
@@ -102,6 +103,7 @@ abstract class IntegrationTestBase {
             status = status,
             note = note,
             outcome = outcome,
+            planReference = planReference,
           ),
         )
         .exchange()

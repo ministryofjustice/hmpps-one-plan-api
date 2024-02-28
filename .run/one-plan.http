@@ -132,3 +132,7 @@ Authorization: Bearer {{auth_token}}
 ### Get objective with steps
 GET {{base.url}}/person/123/objectives?includeSteps=true
 Authorization: Bearer {{auth_token}}
+
+### Get All for person
+GET {{base.url}}/person/123/plans?includeObjectivesAndSteps=true
+Authorization: Bearer {{auth_token}}

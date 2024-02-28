@@ -45,7 +45,7 @@ class PlanService(
     val createdPlan = planRepository.save(
       PlanEntity(
         type = planRequest.planType,
-        caseReferenceNumber = crn.value,
+        caseReferenceNumber = crn,
       ),
     )
 

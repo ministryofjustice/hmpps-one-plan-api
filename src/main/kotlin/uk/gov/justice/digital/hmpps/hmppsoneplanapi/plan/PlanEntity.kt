@@ -24,7 +24,7 @@ data class PlanEntity(
   val reference: UUID = UUID.randomUUID(),
   @InsertOnlyProperty
   @Column("crn")
-  val caseReferenceNumber: String,
+  val caseReferenceNumber: CaseReferenceNumber,
   val type: PlanType,
 
   @InsertOnlyProperty

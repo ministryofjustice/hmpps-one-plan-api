@@ -1,13 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.Objective
 import java.time.ZonedDateTime
 import java.util.UUID
 
 data class Plan(
   val reference: UUID,
-  val caseReferenceNumber: String,
+  val caseReferenceNumber: CaseReferenceNumber,
   val type: PlanType,
 
   val createdBy: String?,

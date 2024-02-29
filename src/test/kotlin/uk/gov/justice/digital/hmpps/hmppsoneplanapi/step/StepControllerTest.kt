@@ -164,14 +164,15 @@ class StepControllerTest : IntegrationTestBase() {
     deleteStep(objectiveKey, stepReference)
 
     runBlocking {
-      val isDeleted = databaseClient.sql("select is_deleted from step where reference = :ref")
+      val (isDeleted, status) = databaseClient.sql("select is_deleted, status from step where reference = :ref")
         .bind("ref", stepReference)
         .fetch()
         .one()
-        .map { it["is_deleted"] as Boolean }
+        .map { it["is_deleted"] as Boolean to it["status"] as String }
         .awaitSingle()
 
       assertThat(isDeleted).describedAs("is_deleted should be true").isTrue()
+      assertThat(status).isEqualTo(StepStatus.ARCHIVED.name)
     }
   }
 

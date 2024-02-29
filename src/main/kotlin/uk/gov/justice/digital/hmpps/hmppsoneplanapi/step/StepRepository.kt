@@ -14,7 +14,8 @@ interface StepRepository : CoroutineCrudRepository<StepEntity, UUID> {
   @Modifying
   @Query(
     """
-      update step s set is_deleted=true
+      update step s
+        set is_deleted=true, status='ARCHIVED'
         where reference = :stepReference
         and objective_id = :objectiveId
     """,

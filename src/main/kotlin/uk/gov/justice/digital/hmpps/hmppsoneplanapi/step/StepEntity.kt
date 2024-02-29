@@ -58,6 +58,10 @@ data class StepEntity(
 }
 
 enum class StepStatus {
+  NOT_STARTED,
+  BLOCKED,
+  DEFERRED,
   IN_PROGRESS,
   COMPLETED,
+  ARCHIVED,
 }

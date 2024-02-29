@@ -56,7 +56,8 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Post - 400 when status field is not one of allowed values`() {
     val body = createRequestBuilder(status = "MOOSE")
     post(body).value {
-      assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]")
+      assertThat(it.userMessage)
+        .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
     }
   }
 
@@ -159,7 +160,8 @@ class StepControllerValidationTests : WebfluxTestBase() {
   fun `Put - 400 when status field is not one of allowed values`() {
     val body = updateRequestBuilder(status = "EGG")
     put(body).value {
-      assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]")
+      assertThat(it.userMessage)
+        .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
     }
   }
 

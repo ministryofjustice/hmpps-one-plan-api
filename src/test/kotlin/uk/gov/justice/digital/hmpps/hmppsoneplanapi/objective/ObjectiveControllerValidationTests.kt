@@ -48,8 +48,10 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
 
   @Test
   fun `Post - 400 when status is not one of the allowed values`() {
-    post(createRequestBuilder(status = "BATMAN"))
-      .value { assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]") }
+    post(createRequestBuilder(status = "BATMAN")).value {
+      assertThat(it.userMessage)
+        .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
+    }
   }
 
   @Test
@@ -84,8 +86,10 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
 
   @Test
   fun `Put - 400 when status is not one of the allowed values`() {
-    put(updateRequestBuilder(status = "BATMAN"))
-      .value { assertThat(it.userMessage).isEqualTo("status: must be one of [IN_PROGRESS, COMPLETED]") }
+    put(updateRequestBuilder(status = "BATMAN")).value {
+      assertThat(it.userMessage)
+        .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
+    }
   }
 
   @Test

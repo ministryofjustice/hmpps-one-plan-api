@@ -11,10 +11,10 @@ data class CreateObjectiveRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 512)
   val title: String,
-  val targetCompletionDate: LocalDate?,
   val status: ObjectiveStatus,
-  val note: String?,
-  val outcome: String?,
+  val targetCompletionDate: LocalDate? = null,
+  val note: String? = null,
+  val outcome: String? = null,
   @field:Schema(description = "Optional plan reference to add objective to")
   val planReference: UUID? = null,
 ) {

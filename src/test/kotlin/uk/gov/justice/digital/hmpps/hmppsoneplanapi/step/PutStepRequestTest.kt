@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class UpdateStepRequestTest {
+class PutStepRequestTest {
   @Test
   fun `updates step entity`() {
     val original = StepEntity(
@@ -16,13 +16,13 @@ class UpdateStepRequestTest {
       staffTask = true,
     )
 
-    val updated = UpdateStepRequest(
+    val updated = PutStepRequest(
       description = "desc2",
       status = StepStatus.COMPLETED,
       reasonForChange = "reason for change",
       staffNote = null,
       staffTask = false,
-    ).updateEntity(original)
+    ).updateStepEntity(original)
 
     assertThat(updated.objectiveId).isEqualTo(original.objectiveId)
     assertThat(updated.status).isEqualTo(StepStatus.COMPLETED)

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -172,7 +173,7 @@ class StepController(private val service: StepService) {
   }
 
   @Operation(
-    summary = "Updated a single Step",
+    summary = "Updates a single Step",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -200,8 +201,42 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
-    @RequestBody @Valid updateStepRequest: UpdateStepRequest,
+    @RequestBody @Valid putStepRequest: PutStepRequest,
   ): StepEntity {
-    return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, updateStepRequest)
+    return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, putStepRequest)
+  }
+
+  @Operation(
+    summary = "Partially updates a single step",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "The result of the update",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Step or Objective not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PatchMapping("/person/{crn}/objectives/{objectiveReference}/steps/{stepReference}")
+  suspend fun partialUpdateStep(
+    @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+    @PathVariable(value = "stepReference") stepReference: UUID,
+    @RequestBody @Valid patchRequest: PatchStepRequest,
+  ): StepEntity {
+    return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, patchRequest)
   }
 }

@@ -46,10 +46,11 @@ class StepService(
     }
   }
 
-  suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: UpdateStepRequest): StepEntity {
+  @Transactional
+  suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: StepUpdate): StepEntity {
     val step = getStep(objectiveKey, stepReference)
     checkStepCanBeUpdated(step)
-    val updated = request.updateEntity(step)
+    val updated = request.updateStepEntity(step)
     val result = entityTemplate.insert(buildHistory(step, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated)).awaitSingle()
     return result.t2

@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -243,8 +244,10 @@ class StepControllerValidationTests : WebfluxTestBase() {
       )
   }
 
-  private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.put()
+  private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> = request(HttpMethod.PUT, body)
+
+  private fun request(method: HttpMethod, body: String): WebTestClient.BodySpec<ErrorResponse, *> =
+    authedWebTestClient.method(method)
       .uri(
         "/person/123/objectives/{oRef}/steps/{sRef}",
         UUID.randomUUID(),
@@ -271,4 +274,52 @@ class StepControllerValidationTests : WebfluxTestBase() {
       .expectBody(ErrorResponse::class.java)
       .value { assertThat(it.userMessage).isEqualTo("unexpected error, please retry") }
   }
+
+  @Test
+  fun `Patch 400 on patch when description is too long`() {
+    request(HttpMethod.PATCH, patchRequestBuilder(description = "Z".repeat(513)))
+      .value {
+        assertThat(it.userMessage).isEqualTo("description: size must be between 1 and 512")
+      }
+  }
+
+  @Test
+  fun `Patch 400 on patch when note is too long`() {
+    request(HttpMethod.PATCH, patchRequestBuilder(staffNote = "C".repeat(513)))
+      .value {
+        assertThat(it.userMessage).isEqualTo("staffNote: size must be between 0 and 512")
+      }
+  }
+
+  @Test
+  fun `Patch 400 on patch when reason is too long`() {
+    request(HttpMethod.PATCH, patchRequestBuilder(reasonForChange = "C".repeat(251)))
+      .value {
+        assertThat(it.userMessage).isEqualTo("reasonForChange: size must be between 1 and 250")
+      }
+  }
+
+  @Test
+  fun `Patch 400 on patch when reason is missing`() {
+    request(HttpMethod.PATCH, patchRequestBuilder(reasonForChange = null))
+      .value {
+        assertThat(it.userMessage).isEqualTo("reasonForChange: is required")
+      }
+  }
+
+  private fun patchRequestBuilder(
+    description: Any? = null,
+    stepOrder: Any? = null,
+    status: Any? = null,
+    staffTask: Any? = null,
+    staffNote: Any? = null,
+    reasonForChange: Any? = "reason for change",
+  ): String = updateRequestBuilder(
+    description = description,
+    stepOrder = stepOrder,
+    staffNote = staffNote,
+    staffTask = staffTask,
+    status = status,
+    reasonForChange = reasonForChange,
+  )
 }

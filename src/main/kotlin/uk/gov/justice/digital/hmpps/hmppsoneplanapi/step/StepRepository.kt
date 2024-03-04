@@ -31,4 +31,15 @@ interface StepRepository : CoroutineCrudRepository<StepEntity, UUID> {
     """,
   )
   suspend fun nextStepId(objectiveId: UUID): Int
+
+  @Query(
+    """
+    select * from step
+    where reference = :reference
+    and objective_id = :objectiveId
+    and is_deleted = false
+    for update
+  """,
+  )
+  suspend fun getStepForUpdate(reference: UUID, objectiveId: UUID): StepEntity?
 }

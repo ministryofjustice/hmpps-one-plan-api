@@ -97,4 +97,15 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
   """,
   )
   suspend fun findAllByCrn(crn: CaseReferenceNumber): Flow<ObjectiveEntity>
+
+  @Query(
+    """
+    select * from objective
+    where reference = :objectiveReference
+    and crn = :crn
+    and is_deleted = false
+    for update
+  """,
+  )
+  suspend fun getObjectiveForUpdate(crn: CaseReferenceNumber, objectiveReference: UUID): ObjectiveEntity?
 }

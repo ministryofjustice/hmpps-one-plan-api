@@ -48,12 +48,18 @@ class StepService(
 
   @Transactional
   suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: StepUpdate): StepEntity {
-    val step = getStep(objectiveKey, stepReference)
+    val step = getStepForUpdate(objectiveKey, stepReference)
     checkStepCanBeUpdated(step)
     val updated = request.updateStepEntity(step)
     val result = entityTemplate.insert(buildHistory(step, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated)).awaitSingle()
     return result.t2
+  }
+
+  suspend fun getStepForUpdate(objectiveKey: ObjectiveKey, stepReference: UUID): StepEntity {
+    val objective = objectiveService.getObjectiveForUpdate(objectiveKey)
+    return stepRepository.findByReferenceAndObjectiveIdAndIsDeletedIsFalse(stepReference, objective.id)
+      ?: throw stepNotFound(objectiveKey, stepReference)
   }
 
   private fun checkStepCanBeUpdated(step: StepEntity) {

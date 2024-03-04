@@ -31,7 +31,7 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
   @Modifying
   @Query(
     """
-      update objective o set is_deleted=true
+      update objective o set is_deleted=true, status='ARCHIVED'
       where o.reference = :objectiveReference
         and o.crn = :crn
         and o.is_deleted = false
@@ -97,4 +97,15 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
   """,
   )
   suspend fun findAllByCrn(crn: CaseReferenceNumber): Flow<ObjectiveEntity>
+
+  @Query(
+    """
+    select * from objective
+    where reference = :objectiveReference
+    and crn = :crn
+    and is_deleted = false
+    for update
+  """,
+  )
+  suspend fun getObjectiveForUpdate(crn: CaseReferenceNumber, objectiveReference: UUID): ObjectiveEntity?
 }

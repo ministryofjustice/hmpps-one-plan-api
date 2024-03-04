@@ -1,5 +1,5 @@
 ### Get an auth token from local docker hmpps-auth
-POST http://localhost:9090/auth/oauth/token?grant_type=password&username=ONE_PLAN_USER&password=password123456
+POST http://localhost:9090/auth/oauth/token?grant_type=password&username=ONE_PLAN_USER&password=password{{crn}}456
 Authorization: Basic elite2apiclient clientsecret
 
 > {% client.global.set("auth_token", response.body["access_token"]); %}
@@ -17,7 +17,7 @@ redirect_uri=&username={{authUser}}&password={{authPassword}}
 %}
 
 ### Create a plan
-POST {{base.url}}/person/123/plans
+POST {{base.url}}/person/{{crn}}/plans
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -26,7 +26,7 @@ Authorization: Bearer {{auth_token}}
 }
 
 ### Create a plan with an objective ref
-POST {{base.url}}/person/123/plans
+POST {{base.url}}/person/{{crn}}/plans
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -39,15 +39,15 @@ Authorization: Bearer {{auth_token}}
 > {% client.global.set("planReference", response.body["reference"]); %}
 
 ### Get plan
-GET {{base.url}}/person/123/plans/{{planReference}}
+GET {{base.url}}/person/{{crn}}/plans/{{planReference}}
 Authorization: Bearer {{auth_token}}
 
 ### Get all plans
-GET {{base.url}}/person/123/plans
+GET {{base.url}}/person/{{crn}}/plans
 Authorization: Bearer {{auth_token}}
 
 ### Create objective
-POST {{base.url}}/person/123/objectives
+POST {{base.url}}/person/{{crn}}/objectives
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -62,7 +62,7 @@ Authorization: Bearer {{auth_token}}
 
 
 ### Create objective with plan reference
-POST {{base.url}}/person/123/objectives
+POST {{base.url}}/person/{{crn}}/objectives
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -77,12 +77,12 @@ Authorization: Bearer {{auth_token}}
 > {% client.global.set("objectiveReference", response.body["reference"]); %}
 
 ### Get Objective
-GET {{base.url}}/person/123/objectives/{{objectiveReference}}
+GET {{base.url}}/person/{{crn}}/objectives/{{objectiveReference}}
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
 ### Update objective
-PUT {{base.url}}/person/123/objectives/{{objectiveReference}}
+PUT {{base.url}}/person/{{crn}}/objectives/{{objectiveReference}}
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -97,7 +97,7 @@ Authorization: Bearer {{auth_token}}
 > {% client.global.set("objectiveReference", response.body["reference"]); %}
 
 ### Create Step
-POST {{base.url}}/person/123/objectives/{{objectiveReference}}/steps
+POST {{base.url}}/person/{{crn}}/objectives/{{objectiveReference}}/steps
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -109,11 +109,11 @@ Authorization: Bearer {{auth_token}}
 > {% client.global.set("stepReference", response.body["reference"]); %}
 
 ### Get Step
-GET {{base.url}}/person/123/objectives/{{objectiveReference}}/steps/{{stepReference}}
+GET {{base.url}}/person/{{crn}}/objectives/{{objectiveReference}}/steps/{{stepReference}}
 Authorization: Bearer {{auth_token}}
 
 ### Update Step
-PUT {{base.url}}/person/123/objectives/{{objectiveReference}}/steps/{{stepReference}}
+PUT {{base.url}}/person/{{crn}}/objectives/{{objectiveReference}}/steps/{{stepReference}}
 content-type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -125,14 +125,14 @@ Authorization: Bearer {{auth_token}}
 }
 
 ### Get all objectives for person
-GET {{base.url}}/person/123/objectives
+GET {{base.url}}/person/{{crn}}/objectives
 Authorization: Bearer {{auth_token}}
 
 
 ### Get objective with steps
-GET {{base.url}}/person/123/objectives?includeSteps=true
+GET {{base.url}}/person/{{crn}}/objectives?includeSteps=true
 Authorization: Bearer {{auth_token}}
 
 ### Get All for person
-GET {{base.url}}/person/123/plans?includeObjectivesAndSteps=true
+GET {{base.url}}/person/{{crn}}/plans?includeObjectivesAndSteps=true
 Authorization: Bearer {{auth_token}}

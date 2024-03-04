@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepEntity
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepStatus
 import java.util.UUID
 
 class ObjectiveControllerTest : IntegrationTestBase() {
@@ -225,11 +226,12 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .expectStatus()
       .isNoContent()
 
-    val isDeletedInDb =
-      databaseClient.sql(""" select is_deleted from objective where reference = :reference """)
+    val (isDeletedInDb, status) =
+      databaseClient.sql(""" select is_deleted,status from objective where reference = :reference """)
         .bind("reference", objectiveReference)
-        .fetch().one().map { it["is_deleted"] as Boolean }.block()
-    assertThat(isDeletedInDb!!).describedAs("Db is_deleted flag should be true").isTrue()
+        .fetch().one().map { it["is_deleted"] as Boolean to it["status"] as String }.block()!!
+    assertThat(isDeletedInDb).describedAs("Db is_deleted flag should be true").isTrue()
+    assertThat(status).isEqualTo(StepStatus.ARCHIVED.name)
   }
 
   private fun deleteObjective(
@@ -370,5 +372,31 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .doesNotContainNull()
     val objectiveWithoutSteps = response.find { it.reference == objectiveWithNoStepsRef }!!
     assertThat(objectiveWithoutSteps.steps).hasSize(0)
+  }
+
+  @Test
+  fun `PATCH partially updates an objective`() {
+    val (crn, objectiveReference) = givenAnObjective()
+    val patchBody = """
+        {
+                "status":"COMPLETED",
+                "reasonForChange": "Changed the status"
+        }
+    """.trimIndent()
+
+    authedWebTestClient.patch()
+      .uri(
+        "/person/{crn}/objectives/{obj}",
+        crn,
+        objectiveReference,
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(patchBody)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.status").isEqualTo("COMPLETED")
+      .jsonPath("$.title").isEqualTo("title")
   }
 }

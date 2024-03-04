@@ -44,15 +44,21 @@ class ObjectiveService(
   }
 
   @Transactional
-  suspend fun updateObjective(objectiveKey: ObjectiveKey, request: UpdateObjectiveRequest): ObjectiveEntity {
-    val objective = getObjective(objectiveKey)
+  suspend fun updateObjective(objectiveKey: ObjectiveKey, request: ObjectiveUpdate): ObjectiveEntity {
+    val objective = getObjectiveForUpdate(objectiveKey)
     checkObjectiveCanBeUpdated(objective)
-    val updated = request.updateEntity(objective)
+    val updated = request.updateObjectiveEntity(objective)
 
     val saveResult = entityTemplate.insert(buildHistory(objective, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated))
       .awaitSingle()
     return saveResult.t2
+  }
+
+  suspend fun getObjectiveForUpdate(objectiveKey: ObjectiveKey): ObjectiveEntity {
+    val (crn, objectiveReference) = objectiveKey
+    return objectiveRepository.getObjectiveForUpdate(crn, objectiveKey.objectiveReference)
+      ?: throw NotFoundException("/person/$crn/objectives/$objectiveReference")
   }
 
   private fun checkObjectiveCanBeUpdated(objective: ObjectiveEntity) {

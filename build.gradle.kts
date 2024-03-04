@@ -37,6 +37,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
   testImplementation("io.mockk:mockk:1.13.9")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
+  testImplementation("org.springframework.security:spring-security-test")
 }
 
 kotlin {

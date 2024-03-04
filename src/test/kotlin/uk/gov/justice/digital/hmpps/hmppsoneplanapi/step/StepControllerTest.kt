@@ -164,14 +164,15 @@ class StepControllerTest : IntegrationTestBase() {
     deleteStep(objectiveKey, stepReference)
 
     runBlocking {
-      val isDeleted = databaseClient.sql("select is_deleted from step where reference = :ref")
+      val (isDeleted, status) = databaseClient.sql("select is_deleted, status from step where reference = :ref")
         .bind("ref", stepReference)
         .fetch()
         .one()
-        .map { it["is_deleted"] as Boolean }
+        .map { it["is_deleted"] as Boolean to it["status"] as String }
         .awaitSingle()
 
       assertThat(isDeleted).describedAs("is_deleted should be true").isTrue()
+      assertThat(status).isEqualTo(StepStatus.ARCHIVED.name)
     }
   }
 
@@ -241,17 +242,20 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.status").isEqualTo("COMPLETED")
       .jsonPath("$.staffTask").isEqualTo(true)
 
-    val reasonForChangeOnHistoryRecord =
-      databaseClient.sql(
-        """ select reason_for_change from step_history where step_id =
-        | (select step_id from step where reference = :reference)
-        """.trimMargin(),
-      )
-        .bind("reference", step)
-        .fetch().one().map { it["reason_for_change"] as String }.block()
+    val reasonForChangeOnHistoryRecord = getReasonForChangeFromHistory(step)
 
     assertThat(reasonForChangeOnHistoryRecord).isEqualTo("reason for change")
   }
+
+  private fun getReasonForChangeFromHistory(step: UUID): String? = databaseClient.sql(
+    """ select reason_for_change from step_history where step_id =
+          | (select id from step where reference = :reference)
+    """.trimMargin(),
+  )
+    .bind("reference", step)
+    .mapValue(String::class.java)
+    .one()
+    .block()
 
   private fun putStep(
     objective: ObjectiveKey,
@@ -311,5 +315,35 @@ class StepControllerTest : IntegrationTestBase() {
       .isBadRequest()
       .expectBody()
       .jsonPath("$.userMessage").isEqualTo("cannot update completed Step")
+  }
+
+  @Test
+  fun `PATCH partially updates a step`() {
+    val objective = givenAnObjective()
+    val step = givenAStep(objective)
+
+    val body = """
+                    {
+                      "status": "COMPLETED",
+                      "reasonForChange": "completed"
+                    }
+    """.trimIndent()
+
+    authedWebTestClient.patch()
+      .uri(
+        "/person/{crn}/objectives/{objRef}/steps/{stepRef}",
+        objective.caseReferenceNumber,
+        objective.objectiveReference,
+        step,
+      ).contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(body)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.status").isEqualTo("COMPLETED")
+      .jsonPath("$.description").isEqualTo("description")
+
+    assertThat(getReasonForChangeFromHistory(step)).isEqualTo("completed")
   }
 }

@@ -65,6 +65,10 @@ data class ObjectiveKey(
 )
 
 enum class ObjectiveStatus {
+  NOT_STARTED,
+  BLOCKED,
+  DEFERRED,
   IN_PROGRESS,
   COMPLETED,
+  ARCHIVED,
 }

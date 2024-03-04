@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.LocalDate
 
-class UpdateObjectiveRequestTest {
+class PutObjectiveRequestTest {
   @Test
   fun `updates entity`() {
     val original = ObjectiveEntity(
@@ -17,14 +17,14 @@ class UpdateObjectiveRequestTest {
       caseReferenceNumber = CaseReferenceNumber("crn"),
     )
 
-    val updated = UpdateObjectiveRequest(
+    val updated = PutObjectiveRequest(
       title = "title2",
       targetCompletionDate = LocalDate.of(2024, 2, 2),
       status = ObjectiveStatus.COMPLETED,
       note = "note2",
       outcome = "outcome2",
       reasonForChange = "reason for change",
-    ).updateEntity(original)
+    ).updateObjectiveEntity(original)
 
     assertThat(updated.title).isEqualTo("title2")
     assertThat(updated.targetCompletionDate).isEqualTo("2024-02-02")

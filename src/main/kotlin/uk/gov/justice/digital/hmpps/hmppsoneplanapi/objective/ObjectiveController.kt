@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -194,7 +195,7 @@ class ObjectiveController(
   suspend fun putObjective(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody @Valid request: UpdateObjectiveRequest,
+    @RequestBody @Valid request: PutObjectiveRequest,
   ): ObjectiveEntity {
     return objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
   }
@@ -230,5 +231,38 @@ class ObjectiveController(
   ): ResponseEntity<Nothing> {
     objectiveService.deleteObjective(ObjectiveKey(crn, objectiveReference))
     return ResponseEntity.noContent().build()
+  }
+
+  @Operation(
+    summary = "Partially update data for a single Objective",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Objective data is returned",
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to use this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Objective or plan not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PatchMapping("/person/{crn}/objectives/{objectiveReference}")
+  suspend fun patchObjective(
+    @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
+    @PathVariable(value = "objectiveReference") objectiveReference: UUID,
+    @RequestBody @Valid request: PatchObjectiveRequest,
+  ): ObjectiveEntity {
+    return objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
   }
 }

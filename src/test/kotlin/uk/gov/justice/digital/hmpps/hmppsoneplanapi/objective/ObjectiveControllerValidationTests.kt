@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
@@ -169,8 +170,11 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
       )
   }
 
-  private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.put()
+  private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> = request(HttpMethod.PUT, body)
+  private fun patch(body: String): WebTestClient.BodySpec<ErrorResponse, *> = request(HttpMethod.PATCH, body)
+
+  private fun request(method: HttpMethod, body: String): WebTestClient.BodySpec<ErrorResponse, *> =
+    authedWebTestClient.method(method)
       .uri("/person/123/objectives/{oRef}", UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(body)
@@ -198,5 +202,62 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
           "reasonForChange" to reasonForChange,
         ).filter { it.value != null },
       )
+  }
+
+  private fun patchRequestBuilder(
+    title: String? = null,
+    targetCompletionDate: String? = null,
+    status: String? = null,
+    note: String? = null,
+    outcome: String? = null,
+    reasonForChange: String? = "reasonable",
+  ) = updateRequestBuilder(title, targetCompletionDate, status, note, outcome, reasonForChange)
+
+  @Test
+  fun `Patch - 400 when reasonForChange field is too long`() {
+    val body = updateRequestBuilder(title = "something", reasonForChange = "X".repeat(251))
+    patch(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: size must be between 1 and 250")
+    }
+  }
+
+  @Test
+  fun `Patch - 400 when reasonForChange field is null`() {
+    val body = patchRequestBuilder(title = "something", reasonForChange = null)
+    patch(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: is required")
+    }
+  }
+
+  @Test
+  fun `Patch - 400 when reasonForChange field is blank`() {
+    val body = patchRequestBuilder(title = "something", reasonForChange = "\n   ")
+    patch(body).value {
+      assertThat(it.userMessage).isEqualTo("reasonForChange: must not be blank")
+    }
+  }
+
+  @Test
+  fun `Patch - 400 when title field is too long`() {
+    val body = patchRequestBuilder(title = "Z".repeat(513))
+    patch(body).value {
+      assertThat(it.userMessage).isEqualTo("title: size must be between 1 and 512")
+    }
+  }
+
+  @Test
+  fun `Patch - 400 when target date is formatted incorrectly`() {
+    val body = patchRequestBuilder(targetCompletionDate = "not a date")
+    patch(body).value {
+      assertThat(it.userMessage).isEqualTo("targetCompletionDate: must be a date in format yyyy-MM-dd")
+    }
+  }
+
+  @Test
+  fun `Patch - 400 when status is not one of the allowed values`() {
+    patch(patchRequestBuilder(status = "BATMAN")).value {
+      assertThat(it.userMessage)
+        .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
+    }
   }
 }

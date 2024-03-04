@@ -44,10 +44,10 @@ class ObjectiveService(
   }
 
   @Transactional
-  suspend fun updateObjective(objectiveKey: ObjectiveKey, request: UpdateObjectiveRequest): ObjectiveEntity {
+  suspend fun updateObjective(objectiveKey: ObjectiveKey, request: ObjectiveUpdate): ObjectiveEntity {
     val objective = getObjective(objectiveKey)
     checkObjectiveCanBeUpdated(objective)
-    val updated = request.updateEntity(objective)
+    val updated = request.updateObjectiveEntity(objective)
 
     val saveResult = entityTemplate.insert(buildHistory(objective, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated))

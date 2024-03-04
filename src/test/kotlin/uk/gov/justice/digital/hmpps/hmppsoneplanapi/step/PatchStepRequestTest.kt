@@ -48,6 +48,6 @@ class PatchStepRequestTest {
       .ignoringFields(field, "isNew")
       .isEqualTo(entity)
 
-    assertThat(result.isNew).isTrue()
+    assertThat(result.isNew).isFalse()
   }
 }

@@ -373,4 +373,30 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val objectiveWithoutSteps = response.find { it.reference == objectiveWithNoStepsRef }!!
     assertThat(objectiveWithoutSteps.steps).hasSize(0)
   }
+
+  @Test
+  fun `PATCH partially updates an objective`() {
+    val (crn, objectiveReference) = givenAnObjective()
+    val patchBody = """
+        {
+                "status":"COMPLETED",
+                "reasonForChange": "Changed the status"
+        }
+    """.trimIndent()
+
+    authedWebTestClient.patch()
+      .uri(
+        "/person/{crn}/objectives/{obj}",
+        crn,
+        objectiveReference,
+      )
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(patchBody)
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.status").isEqualTo("COMPLETED")
+      .jsonPath("$.title").isEqualTo("title")
+  }
 }

@@ -24,11 +24,11 @@ data class PutStepRequest(
 }
 
 data class PatchStepRequest(
+  @field:NotBlank
   @field:Size(min = 1, max = 250)
   override val reasonForChange: String,
   val status: StepStatus? = null,
   @field:Size(min = 1, max = 512)
-  @NotBlank
   val description: String? = null,
   @field:Size(min = 0, max = 512)
   val staffNote: String? = null,

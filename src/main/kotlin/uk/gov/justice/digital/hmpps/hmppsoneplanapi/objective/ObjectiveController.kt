@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.Crn
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import java.util.UUID
+import io.swagger.v3.oas.annotations.parameters.RequestBody as BodyDoc
 
 @RestController
 @Validated
@@ -100,8 +101,8 @@ class ObjectiveController(
   suspend fun getObjective(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-  ): Objective {
-    return buildObjective(objectiveService.getObjective(ObjectiveKey(crn, objectiveReference)))
+  ): ObjectiveEntity {
+    return objectiveService.getObjective(ObjectiveKey(crn, objectiveReference))
   }
 
   @Operation(
@@ -132,8 +133,8 @@ class ObjectiveController(
   suspend fun getObjectivesForPlan(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "planReference") planReference: UUID,
-  ): Flow<Objective> {
-    return objectiveService.getObjectives(PlanKey(crn, planReference)).map { buildObjective(it) }
+  ): Flow<ObjectiveEntity> {
+    return objectiveService.getObjectives(PlanKey(crn, planReference))
   }
 
   @Operation(
@@ -141,7 +142,8 @@ class ObjectiveController(
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "Objective data is returned, empty array if no objectives found for the Person",
+        description = "Objective data is returned, empty array if no objectives found for the Person. " +
+          "Steps are only included if includeSteps param is true",
       ),
       ApiResponse(
         responseCode = "401",
@@ -158,7 +160,9 @@ class ObjectiveController(
   @GetMapping("/person/{crn}/objectives")
   suspend fun getObjectives(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
-    @RequestParam(value = "includeSteps", required = false) includeSteps: Boolean = false,
+    @RequestParam(value = "includeSteps", required = false)
+    @Parameter(description = "whether to include the steps of the objective in the response (defaults to false)")
+    includeSteps: Boolean = false,
   ): Flow<Objective> {
     return if (includeSteps) {
       objectiveService.getObjectivesAndSteps(crn)
@@ -261,7 +265,13 @@ class ObjectiveController(
   suspend fun patchObjective(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-    @RequestBody @Valid request: PatchObjectiveRequest,
+    @RequestBody
+    @BodyDoc(
+      required = true,
+      description = "Set present fields to the given values, only reasonForChange is required",
+    )
+    @Valid
+    request: PatchObjectiveRequest,
   ): ObjectiveEntity {
     return objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
   }

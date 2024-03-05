@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.Crn
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import java.util.UUID
+import io.swagger.v3.oas.annotations.parameters.RequestBody as BodyDoc
 
 @RestController
 @RequestMapping
@@ -235,7 +236,13 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
-    @RequestBody @Valid patchRequest: PatchStepRequest,
+    @RequestBody
+    @Valid
+    @BodyDoc(
+      required = true,
+      description = "Set present fields to the given values, only reasonForChange is required",
+    )
+    patchRequest: PatchStepRequest,
   ): StepEntity {
     return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, patchRequest)
   }

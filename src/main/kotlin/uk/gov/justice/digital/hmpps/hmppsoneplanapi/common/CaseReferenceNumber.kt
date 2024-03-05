@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.common
 
+import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
@@ -18,6 +19,7 @@ value class CaseReferenceNumber(
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @MustBeDocumented
 @Constraint(validatedBy = [CrnValidator::class])
+@Parameter(description = "The case reference number of the person")
 annotation class Crn(
   val message: String = "crn: must be not blank and between and no more than 10 characters",
   val groups: Array<KClass<*>> = [],

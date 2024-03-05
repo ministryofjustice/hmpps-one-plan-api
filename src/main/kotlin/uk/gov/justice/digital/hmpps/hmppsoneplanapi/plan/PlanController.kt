@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -40,7 +41,12 @@ class PlanController(
       ApiResponse(
         responseCode = "200",
         description = "Plan successfully created, response contains the unique reference that identifies the created Plan",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = CreateEntityResponse::class))],
+        content = [
+          Content(
+            mediaType = "application/json",
+            schema = Schema(implementation = CreateEntityResponse::class),
+          ),
+        ],
       ),
       ApiResponse(
         responseCode = "401",
@@ -105,7 +111,8 @@ class PlanController(
     responses = [
       ApiResponse(
         responseCode = "200",
-        description = "An array containing all plans for the given person. Will be empty if no plans are found",
+        description = "An array containing all plans for the given person. " +
+          "Will be empty if no plans are found and objectives are only included if includeObjectivesAndSteps param is set to true",
       ),
       ApiResponse(
         responseCode = "401",
@@ -122,7 +129,9 @@ class PlanController(
   @GetMapping("/person/{crn}/plans")
   suspend fun getAllPlans(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
-    @RequestParam(value = "includeObjectivesAndSteps", required = false) includeObjectives: Boolean = false,
+    @RequestParam(value = "includeObjectivesAndSteps", required = false)
+    @Parameter(description = "Whether to include objectives and steps, defaults to false if not present")
+    includeObjectives: Boolean = false,
   ): Flow<Plan> {
     return if (includeObjectives) {
       linkService.getAllPlansWithObjectivesAndSteps(crn)

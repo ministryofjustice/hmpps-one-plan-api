@@ -79,7 +79,7 @@ workflows:
            pipeline_number: <<pipeline.number>>
            context:
              - hmpps-common-vars
-             - hmpps-one-plan-api-preprod
+             - hmpps-one-plan-preprod
            requires:
              - request-preprod-approval
            helm_timeout: 5m
@@ -98,7 +98,7 @@ workflows:
           slack_channel_name: << pipeline.parameters.releases-slack-channel >>
           context:
             - hmpps-common-vars
-            - hmpps-one-plan-api-prod
+            - hmpps-one-plan-prod
           requires:
             - request-prod-approval
           helm_timeout: 5m

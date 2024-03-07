@@ -26,7 +26,6 @@ class AuditService(private val auditService: AuditSdkService) {
 
 enum class AuditAction {
   CREATE_PLAN,
-  UPDATE_PLAN,
   DELETE_PLAN,
 
   CREATE_OBJECTIVE,

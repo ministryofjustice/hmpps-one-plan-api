@@ -1,6 +1,7 @@
 generic-service:
   nameOverride: hmpps-one-plan-api
   productId: "DPS088" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
+  serviceAccountName: hmpps-one-plan
 
   replicaCount: 4
 

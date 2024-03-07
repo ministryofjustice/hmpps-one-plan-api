@@ -49,6 +49,7 @@ abstract class IntegrationTestBase {
 
   companion object {
     private val pgContainer = PostgresContainer.instance
+    private val localStackContainer = LocalStackContainerHolder.instance
 
     @JvmStatic
     @DynamicPropertySource
@@ -61,6 +62,9 @@ abstract class IntegrationTestBase {
         registry.add("spring.r2dbc.username", pgContainer::getUsername)
         registry.add("spring.r2dbc.password", pgContainer::getPassword)
       }
+
+      registry.add("hmpps.sqs.region", localStackContainer::getRegion)
+      registry.add("hmpps.sqs.localstackUrl", localStackContainer::getEndpoint)
     }
   }
 

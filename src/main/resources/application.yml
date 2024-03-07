@@ -72,3 +72,9 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+hmpps.sqs:
+  useWebToken: true
+  queues:
+    audit:
+      queueName: Digital-Prison-Services-dev-hmpps_audit_queue

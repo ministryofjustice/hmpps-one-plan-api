@@ -77,4 +77,4 @@ hmpps.sqs:
   useWebToken: true
   queues:
     audit:
-      queueName: Digital-Prison-Services-dev-hmpps_audit_queue
+      queueName: Digital-Prison-Services-${ENVIRONMENT:dev}-hmpps_audit_queue

@@ -12,7 +12,7 @@ data class PutStepRequest(
   @field:Size(min = 1, max = 250)
   override val reasonForChange: String,
   @field:Size(min = 0, max = 512)
-  val staffNote: String?,
+  val staffNote: String? = null,
   val staffTask: Boolean,
 ) : StepUpdate {
   override fun updateStepEntity(entity: StepEntity) = entity.copy(

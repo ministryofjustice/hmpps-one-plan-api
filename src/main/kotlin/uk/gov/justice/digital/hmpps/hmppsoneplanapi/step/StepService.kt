@@ -6,6 +6,8 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.AuditService
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.UpdateNotAllowedException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
@@ -19,13 +21,16 @@ class StepService(
   private val entityTemplate: R2dbcEntityTemplate,
   private val stepRepository: StepRepository,
   private val objectMapper: ObjectMapper,
+  private val auditService: AuditService,
 ) {
   @Transactional
   suspend fun createStep(objectiveKey: ObjectiveKey, request: CreateStepRequest): StepEntity {
     val objective = objectiveService.getObjective(objectiveKey)
     val stepOrder = stepRepository.nextStepId(objective.id)
     val step = request.buildEntity(objective.id, stepOrder)
-    return entityTemplate.insert(step).awaitSingle()
+    return entityTemplate.insert(step).awaitSingle().also {
+      auditService.audit(AuditAction.CREATE_STEP, objectiveKey.caseReferenceNumber, step.reference)
+    }
   }
 
   suspend fun getStep(objectiveKey: ObjectiveKey, stepReference: UUID): StepEntity {
@@ -44,6 +49,7 @@ class StepService(
     if (count != 1) {
       throw stepNotFound(objectiveKey, stepReference)
     }
+    auditService.audit(AuditAction.DELETE_STEP, objectiveKey.caseReferenceNumber, stepReference)
   }
 
   @Transactional
@@ -53,6 +59,8 @@ class StepService(
     val updated = request.updateStepEntity(step)
     val result = entityTemplate.insert(buildHistory(step, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated)).awaitSingle()
+
+    auditService.audit(AuditAction.UPDATE_STEP, objectiveKey.caseReferenceNumber, stepReference)
     return result.t2
   }
 

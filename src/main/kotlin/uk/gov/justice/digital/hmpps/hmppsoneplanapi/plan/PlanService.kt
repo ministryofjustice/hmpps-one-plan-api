@@ -11,6 +11,8 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.AuditService
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveEntity
@@ -23,6 +25,7 @@ class PlanService(
   private val planRepository: PlanRepository,
   private val objectiveRepository: ObjectiveRepository,
   private val entityTemplate: R2dbcEntityTemplate,
+  private val auditService: AuditService,
 ) {
   suspend fun getByKey(planKey: PlanKey): PlanEntity {
     val (crn, reference) = planKey
@@ -38,6 +41,7 @@ class PlanService(
     if (countUpdated != 1) {
       throw planNotFound(crn, reference)
     }
+    auditService.audit(AuditAction.DELETE_PLAN, crn, reference)
   }
 
   @Transactional
@@ -52,6 +56,8 @@ class PlanService(
     getObjectives(crn, planRequest.objectives).map { objective ->
       createPlanObjectiveLink(createdPlan, objective)
     }.collect()
+
+    auditService.audit(AuditAction.CREATE_PLAN, crn, createdPlan.reference)
 
     return createdPlan
   }

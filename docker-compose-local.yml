@@ -39,5 +39,12 @@ services:
       - SPRING_PROFILES_ACTIVE=dev,local-postgres
       - SERVER_PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
+  localstack:
+    image: localstack/localstack:stable
+    networks:
+      - hmpps
+    ports:
+      - "4566:4566"
+
 networks:
   hmpps:

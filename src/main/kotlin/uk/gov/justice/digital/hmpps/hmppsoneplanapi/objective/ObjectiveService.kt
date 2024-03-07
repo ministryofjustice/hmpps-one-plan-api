@@ -9,6 +9,8 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.AuditService
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.exceptions.UpdateNotAllowedException
@@ -22,6 +24,7 @@ class ObjectiveService(
   private val entityTemplate: R2dbcEntityTemplate,
   private val objectiveRepository: ObjectiveRepository,
   private val objectMapper: ObjectMapper,
+  private val auditService: AuditService,
 ) {
   @Transactional
   suspend fun createObjective(crn: CaseReferenceNumber, request: CreateObjectiveRequest): ObjectiveEntity {
@@ -33,6 +36,8 @@ class ObjectiveService(
       val link = PlanObjectiveLink(planId = plan.id, objectiveId = objective.id)
       entityTemplate.insert(link).awaitSingle()
     }
+
+    auditService.audit(AuditAction.CREATE_OBJECTIVE, crn, objective.reference)
 
     return savedObjective
   }
@@ -52,6 +57,7 @@ class ObjectiveService(
     val saveResult = entityTemplate.insert(buildHistory(objective, updated, request.reasonForChange))
       .zipWith(entityTemplate.update(updated))
       .awaitSingle()
+    auditService.audit(AuditAction.UPDATE_OBJECTIVE, objectiveKey.caseReferenceNumber, objectiveKey.objectiveReference)
     return saveResult.t2
   }
 
@@ -86,6 +92,7 @@ class ObjectiveService(
     if (count != 1) {
       throw NotFoundException("/person/$crn/objectives/$objectiveReference")
     }
+    auditService.audit(AuditAction.DELETE_OBJECTIVE, crn, objectiveReference)
   }
 
   suspend fun getObjectives(planKey: PlanKey): Flow<ObjectiveEntity> {

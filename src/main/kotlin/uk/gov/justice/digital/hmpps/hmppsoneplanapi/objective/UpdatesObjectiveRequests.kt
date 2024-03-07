@@ -8,10 +8,10 @@ data class PutObjectiveRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 512)
   val title: String,
-  val targetCompletionDate: LocalDate?,
+  val targetCompletionDate: LocalDate? = null,
   val status: ObjectiveStatus,
-  val note: String?,
-  val outcome: String?,
+  val note: String? = null,
+  val outcome: String? = null,
   @field:NotBlank
   @field:Size(min = 1, max = 250)
   override val reasonForChange: String,

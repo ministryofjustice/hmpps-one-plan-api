@@ -1,4 +1,4 @@
-### Get an auth token from local docker hmpps-auth
+### Get an auth token from local docker hmpps-auth (run setup role script first)
 POST http://localhost:9090/auth/oauth/token?grant_type=password&username=ONE_PLAN_USER&password=password{{crn}}456
 Authorization: Basic elite2apiclient clientsecret
 

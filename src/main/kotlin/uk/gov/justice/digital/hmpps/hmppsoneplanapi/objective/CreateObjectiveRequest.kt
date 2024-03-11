@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.sanitise
 import java.time.LocalDate
 import java.util.UUID
 
@@ -19,11 +20,11 @@ data class CreateObjectiveRequest(
   val planReference: UUID? = null,
 ) {
   fun buildEntity(crn: CaseReferenceNumber): ObjectiveEntity = ObjectiveEntity(
-    title = title,
+    title = title.sanitise(),
     targetCompletionDate = targetCompletionDate,
     status = status,
-    note = note,
-    outcome = outcome,
+    note = note?.sanitise(),
+    outcome = outcome?.sanitise(),
     caseReferenceNumber = crn,
   )
 }

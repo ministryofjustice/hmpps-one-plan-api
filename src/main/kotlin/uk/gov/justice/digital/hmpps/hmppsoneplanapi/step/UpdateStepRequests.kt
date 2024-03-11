@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsoneplanapi.step
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.sanitise
 
 data class PutStepRequest(
   @field:NotBlank
@@ -16,9 +17,9 @@ data class PutStepRequest(
   val staffTask: Boolean,
 ) : StepUpdate {
   override fun updateStepEntity(entity: StepEntity) = entity.copy(
-    description = description,
+    description = description.sanitise(),
     status = status,
-    staffNote = staffNote,
+    staffNote = staffNote?.sanitise(),
     staffTask = staffTask,
   ).markAsUpdate()
 }
@@ -35,9 +36,9 @@ data class PatchStepRequest(
   val staffTask: Boolean? = null,
 ) : StepUpdate {
   override fun updateStepEntity(entity: StepEntity) = entity.copy(
-    description = description ?: entity.description,
+    description = description?.sanitise() ?: entity.description,
     status = status ?: entity.status,
-    staffNote = staffNote ?: entity.staffNote,
+    staffNote = staffNote?.sanitise() ?: entity.staffNote,
     staffTask = staffTask ?: entity.staffTask,
   ).markAsUpdate()
 }

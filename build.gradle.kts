@@ -25,6 +25,7 @@ dependencies {
   implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
   implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
   implementation("uk.gov.justice.service.hmpps:hmpps-audit-sdk:1.0.0")
+  implementation("org.jsoup:jsoup:1.17.2")
 
   runtimeOnly("org.flywaydb:flyway-core:10.8.1")
   runtimeOnly("org.flywaydb:flyway-database-postgresql:10.8.1")
@@ -42,6 +43,7 @@ dependencies {
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.1.1")
+  testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
 kotlin {

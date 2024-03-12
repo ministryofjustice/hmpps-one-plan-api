@@ -5,7 +5,7 @@ info.app:
 api:
   base:
     url:
-      oauth: https://sign-in-dev.hmpps.service.justice.gov.uk
+      oauth: ${OAUTH_BASE_URL:https://sign-in-dev.hmpps.service.justice.gov.uk}
 
 spring:
   application:

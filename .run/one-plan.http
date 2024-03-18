@@ -16,6 +16,13 @@ redirect_uri=&username={{authUser}}&password={{authPassword}}
     client.global.set("auth_token", token);
 %}
 
+### Get an auth token with client credentials
+// @no-redirect
+POST https://sign-in-preprod.hmpps.service.justice.gov.uk/auth/oauth/token?grant_type=client_credentials
+Authorization: Basic {{clientId}} {{clientSecret}}
+
+> {% client.global.set("auth_token", response.body["access_token"]); %}
+
 ### Create a plan
 POST {{base.url}}/person/{{crn}}/plans
 content-type: application/json

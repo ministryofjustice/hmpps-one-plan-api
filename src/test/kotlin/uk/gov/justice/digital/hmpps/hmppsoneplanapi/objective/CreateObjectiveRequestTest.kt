@@ -22,5 +22,6 @@ class CreateObjectiveRequestTest {
     assertThat(entity.note).isEqualTo("note")
     assertThat(entity.outcome).isEqualTo("outcome")
     assertThat(entity.caseReferenceNumber).isEqualTo(CaseReferenceNumber("crn"))
+    assertThat(entity.isNew).isTrue()
   }
 }

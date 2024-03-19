@@ -90,8 +90,10 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.outcome").isEqualTo("outcome")
       .jsonPath("$.reference").isEqualTo(objectiveReference.toString())
       .jsonPath("$.createdBy").isEqualTo("test-user")
+      .jsonPath("$.createdByDisplayName").isEqualTo("Test User")
       .jsonPath("$.createdAt").isNotEmpty()
       .jsonPath("$.updatedBy").isEqualTo("test-user")
+      .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
       .jsonPath("$.steps").doesNotExist()
   }

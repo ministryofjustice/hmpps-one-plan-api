@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.DisplayNameAudited
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -43,7 +44,9 @@ data class ObjectiveEntity(
   val updatedBy: String? = createdBy,
   @LastModifiedDate
   val updatedAt: ZonedDateTime? = createdAt,
-) : Persistable<UUID> {
+  override var createdByDisplayName: String? = null,
+  override var updatedByDisplayName: String? = null,
+) : Persistable<UUID>, DisplayNameAudited {
   @Transient
   private var isNew: Boolean = true
 

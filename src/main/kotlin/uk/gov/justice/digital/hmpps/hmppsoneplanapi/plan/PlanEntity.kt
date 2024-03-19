@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.DisplayNameAudited
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -37,10 +38,11 @@ data class PlanEntity(
   var updatedBy: String? = createdBy,
   @LastModifiedDate
   var updatedAt: ZonedDateTime? = createdAt,
-
+  override var createdByDisplayName: String? = null,
+  override var updatedByDisplayName: String? = null,
   @JsonIgnore
   var isDeleted: Boolean = false,
-) : Persistable<UUID> {
+) : Persistable<UUID>, DisplayNameAudited {
   override fun getId(): UUID = id
 
   @JsonIgnore

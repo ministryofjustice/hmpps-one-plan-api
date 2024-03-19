@@ -63,8 +63,10 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.stepOrder").isEqualTo(1)
       .jsonPath("$.reference").isEqualTo(stepRef.toString())
       .jsonPath("$.createdBy").isEqualTo("test-user")
+      .jsonPath("$.createdByDisplayName").isEqualTo("Test User")
       .jsonPath("$.createdAt").isNotEmpty()
       .jsonPath("$.updatedBy").isEqualTo("test-user")
+      .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
   }
 

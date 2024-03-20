@@ -126,6 +126,7 @@ abstract class IntegrationTestBase {
     status: StepStatus = StepStatus.IN_PROGRESS,
     staffNote: String? = "note",
     staffTask: Boolean = false,
+    createdAtPrison: String? = null,
   ): UUID {
     val exchangeResult = authedWebTestClient.post()
       .uri(
@@ -140,6 +141,7 @@ abstract class IntegrationTestBase {
           staffTask = staffTask,
           staffNote = staffNote,
           description = description,
+          createdAtPrison = createdAtPrison,
         ),
       )
       .exchange()

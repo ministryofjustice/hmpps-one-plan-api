@@ -42,6 +42,8 @@ data class StepEntity(
   val updatedAt: ZonedDateTime? = createdAt,
   override var createdByDisplayName: String? = null,
   override var updatedByDisplayName: String? = null,
+  val createdAtPrison: String? = null,
+  val updatedAtPrison: String? = createdAtPrison,
   @JsonIgnore
   val isDeleted: Boolean = false,
 ) : Persistable<UUID>, DisplayNameAudited {

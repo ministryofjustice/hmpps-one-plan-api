@@ -15,12 +15,15 @@ data class PutStepRequest(
   @field:Size(min = 0, max = 512)
   val staffNote: String? = null,
   val staffTask: Boolean,
+  @field:Size(min = 0, max = 250)
+  val updatedAtPrison: String? = null,
 ) : StepUpdate {
   override fun updateStepEntity(entity: StepEntity) = entity.copy(
     description = description.sanitise(),
     status = status,
     staffNote = staffNote?.sanitise(),
     staffTask = staffTask,
+    updatedAtPrison = updatedAtPrison?.sanitise(),
   ).markAsUpdate()
 }
 
@@ -34,12 +37,15 @@ data class PatchStepRequest(
   @field:Size(min = 0, max = 512)
   val staffNote: String? = null,
   val staffTask: Boolean? = null,
+  @field:Size(min = 0, max = 250)
+  val updatedAtPrison: String? = null,
 ) : StepUpdate {
   override fun updateStepEntity(entity: StepEntity) = entity.copy(
     description = description?.sanitise() ?: entity.description,
     status = status ?: entity.status,
     staffNote = staffNote?.sanitise() ?: entity.staffNote,
     staffTask = staffTask ?: entity.staffTask,
+    updatedAtPrison = updatedAtPrison?.sanitise(),
   ).markAsUpdate()
 }
 

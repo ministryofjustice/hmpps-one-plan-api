@@ -13,6 +13,7 @@ class CreateStepRequestTest {
       status = StepStatus.IN_PROGRESS,
       staffNote = "staff note",
       staffTask = true,
+      createdAtPrison = "prison1",
     ).buildEntity(id, 1)
 
     assertThat(entity.objectiveId).isEqualTo(id)
@@ -21,5 +22,7 @@ class CreateStepRequestTest {
     assertThat(entity.description).isEqualTo("desc")
     assertThat(entity.staffNote).isEqualTo("staff note")
     assertThat(entity.staffTask).isTrue()
+    assertThat(entity.createdAtPrison).isEqualTo("prison1")
+    assertThat(entity.updatedAtPrison).isEqualTo(entity.createdAtPrison)
   }
 }

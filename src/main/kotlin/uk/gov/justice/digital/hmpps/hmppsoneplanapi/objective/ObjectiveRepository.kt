@@ -68,6 +68,8 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
         s.updated_at as step_updated_at,
         s.updated_by as step_updated_by,
         s.updated_by as step_updated_by_display_name,
+        s.created_at_prison as step_created_at_prison,
+        s.updated_at_prison as step_updated_at_prison,
 
         o.id as objective_id,
         o.reference as objective_reference,

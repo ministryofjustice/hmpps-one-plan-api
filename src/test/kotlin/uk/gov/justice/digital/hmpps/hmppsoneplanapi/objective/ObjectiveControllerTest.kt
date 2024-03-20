@@ -359,8 +359,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val objectiveWithNoStepsRef = givenAnObjective(crn = "899")
     val objectiveWithStepsRef = givenAnObjective(crn = "899")
     val key = ObjectiveKey(CaseReferenceNumber("899"), objectiveWithStepsRef)
-    givenAStep(key)
-    givenAStep(key)
+    givenAStep(key, createdAtPrison = "prison1")
+    givenAStep(key, createdAtPrison = "prison2")
 
     val response = authedWebTestClient.get()
       .uri("/person/899/objectives?includeSteps=true")

@@ -37,6 +37,8 @@ class StepAndObjectiveConverter : Converter<Row, ObjectiveAndStep> {
       updatedAt = source.getOptional("step_updated_at"),
       updatedBy = source.getOptional("step_updated_by"),
       updatedByDisplayName = source.getOptional("step_updated_by_display_name"),
+      updatedAtPrison = source.getOptional("step_updated_at_prison"),
+      createdAtPrison = source.getOptional("step_created_at_prison"),
     )
   }
 

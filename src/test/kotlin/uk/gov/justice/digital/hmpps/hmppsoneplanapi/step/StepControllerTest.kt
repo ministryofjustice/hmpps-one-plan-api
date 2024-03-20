@@ -22,7 +22,8 @@ class StepControllerTest : IntegrationTestBase() {
                 "description":"description",
                 "status": "IN_PROGRESS",
                 "staffTask": false,
-                "staffNote": "staff note"
+                "staffNote": "staff note",
+                "createdAtPrison": "prison1"
         }
   """.trimIndent()
 
@@ -68,6 +69,8 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.updatedBy").isEqualTo("test-user")
       .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
+      .jsonPath("$.createdAtPrison").isEqualTo("prison1")
+      .jsonPath("$.updatedAtPrison").isEqualTo("prison1")
   }
 
   private fun getStep(

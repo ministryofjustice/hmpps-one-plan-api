@@ -46,6 +46,8 @@ data class ObjectiveEntity(
   val updatedAt: ZonedDateTime? = createdAt,
   override var createdByDisplayName: String? = null,
   override var updatedByDisplayName: String? = null,
+  val createdAtPrison: String? = null,
+  val updatedAtPrison: String? = createdAtPrison,
 ) : Persistable<UUID>, DisplayNameAudited {
   @Transient
   private var isNew: Boolean = true

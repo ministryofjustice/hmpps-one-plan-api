@@ -82,7 +82,9 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
         o.created_by_display_name as objective_created_by_display_name,
         o.updated_at as objective_updated_at,
         o.updated_by as objective_updated_by,
-        o.updated_by_display_name as objective_updated_by_display_name
+        o.updated_by_display_name as objective_updated_by_display_name,
+        o.created_at_prison as objective_created_at_prison,
+        o.updated_at_prison as objective_updated_at_prison
     from objective o
     left outer join step s
         on o.id = s.objective_id

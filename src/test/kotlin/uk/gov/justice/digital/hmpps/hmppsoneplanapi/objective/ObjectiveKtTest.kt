@@ -27,6 +27,8 @@ class ObjectiveKtTest {
       updatedByDisplayName = "Some One",
       createdBy = "someoneElse",
       createdByDisplayName = "Someone Else",
+      createdAtPrison = "prison1",
+      updatedAtPrison = "prison2",
     )
 
     val result = buildObjective(entity)
@@ -44,6 +46,8 @@ class ObjectiveKtTest {
     assertThat(result.createdBy).isEqualTo(entity.createdBy)
     assertThat(result.createdByDisplayName).isEqualTo(entity.createdByDisplayName)
     assertThat(result.updatedByDisplayName).isEqualTo(entity.updatedByDisplayName)
+    assertThat(result.createdAtPrison).isEqualTo(entity.createdAtPrison)
+    assertThat(result.updatedAtPrison).isEqualTo(entity.updatedAtPrison)
     assertThat(result.steps).isNull()
   }
 

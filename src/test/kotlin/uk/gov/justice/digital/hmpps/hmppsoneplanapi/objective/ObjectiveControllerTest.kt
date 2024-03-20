@@ -23,7 +23,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
                 "targetCompletionDate": "2024-02-01",
                 "status":"IN_PROGRESS",
                 "note":"note",
-                "outcome":"outcome"
+                "outcome":"outcome",
+                "createdAtPrison": "prison1"
         }
   """.trimIndent()
 
@@ -96,6 +97,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
       .jsonPath("$.steps").doesNotExist()
+      .jsonPath("$.createdAtPrison").isEqualTo("prison1")
+      .jsonPath("$.updatedAtPrison").isEqualTo("prison1")
   }
 
   @Test

@@ -1,6 +1,5 @@
 import org.springframework.boot.gradle.tasks.run.BootRun
 
-
 plugins {
   val kotlinVersion = "1.9.22"
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
@@ -44,6 +43,7 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.1.1")
   testImplementation("org.awaitility:awaitility:4.2.0")
+  testImplementation(kotlin("reflect"))
 }
 
 kotlin {

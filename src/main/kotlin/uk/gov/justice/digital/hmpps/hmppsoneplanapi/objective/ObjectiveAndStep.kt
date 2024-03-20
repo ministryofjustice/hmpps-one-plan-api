@@ -33,8 +33,10 @@ class StepAndObjectiveConverter : Converter<Row, ObjectiveAndStep> {
       status = source.getMandatoryEnum("step_status"),
       createdAt = source.getOptional("step_created_at"),
       createdBy = source.getOptional("step_created_by"),
+      createdByDisplayName = source.getOptional("step_created_by_display_name"),
       updatedAt = source.getOptional("step_updated_at"),
       updatedBy = source.getOptional("step_updated_by"),
+      updatedByDisplayName = source.getOptional("step_updated_by_display_name"),
     )
   }
 
@@ -49,8 +51,10 @@ class StepAndObjectiveConverter : Converter<Row, ObjectiveAndStep> {
     targetCompletionDate = source.getOptional("target_completion_date"),
     createdAt = source.getOptional("objective_created_at"),
     createdBy = source.getOptional("objective_created_by"),
+    createdByDisplayName = source.getOptional("objective_created_by_display_name"),
     updatedAt = source.getOptional("objective_updated_at"),
     updatedBy = source.getOptional("objective_updated_by"),
+    updatedByDisplayName = source.getOptional("objective_updated_by_display_name"),
   )
 }
 

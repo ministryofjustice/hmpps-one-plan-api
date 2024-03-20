@@ -64,8 +64,10 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
         s.status as step_status,
         s.created_at as step_created_at,
         s.created_by as step_created_by,
+        s.created_by_display_name as step_created_by_display_name,
         s.updated_at as step_updated_at,
         s.updated_by as step_updated_by,
+        s.updated_by as step_updated_by_display_name,
 
         o.id as objective_id,
         o.reference as objective_reference,
@@ -77,8 +79,10 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
         o.target_completion_date,
         o.created_at as objective_created_at,
         o.created_by as objective_created_by,
+        o.created_by_display_name as objective_created_by_display_name,
         o.updated_at as objective_updated_at,
-        o.updated_by as objective_updated_by
+        o.updated_by as objective_updated_by,
+        o.updated_by_display_name as objective_updated_by_display_name
     from objective o
     left outer join step s
         on o.id = s.objective_id

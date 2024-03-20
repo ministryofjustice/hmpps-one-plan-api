@@ -19,8 +19,10 @@ data class Objective(
   val note: String?,
   val outcome: String?,
   val createdBy: String? = null,
+  val createdByDisplayName: String? = null,
   val createdAt: ZonedDateTime? = null,
   val updatedBy: String? = createdBy,
+  val updatedByDisplayName: String? = createdByDisplayName,
   val updatedAt: ZonedDateTime? = createdAt,
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -40,5 +42,7 @@ internal fun buildObjective(entity: ObjectiveEntity, steps: List<StepEntity>? = 
   createdAt = entity.createdAt,
   updatedBy = entity.updatedBy,
   updatedAt = entity.updatedAt,
+  createdByDisplayName = entity.createdByDisplayName,
+  updatedByDisplayName = entity.updatedByDisplayName,
   steps = steps,
 )

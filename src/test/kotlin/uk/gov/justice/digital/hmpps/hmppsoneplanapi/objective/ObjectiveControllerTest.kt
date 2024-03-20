@@ -9,7 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepEntity
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.assertThatPop
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepStatus
 import java.util.UUID
 
@@ -368,10 +368,10 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .hasSize(2)
       .returnResult().responseBody!!
 
+    assertThat(response).allSatisfy { assertThatPop(it).excluding("id").isFullyPopulated() }
     val objectiveWithSteps = response.find { it.reference == objectiveWithStepsRef }!!
     assertThat(objectiveWithSteps.steps).hasSize(2)
-    assertThat(objectiveWithSteps.steps).extracting(StepEntity::staffNote, StepEntity::createdAt)
-      .doesNotContainNull()
+    assertThat(objectiveWithSteps.steps).allSatisfy { assertThatPop(it).isFullyPopulated() }
     val objectiveWithoutSteps = response.find { it.reference == objectiveWithNoStepsRef }!!
     assertThat(objectiveWithoutSteps.steps).hasSize(0)
   }

@@ -16,7 +16,7 @@ data class PutObjectiveRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 250)
   override val reasonForChange: String,
-  @field:Size(min = 1, max = 250)
+  @field:Size(min = 0, max = 250)
   val updatedAtPrison: String? = null,
 ) : ObjectiveUpdate {
   override fun updateObjectiveEntity(original: ObjectiveEntity): ObjectiveEntity = original.copy(
@@ -40,7 +40,7 @@ data class PatchObjectiveRequest(
   val status: ObjectiveStatus? = null,
   val note: String? = null,
   val outcome: String? = null,
-  @field:Size(min = 1, max = 250)
+  @field:Size(min = 0, max = 250)
   val updatedAtPrison: String? = null,
 ) : ObjectiveUpdate {
   override fun updateObjectiveEntity(original: ObjectiveEntity): ObjectiveEntity = original.copy(

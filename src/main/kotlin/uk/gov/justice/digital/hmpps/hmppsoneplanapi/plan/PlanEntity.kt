@@ -40,6 +40,8 @@ data class PlanEntity(
   var updatedAt: ZonedDateTime? = createdAt,
   override var createdByDisplayName: String? = null,
   override var updatedByDisplayName: String? = null,
+  var createdAtPrison: String? = null,
+  var updatedAtPrison: String? = createdAtPrison,
   @JsonIgnore
   var isDeleted: Boolean = false,
 ) : Persistable<UUID>, DisplayNameAudited {

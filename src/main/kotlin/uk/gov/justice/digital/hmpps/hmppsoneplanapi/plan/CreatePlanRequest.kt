@@ -8,4 +8,5 @@ data class CreatePlanRequest(
   val planType: PlanType,
   @field:Schema(requiredMode = NOT_REQUIRED, description = "Optionally add these objectives to the created plan")
   val objectives: Collection<UUID> = emptyList(),
+  val createdAtPrison: String? = null,
 )

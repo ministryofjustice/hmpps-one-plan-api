@@ -70,7 +70,7 @@ abstract class IntegrationTestBase {
 
   fun givenAPlan(crn: String = "123", type: PlanType = PlanType.PERSONAL_LEARNING): PlanKey {
     val reference = authedWebTestClient.post().uri("/person/{crn}/plans", crn)
-      .bodyValue(CreatePlanRequest(planType = type))
+      .bodyValue(CreatePlanRequest(planType = type, createdAtPrison = "prison1"))
       .exchange()
       .expectStatus()
       .isOk()

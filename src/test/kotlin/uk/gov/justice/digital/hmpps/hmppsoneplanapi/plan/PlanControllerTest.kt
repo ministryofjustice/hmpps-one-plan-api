@@ -44,6 +44,8 @@ class PlanControllerTest : IntegrationTestBase() {
       .jsonPath("$.updatedBy").isEqualTo("test-user")
       .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
+      .jsonPath("$.createdAtPrison").isEqualTo("prison1")
+      .jsonPath("$.updatedAtPrison").isEqualTo("prison1")
   }
 
   @Test

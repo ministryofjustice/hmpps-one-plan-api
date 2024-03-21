@@ -6,6 +6,8 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
+import kotlin.reflect.KClass
+import kotlin.reflect.full.declaredMemberProperties
 
 class ObjectiveKtTest {
   @Test
@@ -22,7 +24,11 @@ class ObjectiveKtTest {
       updatedAt = ZonedDateTime.now(),
       createdAt = ZonedDateTime.now().minusDays(1),
       updatedBy = "someone",
+      updatedByDisplayName = "Some One",
       createdBy = "someoneElse",
+      createdByDisplayName = "Someone Else",
+      createdAtPrison = "prison1",
+      updatedAtPrison = "prison2",
     )
 
     val result = buildObjective(entity)
@@ -38,6 +44,18 @@ class ObjectiveKtTest {
     assertThat(result.updatedBy).isEqualTo(entity.updatedBy)
     assertThat(result.createdAt).isEqualTo(entity.createdAt)
     assertThat(result.createdBy).isEqualTo(entity.createdBy)
+    assertThat(result.createdByDisplayName).isEqualTo(entity.createdByDisplayName)
+    assertThat(result.updatedByDisplayName).isEqualTo(entity.updatedByDisplayName)
+    assertThat(result.createdAtPrison).isEqualTo(entity.createdAtPrison)
+    assertThat(result.updatedAtPrison).isEqualTo(entity.updatedAtPrison)
     assertThat(result.steps).isNull()
   }
+
+  @Test
+  fun `has all of the fields of an entity`() {
+    assertThat(allProps(Objective::class))
+      .containsAll(allProps(ObjectiveEntity::class) - "isNew")
+  }
+
+  private fun allProps(type: KClass<*>) = type.declaredMemberProperties.map { it.name }
 }

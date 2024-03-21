@@ -15,6 +15,7 @@ class PutObjectiveRequestTest {
       note = "note",
       outcome = "outcome",
       caseReferenceNumber = CaseReferenceNumber("crn"),
+      createdAtPrison = "prison1",
     )
 
     val updated = PutObjectiveRequest(
@@ -24,6 +25,7 @@ class PutObjectiveRequestTest {
       note = "note2",
       outcome = "outcome2",
       reasonForChange = "reason for change",
+      updatedAtPrison = "prison2",
     ).updateObjectiveEntity(original)
 
     assertThat(updated.title).isEqualTo("title2")
@@ -31,6 +33,7 @@ class PutObjectiveRequestTest {
     assertThat(updated.status).isEqualTo(ObjectiveStatus.COMPLETED)
     assertThat(updated.note).isEqualTo("note2")
     assertThat(updated.outcome).isEqualTo("outcome2")
+    assertThat(updated.createdAtPrison).isEqualTo(original.createdAtPrison)
     assertThat(updated.isNew).describedAs("should be seen as update to db mapping").isFalse()
   }
 }

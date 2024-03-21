@@ -72,6 +72,12 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
+  fun `Post - 400 when created at prison is too long`() {
+    post(createRequestBuilder(createdAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("createdAtPrison: size must be between 0 and 250") }
+  }
+
+  @Test
   fun `Put - 400 when target date is formatted incorrectly`() {
     val body = updateRequestBuilder(targetCompletionDate = "not a date")
     put(body).value {
@@ -141,6 +147,12 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     }
   }
 
+  @Test
+  fun `Put - 400 when created at prison is too long`() {
+    put(updateRequestBuilder(updatedAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("updatedAtPrison: size must be between 0 and 250") }
+  }
+
   private fun post(body: String, crn: String = "123"): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.post()
       .uri("/person/{crn}/objectives", crn, UUID.randomUUID())
@@ -157,6 +169,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     status: String? = "IN_PROGRESS",
     note: String? = "note",
     outcome: String? = "outcome",
+    createdAtPrison: String? = null,
   ): String {
     return objectMapper
       .writeValueAsString(
@@ -166,6 +179,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
           "status" to status,
           "note" to note,
           "outcome" to outcome,
+          "createdAtPrison" to createdAtPrison,
         ).filter { it.value != null },
       )
   }
@@ -190,6 +204,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     note: String? = "note",
     outcome: String? = "outcome",
     reasonForChange: String? = "reasonForChange",
+    updatedAtPrison: String? = null,
   ): String {
     return objectMapper
       .writeValueAsString(
@@ -200,6 +215,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
           "note" to note,
           "outcome" to outcome,
           "reasonForChange" to reasonForChange,
+          "updatedAtPrison" to updatedAtPrison,
         ).filter { it.value != null },
       )
   }
@@ -211,7 +227,8 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     note: String? = null,
     outcome: String? = null,
     reasonForChange: String? = "reasonable",
-  ) = updateRequestBuilder(title, targetCompletionDate, status, note, outcome, reasonForChange)
+    updatedAtPrison: String? = null,
+  ) = updateRequestBuilder(title, targetCompletionDate, status, note, outcome, reasonForChange, updatedAtPrison)
 
   @Test
   fun `Patch - 400 when reasonForChange field is too long`() {
@@ -259,5 +276,11 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
       assertThat(it.userMessage)
         .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
     }
+  }
+
+  @Test
+  fun `Patch - 400 when created at prison is too long`() {
+    patch(patchRequestBuilder(title = "nice", updatedAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("updatedAtPrison: size must be between 0 and 250") }
   }
 }

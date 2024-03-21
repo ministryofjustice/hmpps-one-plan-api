@@ -13,6 +13,8 @@ data class CreateStepRequest(
   @field:Size(min = 0, max = 512)
   val staffNote: String?,
   val staffTask: Boolean,
+  @field:Size(min = 0, max = 250)
+  val createdAtPrison: String? = null,
 ) {
   fun buildEntity(objectiveId: UUID, order: Int): StepEntity = StepEntity(
     objectiveId = objectiveId,
@@ -21,5 +23,6 @@ data class CreateStepRequest(
     stepOrder = order,
     staffNote = staffNote?.sanitise(),
     staffTask = staffTask,
+    createdAtPrison = createdAtPrison,
   )
 }

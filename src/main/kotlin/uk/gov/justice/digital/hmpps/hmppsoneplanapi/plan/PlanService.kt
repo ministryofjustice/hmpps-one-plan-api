@@ -50,6 +50,7 @@ class PlanService(
       PlanEntity(
         type = planRequest.planType,
         caseReferenceNumber = crn,
+        createdAtPrison = planRequest.createdAtPrison,
       ),
     )
 

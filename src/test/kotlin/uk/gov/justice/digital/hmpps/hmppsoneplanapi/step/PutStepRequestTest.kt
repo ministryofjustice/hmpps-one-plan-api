@@ -14,6 +14,7 @@ class PutStepRequestTest {
       status = StepStatus.IN_PROGRESS,
       staffNote = "Notational",
       staffTask = true,
+      createdAtPrison = "prison1",
     )
 
     val updated = PutStepRequest(
@@ -22,6 +23,7 @@ class PutStepRequestTest {
       reasonForChange = "reason for change",
       staffNote = null,
       staffTask = false,
+      updatedAtPrison = "prison2",
     ).updateStepEntity(original)
 
     assertThat(updated.objectiveId).isEqualTo(original.objectiveId)
@@ -30,6 +32,8 @@ class PutStepRequestTest {
     assertThat(updated.description).isEqualTo("desc2")
     assertThat(updated.staffNote).isNull()
     assertThat(updated.staffTask).isFalse()
+    assertThat(updated.updatedAtPrison).isEqualTo("prison2")
+    assertThat(updated.createdAtPrison).isEqualTo("prison1")
     assertThat(updated.isNew).describedAs("Should be flagged as an update").isFalse()
   }
 }

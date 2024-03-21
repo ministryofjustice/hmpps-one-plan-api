@@ -30,6 +30,7 @@ class JwtAuthTestOverride {
       scope = listOf(),
       expiryTime = Duration.ofHours(1L),
       roles = listOf("ROLE_ONE_PLAN_EDIT"),
+      displayName = "Test User",
     )
     return "Bearer $token"
   }
@@ -40,11 +41,13 @@ class JwtAuthTestOverride {
     roles: List<String>? = listOf(),
     expiryTime: Duration = Duration.ofHours(1),
     jwtId: String = UUID.randomUUID().toString(),
+    displayName: String? = null,
   ): String =
     mutableMapOf<String, Any>()
       .also { subject?.let { subject -> it["user_name"] = subject } }
       .also { roles?.let { roles -> it["authorities"] = roles } }
       .also { scope?.let { scope -> it["scope"] = scope } }
+      .also { displayName?.let { displayName -> it["name"] = displayName } }
       .let {
         Jwts.builder()
           .id(jwtId)

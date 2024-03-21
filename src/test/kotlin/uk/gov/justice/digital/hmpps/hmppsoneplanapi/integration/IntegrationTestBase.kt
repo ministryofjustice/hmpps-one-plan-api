@@ -70,7 +70,7 @@ abstract class IntegrationTestBase {
 
   fun givenAPlan(crn: String = "123", type: PlanType = PlanType.PERSONAL_LEARNING): PlanKey {
     val reference = authedWebTestClient.post().uri("/person/{crn}/plans", crn)
-      .bodyValue(CreatePlanRequest(planType = type))
+      .bodyValue(CreatePlanRequest(planType = type, createdAtPrison = "prison1"))
       .exchange()
       .expectStatus()
       .isOk()
@@ -126,6 +126,7 @@ abstract class IntegrationTestBase {
     status: StepStatus = StepStatus.IN_PROGRESS,
     staffNote: String? = "note",
     staffTask: Boolean = false,
+    createdAtPrison: String? = null,
   ): UUID {
     val exchangeResult = authedWebTestClient.post()
       .uri(
@@ -140,6 +141,7 @@ abstract class IntegrationTestBase {
           staffTask = staffTask,
           staffNote = staffNote,
           description = description,
+          createdAtPrison = createdAtPrison,
         ),
       )
       .exchange()

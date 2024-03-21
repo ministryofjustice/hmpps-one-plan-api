@@ -9,7 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CaseReferenceNumber
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepEntity
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.integration.assertThatPop
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.step.StepStatus
 import java.util.UUID
 
@@ -23,7 +23,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
                 "targetCompletionDate": "2024-02-01",
                 "status":"IN_PROGRESS",
                 "note":"note",
-                "outcome":"outcome"
+                "outcome":"outcome",
+                "createdAtPrison": "prison1"
         }
   """.trimIndent()
 
@@ -90,10 +91,14 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.outcome").isEqualTo("outcome")
       .jsonPath("$.reference").isEqualTo(objectiveReference.toString())
       .jsonPath("$.createdBy").isEqualTo("test-user")
+      .jsonPath("$.createdByDisplayName").isEqualTo("Test User")
       .jsonPath("$.createdAt").isNotEmpty()
       .jsonPath("$.updatedBy").isEqualTo("test-user")
+      .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
       .jsonPath("$.steps").doesNotExist()
+      .jsonPath("$.createdAtPrison").isEqualTo("prison1")
+      .jsonPath("$.updatedAtPrison").isEqualTo("prison1")
   }
 
   @Test
@@ -354,8 +359,8 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val objectiveWithNoStepsRef = givenAnObjective(crn = "899")
     val objectiveWithStepsRef = givenAnObjective(crn = "899")
     val key = ObjectiveKey(CaseReferenceNumber("899"), objectiveWithStepsRef)
-    givenAStep(key)
-    givenAStep(key)
+    givenAStep(key, createdAtPrison = "prison1")
+    givenAStep(key, createdAtPrison = "prison2")
 
     val response = authedWebTestClient.get()
       .uri("/person/899/objectives?includeSteps=true")
@@ -366,10 +371,10 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .hasSize(2)
       .returnResult().responseBody!!
 
+    assertThat(response).allSatisfy { assertThatPop(it).excluding("id").isFullyPopulated() }
     val objectiveWithSteps = response.find { it.reference == objectiveWithStepsRef }!!
     assertThat(objectiveWithSteps.steps).hasSize(2)
-    assertThat(objectiveWithSteps.steps).extracting(StepEntity::staffNote, StepEntity::createdAt)
-      .doesNotContainNull()
+    assertThat(objectiveWithSteps.steps).allSatisfy { assertThatPop(it).isFullyPopulated() }
     val objectiveWithoutSteps = response.find { it.reference == objectiveWithNoStepsRef }!!
     assertThat(objectiveWithoutSteps.steps).hasSize(0)
   }

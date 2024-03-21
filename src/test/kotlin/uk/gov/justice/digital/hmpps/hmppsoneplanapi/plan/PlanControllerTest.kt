@@ -39,9 +39,13 @@ class PlanControllerTest : IntegrationTestBase() {
       .jsonPath("$.id").doesNotExist()
       .jsonPath("$.reference").isEqualTo(planReference.toString())
       .jsonPath("$.createdBy").isEqualTo("test-user")
+      .jsonPath("$.createdByDisplayName").isEqualTo("Test User")
       .jsonPath("$.createdAt").isNotEmpty()
       .jsonPath("$.updatedBy").isEqualTo("test-user")
+      .jsonPath("$.updatedByDisplayName").isEqualTo("Test User")
       .jsonPath("$.updatedAt").isNotEmpty()
+      .jsonPath("$.createdAtPrison").isEqualTo("prison1")
+      .jsonPath("$.updatedAtPrison").isEqualTo("prison1")
   }
 
   @Test

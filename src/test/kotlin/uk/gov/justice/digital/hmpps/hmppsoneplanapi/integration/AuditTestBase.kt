@@ -39,7 +39,7 @@ class AuditTestBase : IntegrationTestBase() {
 
     // Retry as call to audit services is done in a background future and is not guaranteed to have completed
     // after the api call completes
-    await().atMost(Duration.ofSeconds(1))
+    await().atMost(Duration.ofSeconds(2))
       .pollDelay(Duration.ZERO)
       .untilAsserted {
         val sent = runBlocking {

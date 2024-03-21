@@ -13,6 +13,7 @@ class PatchStepRequestTest {
     description = "desc",
     status = StepStatus.NOT_STARTED,
     objectiveId = UUID.randomUUID(),
+    createdAtPrison = "prison1",
   )
 
   @Test
@@ -42,10 +43,21 @@ class PatchStepRequestTest {
     assertNotChangedOtherThan("staffTask", result)
   }
 
+  @Test
+  fun `with createdAtPrison`() {
+    val result = PatchStepRequest(reasonForChange = "raison", staffTask = true, updatedAtPrison = "prison2")
+      .updateStepEntity(entity)
+
+    assertThat(result.staffTask).isTrue()
+    assertThat(result.createdAtPrison).isEqualTo("prison1")
+    assertThat(result.updatedAtPrison).isEqualTo("prison2")
+    assertNotChangedOtherThan("staffTask", result = result)
+  }
+
   private fun assertNotChangedOtherThan(field: String, result: StepEntity) {
     assertThat(result)
       .usingRecursiveComparison()
-      .ignoringFields(field, "isNew")
+      .ignoringFields(field, "isNew", "updatedAtPrison")
       .isEqualTo(entity)
 
     assertThat(result.isNew).isFalse()

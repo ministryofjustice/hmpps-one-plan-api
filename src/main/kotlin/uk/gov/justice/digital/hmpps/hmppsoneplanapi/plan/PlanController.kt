@@ -68,7 +68,7 @@ class PlanController(
   @PostMapping("/person/{crn}/plans")
   suspend fun createPlan(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
-    @RequestBody planRequest: CreatePlanRequest,
+    @RequestBody @Valid planRequest: CreatePlanRequest,
   ): CreateEntityResponse {
     val entity = planService.createPlan(crn, planRequest)
     return CreateEntityResponse(entity.reference)

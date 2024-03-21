@@ -16,6 +16,8 @@ data class PutObjectiveRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 250)
   override val reasonForChange: String,
+  @field:Size(min = 0, max = 250)
+  val updatedAtPrison: String? = null,
 ) : ObjectiveUpdate {
   override fun updateObjectiveEntity(original: ObjectiveEntity): ObjectiveEntity = original.copy(
     title = title.sanitise(),
@@ -23,6 +25,7 @@ data class PutObjectiveRequest(
     status = status,
     note = note?.sanitise(),
     outcome = outcome?.sanitise(),
+    updatedAtPrison = updatedAtPrison?.sanitise(),
   ).markAsUpdate()
 }
 
@@ -37,6 +40,8 @@ data class PatchObjectiveRequest(
   val status: ObjectiveStatus? = null,
   val note: String? = null,
   val outcome: String? = null,
+  @field:Size(min = 0, max = 250)
+  val updatedAtPrison: String? = null,
 ) : ObjectiveUpdate {
   override fun updateObjectiveEntity(original: ObjectiveEntity): ObjectiveEntity = original.copy(
     title = title?.sanitise() ?: original.title,
@@ -44,6 +49,7 @@ data class PatchObjectiveRequest(
     status = status ?: original.status,
     note = note?.sanitise() ?: original.note,
     outcome = outcome?.sanitise() ?: original.outcome,
+    updatedAtPrison = updatedAtPrison?.sanitise(),
   ).markAsUpdate()
 }
 

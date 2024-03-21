@@ -89,6 +89,12 @@ class PlanControllerValidationTests : WebfluxTestBase() {
       }
   }
 
+  @Test
+  fun `400 when created at prison is too long`() {
+    post("crn123", requestBuilder(createdAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("createdAtPrison: size must be between 0 and 250") }
+  }
+
   private fun addObjectives(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
     authedWebTestClient.patch()
       .uri("/person/123/plans/{ref}/objectives", UUID.randomUUID())
@@ -99,11 +105,12 @@ class PlanControllerValidationTests : WebfluxTestBase() {
       .isBadRequest()
       .expectBody(ErrorResponse::class.java)
 
-  private fun requestBuilder(type: Any? = "PERSONAL_LEARNING"): String =
+  private fun requestBuilder(type: Any? = "PERSONAL_LEARNING", createdAtPrison: String? = null): String =
     objectMapper.writeValueAsString(
       mapOf(
         "planType" to type,
-      ),
+        "createdAtPrison" to createdAtPrison,
+      ).filterValues { it != null },
     )
 
   private fun post(crn: String, body: String): WebTestClient.BodySpec<ErrorResponse, *> =

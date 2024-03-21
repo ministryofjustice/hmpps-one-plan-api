@@ -93,6 +93,12 @@ class StepControllerValidationTests : WebfluxTestBase() {
       assertThat(it.userMessage).isEqualTo("staffNote: size must be between 0 and 512")
     }
   }
+
+  @Test
+  fun `Post - 400 when created at prison is too long`() {
+    post(createRequestBuilder(createdAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("createdAtPrison: size must be between 0 and 250") }
+  }
   // </editor-fold>
 
   private fun createRequestBuilder(
@@ -101,6 +107,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
     status: Any? = "IN_PROGRESS",
     staffTask: Any? = "false",
     staffNote: Any? = null,
+    createdAtPrison: Any? = null,
   ): String {
     return objectMapper
       .writeValueAsString(
@@ -110,6 +117,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
           "stepOrder" to stepOrder,
           "staffTask" to staffTask,
           "staffNote" to staffNote,
+          "createdAtPrison" to createdAtPrison,
         ).filter { it.value != null },
       )
   }
@@ -221,6 +229,12 @@ class StepControllerValidationTests : WebfluxTestBase() {
       assertThat(it.userMessage).isEqualTo("reasonForChange: must not be blank")
     }
   }
+
+  @Test
+  fun `Put - 400 when created at prison is too long`() {
+    put(updateRequestBuilder(description = "newDesc", updatedAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("updatedAtPrison: size must be between 0 and 250") }
+  }
   // </editor-fold>
 
   private fun updateRequestBuilder(
@@ -230,6 +244,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
     staffTask: Any? = "false",
     staffNote: Any? = null,
     reasonForChange: Any? = "reason for change",
+    updatedAtPrison: Any? = null,
   ): String {
     return objectMapper
       .writeValueAsString(
@@ -240,6 +255,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
           "staffTask" to staffTask,
           "staffNote" to staffNote,
           "reasonForChange" to reasonForChange,
+          "updatedAtPrison" to updatedAtPrison,
         ).filter { it.value != null },
       )
   }
@@ -307,6 +323,12 @@ class StepControllerValidationTests : WebfluxTestBase() {
       }
   }
 
+  @Test
+  fun `Patch - 400 when created at prison is too long`() {
+    request(HttpMethod.PATCH, patchRequestBuilder(description = "newDesc", updatedAtPrison = "1".repeat(251)))
+      .value { assertThat(it.userMessage).isEqualTo("updatedAtPrison: size must be between 0 and 250") }
+  }
+
   private fun patchRequestBuilder(
     description: Any? = null,
     stepOrder: Any? = null,
@@ -314,6 +336,7 @@ class StepControllerValidationTests : WebfluxTestBase() {
     staffTask: Any? = null,
     staffNote: Any? = null,
     reasonForChange: Any? = "reason for change",
+    updatedAtPrison: Any? = null,
   ): String = updateRequestBuilder(
     description = description,
     stepOrder = stepOrder,
@@ -321,5 +344,6 @@ class StepControllerValidationTests : WebfluxTestBase() {
     staffTask = staffTask,
     status = status,
     reasonForChange = reasonForChange,
+    updatedAtPrison = updatedAtPrison,
   )
 }

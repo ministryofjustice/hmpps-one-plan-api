@@ -12,9 +12,13 @@ data class Plan(
   val type: PlanType,
 
   val createdBy: String?,
+  val createdByDisplayName: String?,
+  val createdAtPrison: String?,
   val createdAt: ZonedDateTime?,
   var updatedBy: String?,
+  val updatedByDisplayName: String?,
   var updatedAt: ZonedDateTime?,
+  val updatedAtPrison: String?,
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   val objectives: List<Objective>? = null,
@@ -29,4 +33,8 @@ internal fun buildPlan(planEntity: PlanEntity, objectives: List<Objective>? = nu
   updatedBy = planEntity.updatedBy,
   updatedAt = planEntity.updatedAt,
   objectives = objectives,
+  createdByDisplayName = planEntity.createdByDisplayName,
+  updatedByDisplayName = planEntity.updatedByDisplayName,
+  updatedAtPrison = planEntity.updatedAtPrison,
+  createdAtPrison = planEntity.createdAtPrison,
 )

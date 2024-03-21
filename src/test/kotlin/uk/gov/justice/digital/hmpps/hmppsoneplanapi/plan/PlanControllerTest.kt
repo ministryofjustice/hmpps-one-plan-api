@@ -72,6 +72,7 @@ class PlanControllerTest : IntegrationTestBase() {
     givenAPlan(crn, PlanType.RESETTLEMENT)
 
     getAllExpectingCount(crn, 3)
+      .jsonPath("$.[*].objectives").doesNotExist()
   }
 
   @Test
@@ -235,7 +236,7 @@ class PlanControllerTest : IntegrationTestBase() {
       .is4xxClientError()
   }
 
-  private fun getAllExpectingCount(crn: String, count: Int) {
+  private fun getAllExpectingCount(crn: String, count: Int) =
     authedWebTestClient.get()
       .uri("person/{crn}/plans", crn)
       .exchange()
@@ -243,7 +244,6 @@ class PlanControllerTest : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$").isArray()
       .jsonPath("$.size()").isEqualTo(count)
-  }
 
   @Test
   fun `Can get all plans with objective and steps`() {

@@ -20,7 +20,7 @@ data class Plan(
   var updatedAt: ZonedDateTime?,
   val updatedAtPrison: String?,
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @field:JsonInclude(JsonInclude.Include.NON_NULL)
   val objectives: List<Objective>? = null,
 )
 

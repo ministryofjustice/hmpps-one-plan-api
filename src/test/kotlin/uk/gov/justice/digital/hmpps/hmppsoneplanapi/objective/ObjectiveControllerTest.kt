@@ -352,6 +352,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
       .jsonPath("$.[0].createdAt").isNotEmpty()
       .jsonPath("$.[0].updatedAt").isNotEmpty()
       .jsonPath("$.[0].updatedBy").isNotEmpty()
+      .jsonPath("$.[0].steps").doesNotExist()
   }
 
   @Test

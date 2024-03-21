@@ -27,7 +27,7 @@ data class Objective(
   val createdAtPrison: String? = null,
   val updatedAtPrison: String? = createdAtPrison,
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @field:JsonInclude(JsonInclude.Include.NON_NULL)
   val steps: List<StepEntity>? = null,
 )
 

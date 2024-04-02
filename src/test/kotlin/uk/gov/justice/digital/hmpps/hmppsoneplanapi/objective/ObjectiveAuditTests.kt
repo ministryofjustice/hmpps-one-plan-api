@@ -40,6 +40,7 @@ class ObjectiveAuditTests : AuditTestBase() {
           title = "title",
           reasonForChange = "just testing",
           status = ObjectiveStatus.NOT_STARTED,
+          type = ObjectiveType.PERSONAL,
         ),
       )
       .exchange()

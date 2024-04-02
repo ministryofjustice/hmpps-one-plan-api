@@ -27,6 +27,7 @@ data class ObjectiveEntity(
   val reference: UUID = UUID.randomUUID(),
   @Column("crn")
   val caseReferenceNumber: CaseReferenceNumber,
+  val type: ObjectiveType,
 
   val title: String,
   val targetCompletionDate: LocalDate?,
@@ -76,4 +77,17 @@ enum class ObjectiveStatus {
   IN_PROGRESS,
   COMPLETED,
   ARCHIVED,
+}
+
+enum class ObjectiveType {
+  ACCOMMODATION,
+  ATTITUDES_THINKING_AND_BEHAVIOUR,
+  CHILDREN_FAMILIES_AND_COMMUNITIES,
+  DRUGS_AND_ALCOHOL,
+  EDUCATION,
+  EMPLOYMENT,
+  FINANCE_AND_ID,
+  HEALTH,
+  NEURODIVERSITY,
+  PERSONAL,
 }

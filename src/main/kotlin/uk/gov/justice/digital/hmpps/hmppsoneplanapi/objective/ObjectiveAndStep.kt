@@ -45,6 +45,7 @@ class StepAndObjectiveConverter : Converter<Row, ObjectiveAndStep> {
   private fun mapObjective(source: Row) = ObjectiveEntity(
     id = source.getMandatory("objective_id"),
     reference = source.getMandatory("objective_reference"),
+    type = source.getMandatoryEnum("objective_type"),
     caseReferenceNumber = CaseReferenceNumber(source.getMandatory("crn")),
     title = source.getMandatory("objective_title"),
     status = source.getMandatoryEnum("objective_status"),

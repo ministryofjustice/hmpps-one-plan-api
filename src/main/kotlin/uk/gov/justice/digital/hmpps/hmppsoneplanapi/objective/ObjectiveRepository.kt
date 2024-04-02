@@ -74,6 +74,7 @@ interface ObjectiveRepository : CoroutineCrudRepository<ObjectiveEntity, UUID> {
         o.id as objective_id,
         o.reference as objective_reference,
         o.crn,
+        o.type as objective_type,
         o.title as objective_title,
         o.status as objective_status,
         o.note,

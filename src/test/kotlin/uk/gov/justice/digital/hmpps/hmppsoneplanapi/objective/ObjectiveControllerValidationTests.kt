@@ -56,6 +56,20 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   }
 
   @Test
+  fun `Post - 400 when type is missing`() {
+    post(createRequestBuilder(type = null))
+      .value { assertThat(it.userMessage).isEqualTo("type: is required") }
+  }
+
+  @Test
+  fun `Post - 400 when type is not one of the allowed values`() {
+    post(createRequestBuilder(type = "ROBIN")).value {
+      assertThat(it.userMessage)
+        .isEqualTo("type: must be one of [ACCOMMODATION, ATTITUDES_THINKING_AND_BEHAVIOUR, CHILDREN_FAMILIES_AND_COMMUNITIES, DRUGS_AND_ALCOHOL, EDUCATION, EMPLOYMENT, FINANCE_AND_ID, HEALTH, NEURODIVERSITY, PERSONAL]")
+    }
+  }
+
+  @Test
   fun `Post - 400 when target date is formatted incorrectly`() {
     val body = createRequestBuilder(targetCompletionDate = "not a date")
     post(body).value {
@@ -96,6 +110,20 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     put(updateRequestBuilder(status = "BATMAN")).value {
       assertThat(it.userMessage)
         .isEqualTo("status: must be one of [NOT_STARTED, BLOCKED, DEFERRED, IN_PROGRESS, COMPLETED, ARCHIVED]")
+    }
+  }
+
+  @Test
+  fun `Put - 400 when type is missing`() {
+    put(updateRequestBuilder(type = null))
+      .value { assertThat(it.userMessage).isEqualTo("type: is required") }
+  }
+
+  @Test
+  fun `Put - 400 when type is not one of the allowed values`() {
+    put(updateRequestBuilder(type = "ROBIN")).value {
+      assertThat(it.userMessage)
+        .isEqualTo("type: must be one of [ACCOMMODATION, ATTITUDES_THINKING_AND_BEHAVIOUR, CHILDREN_FAMILIES_AND_COMMUNITIES, DRUGS_AND_ALCOHOL, EDUCATION, EMPLOYMENT, FINANCE_AND_ID, HEALTH, NEURODIVERSITY, PERSONAL]")
     }
   }
 
@@ -165,6 +193,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
 
   private fun createRequestBuilder(
     title: String? = "title",
+    type: Any? = "EDUCATION",
     targetCompletionDate: String? = "2022-02-06",
     status: String? = "IN_PROGRESS",
     note: String? = "note",
@@ -177,6 +206,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
           "title" to title,
           "targetCompletionDate" to targetCompletionDate,
           "status" to status,
+          "type" to type,
           "note" to note,
           "outcome" to outcome,
           "createdAtPrison" to createdAtPrison,
@@ -201,6 +231,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     title: String? = "title",
     targetCompletionDate: String? = "2022-02-06",
     status: String? = "IN_PROGRESS",
+    type: Any? = "ACCOMMODATION",
     note: String? = "note",
     outcome: String? = "outcome",
     reasonForChange: String? = "reasonForChange",
@@ -213,6 +244,7 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
           "targetCompletionDate" to targetCompletionDate,
           "status" to status,
           "note" to note,
+          "type" to type,
           "outcome" to outcome,
           "reasonForChange" to reasonForChange,
           "updatedAtPrison" to updatedAtPrison,
@@ -224,11 +256,21 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     title: String? = null,
     targetCompletionDate: String? = null,
     status: String? = null,
+    type: Any? = null,
     note: String? = null,
     outcome: String? = null,
     reasonForChange: String? = "reasonable",
     updatedAtPrison: String? = null,
-  ) = updateRequestBuilder(title, targetCompletionDate, status, note, outcome, reasonForChange, updatedAtPrison)
+  ) = updateRequestBuilder(
+    title = title,
+    targetCompletionDate = targetCompletionDate,
+    status = status,
+    type = type,
+    note = note,
+    outcome = outcome,
+    reasonForChange = reasonForChange,
+    updatedAtPrison = updatedAtPrison,
+  )
 
   @Test
   fun `Patch - 400 when reasonForChange field is too long`() {
@@ -282,5 +324,13 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
   fun `Patch - 400 when created at prison is too long`() {
     patch(patchRequestBuilder(title = "nice", updatedAtPrison = "1".repeat(251)))
       .value { assertThat(it.userMessage).isEqualTo("updatedAtPrison: size must be between 0 and 250") }
+  }
+
+  @Test
+  fun `Patch - 400 when type is not one of the allowed values`() {
+    put(updateRequestBuilder(type = "SAUSAGE")).value {
+      assertThat(it.userMessage)
+        .isEqualTo("type: must be one of [ACCOMMODATION, ATTITUDES_THINKING_AND_BEHAVIOUR, CHILDREN_FAMILIES_AND_COMMUNITIES, DRUGS_AND_ALCOHOL, EDUCATION, EMPLOYMENT, FINANCE_AND_ID, HEALTH, NEURODIVERSITY, PERSONAL]")
+    }
   }
 }

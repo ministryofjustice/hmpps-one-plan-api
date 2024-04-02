@@ -15,6 +15,7 @@ class CreateObjectiveRequestTest {
       note = "note",
       outcome = "outcome",
       createdAtPrison = "prison1",
+      type = ObjectiveType.PERSONAL,
     ).buildEntity(CaseReferenceNumber("crn"))
 
     assertThat(entity.title).isEqualTo("title")
@@ -25,6 +26,7 @@ class CreateObjectiveRequestTest {
     assertThat(entity.caseReferenceNumber).isEqualTo(CaseReferenceNumber("crn"))
     assertThat(entity.createdAtPrison).isEqualTo("prison1")
     assertThat(entity.updatedAtPrison).isEqualTo("prison1")
+    assertThat(entity.type).isEqualTo(ObjectiveType.PERSONAL)
     assertThat(entity.isNew).isTrue()
   }
 }

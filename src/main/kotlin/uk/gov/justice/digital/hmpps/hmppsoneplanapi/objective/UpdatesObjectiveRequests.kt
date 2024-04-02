@@ -9,6 +9,7 @@ data class PutObjectiveRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 512)
   val title: String,
+  val type: ObjectiveType,
   val targetCompletionDate: LocalDate? = null,
   val status: ObjectiveStatus,
   val note: String? = null,
@@ -26,6 +27,7 @@ data class PutObjectiveRequest(
     note = note?.sanitise(),
     outcome = outcome?.sanitise(),
     updatedAtPrison = updatedAtPrison?.sanitise(),
+    type = type,
   ).markAsUpdate()
 }
 
@@ -36,6 +38,7 @@ data class PatchObjectiveRequest(
 
   @field:Size(min = 1, max = 512)
   val title: String? = null,
+  val type: ObjectiveType? = null,
   val targetCompletionDate: LocalDate? = null,
   val status: ObjectiveStatus? = null,
   val note: String? = null,
@@ -50,6 +53,7 @@ data class PatchObjectiveRequest(
     note = note?.sanitise() ?: original.note,
     outcome = outcome?.sanitise() ?: original.outcome,
     updatedAtPrison = updatedAtPrison?.sanitise(),
+    type = type ?: original.type,
   ).markAsUpdate()
 }
 

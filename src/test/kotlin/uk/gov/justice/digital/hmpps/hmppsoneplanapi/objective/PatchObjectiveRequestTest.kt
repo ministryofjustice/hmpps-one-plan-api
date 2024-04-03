@@ -11,6 +11,7 @@ class PatchObjectiveRequestTest {
     caseReferenceNumber = CaseReferenceNumber("1"),
     note = "note",
     title = "desc",
+    type = ObjectiveType.FINANCE_AND_ID,
     status = ObjectiveStatus.NOT_STARTED,
     outcome = "outcome",
     targetCompletionDate = LocalDate.of(2024, 3, 1),
@@ -60,6 +61,15 @@ class PatchObjectiveRequestTest {
 
     assertThat(result.note).isEqualTo("new note")
     assertNotChangedOtherThan("note", result)
+  }
+
+  @Test
+  fun `updates type`() {
+    val result = PatchObjectiveRequest(reasonForChange = "raison", type = ObjectiveType.HEALTH)
+      .updateObjectiveEntity(entity)
+
+    assertThat(result.type).isEqualTo(ObjectiveType.HEALTH)
+    assertNotChangedOtherThan("type", result)
   }
 
   private fun assertNotChangedOtherThan(field: String, result: ObjectiveEntity) {

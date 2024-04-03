@@ -21,6 +21,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
         {
                 "title":"title",
                 "targetCompletionDate": "2024-02-01",
+                "type": "FINANCE_AND_ID",
                 "status":"IN_PROGRESS",
                 "note":"note",
                 "outcome":"outcome",
@@ -31,6 +32,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
   private val minimalRequestBody = """
         {
                 "title":"title",
+                "type": "EDUCATION",
                 "status":"IN_PROGRESS"
         }
   """.trimIndent()
@@ -160,6 +162,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
                 "title":"title2",
                 "targetCompletionDate": "2024-02-02",
                 "status": "COMPLETED",
+                "type": "EDUCATION",
                 "note":"note2",
                 "outcome":"outcome2",
                 "reasonForChange": "reason for change"
@@ -194,6 +197,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val minimalUpdateBody = """
         {
                 "title":"title",
+                "type": "EDUCATION",
                 "status":"COMPLETED",
                 "reasonForChange": "Just felt like it"
         }
@@ -287,6 +291,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
                     "status":"IN_PROGRESS",
                     "note":"note",
                     "outcome":"outcome",
+                    "type": "EDUCATION",
                     "planReference": "$planReference"
             }
   """.trimIndent()
@@ -318,6 +323,7 @@ class ObjectiveControllerTest : IntegrationTestBase() {
     val requestBody = """
         {
                 "title":"Random change",
+                "type": "EDUCATION",
                 "status":"IN_PROGRESS",
                 "reasonForChange": "Just felt like it"
         }

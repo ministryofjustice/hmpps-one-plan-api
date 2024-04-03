@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.CreateObjectiveReq
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveService
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveStatus
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveType
 import java.time.Duration
 import java.util.UUID
 
@@ -82,6 +83,7 @@ class StepServiceTest : IntegrationTestBase() {
       CreateObjectiveRequest(
         title = "title",
         status = ObjectiveStatus.IN_PROGRESS,
+        type = ObjectiveType.HEALTH,
       ),
     )
     return ObjectiveKey(crn, objective.reference)

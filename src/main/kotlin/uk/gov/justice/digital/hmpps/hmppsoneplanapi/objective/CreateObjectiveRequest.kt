@@ -12,6 +12,7 @@ data class CreateObjectiveRequest(
   @field:NotBlank
   @field:Size(min = 1, max = 512)
   val title: String,
+  val type: ObjectiveType,
   val status: ObjectiveStatus,
   val targetCompletionDate: LocalDate? = null,
   val note: String? = null,
@@ -23,6 +24,7 @@ data class CreateObjectiveRequest(
 ) {
   fun buildEntity(crn: CaseReferenceNumber): ObjectiveEntity = ObjectiveEntity(
     title = title.sanitise(),
+    type = type,
     targetCompletionDate = targetCompletionDate,
     status = status,
     note = note?.sanitise(),

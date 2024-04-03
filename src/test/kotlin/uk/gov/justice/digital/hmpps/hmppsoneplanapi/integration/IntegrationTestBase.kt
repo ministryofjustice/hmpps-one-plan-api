@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.common.CreateEntityResponse
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.CreateObjectiveRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveStatus
+import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.ObjectiveType
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.CreatePlanRequest
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanKey
 import uk.gov.justice.digital.hmpps.hmppsoneplanapi.plan.PlanType
@@ -92,6 +93,7 @@ abstract class IntegrationTestBase {
   fun givenAnObjective(
     crn: String = "123",
     title: String = "title",
+    type: ObjectiveType = ObjectiveType.ACCOMMODATION,
     targetCompletionDate: LocalDate = LocalDate.of(2024, 2, 1),
     status: ObjectiveStatus = ObjectiveStatus.IN_PROGRESS,
     note: String = "note",
@@ -103,6 +105,7 @@ abstract class IntegrationTestBase {
         .bodyValue(
           CreateObjectiveRequest(
             title = title,
+            type = type,
             targetCompletionDate = targetCompletionDate,
             status = status,
             note = note,

@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   val kotlinVersion = "1.9.23"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -22,13 +22,13 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-  implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
+  implementation("io.github.oshai:kotlin-logging-jvm:6.0.9")
   implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
   implementation("uk.gov.justice.service.hmpps:hmpps-audit-sdk:1.0.0")
   implementation("org.jsoup:jsoup:1.17.2")
 
-  runtimeOnly("org.flywaydb:flyway-core:10.10.0")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:10.10.0")
+  runtimeOnly("org.flywaydb:flyway-core:10.11.1")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:10.11.1")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
@@ -42,7 +42,7 @@ dependencies {
   testImplementation("io.mockk:mockk:1.13.10")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.1.1")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:3.1.2")
   testImplementation("org.awaitility:awaitility:4.2.1")
   testImplementation(kotlin("reflect"))
 }

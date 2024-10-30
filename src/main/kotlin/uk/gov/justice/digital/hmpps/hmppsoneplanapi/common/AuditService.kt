@@ -1,15 +1,13 @@
 package uk.gov.justice.digital.hmpps.hmppsoneplanapi.common
 
 import kotlinx.coroutines.reactor.awaitSingle
-import org.springframework.context.annotation.Import
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Component
+import uk.gov.justice.hmpps.sqs.audit.HmppsAuditService
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService as AuditSdkService
 
 @Component
-@Import(AuditSdkService::class)
-class AuditService(private val auditService: AuditSdkService) {
+class AuditService(private val auditService: HmppsAuditService) {
   suspend fun audit(what: AuditAction, crn: CaseReferenceNumber, reference: UUID) {
     val authentication = ReactiveSecurityContextHolder.getContext().map { it.authentication }.awaitSingle()
 

@@ -2,8 +2,8 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 
 plugins {
-  val kotlinVersion = "2.0.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.4"
+  val kotlinVersion = "2.0.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.8"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -24,7 +24,10 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
   implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0")
-  implementation("uk.gov.justice.service.hmpps:hmpps-audit-sdk:1.0.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-autoconfigure:5.0.1")
+  implementation("io.awspring.cloud:spring-cloud-aws-starter-sns:3.2.0")
+  implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs:3.2.0")
+  implementation("software.amazon.awssdk:sqs:2.28.28")
   implementation("org.jsoup:jsoup:1.18.1")
 
   runtimeOnly("org.flywaydb:flyway-core:10.17.3")

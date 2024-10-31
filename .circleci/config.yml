@@ -49,7 +49,7 @@ workflows:
           filters:
             branches:
               only:
-                - HAAR-2582
+                - main
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -60,7 +60,7 @@ workflows:
           filters:
             branches:
               only:
-                - HAAR-2582
+                - main
           requires:
             - validate
             - build_docker

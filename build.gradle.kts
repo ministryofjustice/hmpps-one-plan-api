@@ -24,10 +24,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
   implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-autoconfigure:5.0.1")
-  implementation("io.awspring.cloud:spring-cloud-aws-starter-sns:3.2.0")
-  implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs:3.2.0")
-  implementation("software.amazon.awssdk:sqs:2.28.28")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.0")
   implementation("org.jsoup:jsoup:1.18.1")
 
   runtimeOnly("org.flywaydb:flyway-core:10.17.3")

@@ -57,16 +57,14 @@ class StepServiceTest : IntegrationTestBase() {
     }
   }
 
-  private suspend fun countOfHistoryRecords(reference: UUID): Long {
-    return databaseClient.sql(
-      """ select count(*) from step_history where step_id =
+  private suspend fun countOfHistoryRecords(reference: UUID): Long = databaseClient.sql(
+    """ select count(*) from step_history where step_id =
         | (select id from step where reference = :reference)
-      """.trimMargin(),
-    )
-      .bind("reference", reference)
-      .mapValue(Long::class.javaObjectType)
-      .awaitSingle()
-  }
+    """.trimMargin(),
+  )
+    .bind("reference", reference)
+    .mapValue(Long::class.javaObjectType)
+    .awaitSingle()
 
   private fun anUpdate(description: String) = PutStepRequest(
     description = description,
@@ -107,8 +105,7 @@ class StepServiceTest : IntegrationTestBase() {
 internal class StepTransactionHelper(private val service: StepService) {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: PutStepRequest) =
-    service.updateStep(objectiveKey, stepReference, request)
+  suspend fun updateStep(objectiveKey: ObjectiveKey, stepReference: UUID, request: PutStepRequest) = service.updateStep(objectiveKey, stepReference, request)
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   suspend fun updateAndWait(

@@ -140,14 +140,13 @@ class StepControllerTest : IntegrationTestBase() {
       .jsonPath("$.size()").isEqualTo(0)
   }
 
-  private fun getAllSteps(objectiveKey: ObjectiveKey): WebTestClient.ResponseSpec =
-    authedWebTestClient.get()
-      .uri(
-        "/person/{crn}/objectives/{oReference}/steps",
-        objectiveKey.caseReferenceNumber,
-        objectiveKey.objectiveReference,
-      ).exchange()
-      .expectStatus().isOk()
+  private fun getAllSteps(objectiveKey: ObjectiveKey): WebTestClient.ResponseSpec = authedWebTestClient.get()
+    .uri(
+      "/person/{crn}/objectives/{oReference}/steps",
+      objectiveKey.caseReferenceNumber,
+      objectiveKey.objectiveReference,
+    ).exchange()
+    .expectStatus().isOk()
 
   @Test
   fun `GET All Steps gives 404 when objective does not exist`() {

@@ -181,15 +181,14 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
       .value { assertThat(it.userMessage).isEqualTo("updatedAtPrison: size must be between 0 and 250") }
   }
 
-  private fun post(body: String, crn: String = "123"): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.post()
-      .uri("/person/{crn}/objectives", crn, UUID.randomUUID())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(body)
-      .exchange()
-      .expectStatus()
-      .isBadRequest()
-      .expectBody(ErrorResponse::class.java)
+  private fun post(body: String, crn: String = "123"): WebTestClient.BodySpec<ErrorResponse, *> = authedWebTestClient.post()
+    .uri("/person/{crn}/objectives", crn, UUID.randomUUID())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus()
+    .isBadRequest()
+    .expectBody(ErrorResponse::class.java)
 
   private fun createRequestBuilder(
     title: String? = "title",
@@ -199,33 +198,30 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     note: String? = "note",
     outcome: String? = "outcome",
     createdAtPrison: String? = null,
-  ): String {
-    return objectMapper
-      .writeValueAsString(
-        mapOf(
-          "title" to title,
-          "targetCompletionDate" to targetCompletionDate,
-          "status" to status,
-          "type" to type,
-          "note" to note,
-          "outcome" to outcome,
-          "createdAtPrison" to createdAtPrison,
-        ).filter { it.value != null },
-      )
-  }
+  ): String = objectMapper
+    .writeValueAsString(
+      mapOf(
+        "title" to title,
+        "targetCompletionDate" to targetCompletionDate,
+        "status" to status,
+        "type" to type,
+        "note" to note,
+        "outcome" to outcome,
+        "createdAtPrison" to createdAtPrison,
+      ).filter { it.value != null },
+    )
 
   private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> = request(HttpMethod.PUT, body)
   private fun patch(body: String): WebTestClient.BodySpec<ErrorResponse, *> = request(HttpMethod.PATCH, body)
 
-  private fun request(method: HttpMethod, body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.method(method)
-      .uri("/person/123/objectives/{oRef}", UUID.randomUUID())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(body)
-      .exchange()
-      .expectStatus()
-      .isBadRequest()
-      .expectBody(ErrorResponse::class.java)
+  private fun request(method: HttpMethod, body: String): WebTestClient.BodySpec<ErrorResponse, *> = authedWebTestClient.method(method)
+    .uri("/person/123/objectives/{oRef}", UUID.randomUUID())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus()
+    .isBadRequest()
+    .expectBody(ErrorResponse::class.java)
 
   private fun updateRequestBuilder(
     title: String? = "title",
@@ -236,21 +232,19 @@ class ObjectiveControllerValidationTests : WebfluxTestBase() {
     outcome: String? = "outcome",
     reasonForChange: String? = "reasonForChange",
     updatedAtPrison: String? = null,
-  ): String {
-    return objectMapper
-      .writeValueAsString(
-        mapOf(
-          "title" to title,
-          "targetCompletionDate" to targetCompletionDate,
-          "status" to status,
-          "note" to note,
-          "type" to type,
-          "outcome" to outcome,
-          "reasonForChange" to reasonForChange,
-          "updatedAtPrison" to updatedAtPrison,
-        ).filter { it.value != null },
-      )
-  }
+  ): String = objectMapper
+    .writeValueAsString(
+      mapOf(
+        "title" to title,
+        "targetCompletionDate" to targetCompletionDate,
+        "status" to status,
+        "note" to note,
+        "type" to type,
+        "outcome" to outcome,
+        "reasonForChange" to reasonForChange,
+        "updatedAtPrison" to updatedAtPrison,
+      ).filter { it.value != null },
+    )
 
   private fun patchRequestBuilder(
     title: String? = null,

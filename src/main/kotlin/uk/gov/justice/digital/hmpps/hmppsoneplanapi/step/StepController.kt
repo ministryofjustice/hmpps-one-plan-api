@@ -106,8 +106,7 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "crn") @NotBlank @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
-  ): StepEntity =
-    service.getStep(ObjectiveKey(crn, objectiveReference), stepReference)
+  ): StepEntity = service.getStep(ObjectiveKey(crn, objectiveReference), stepReference)
 
   @Operation(
     summary = "Get all steps for an objective, empty array if there are none.",
@@ -203,9 +202,7 @@ class StepController(private val service: StepService) {
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @PathVariable(value = "stepReference") stepReference: UUID,
     @RequestBody @Valid putStepRequest: PutStepRequest,
-  ): StepEntity {
-    return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, putStepRequest)
-  }
+  ): StepEntity = service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, putStepRequest)
 
   @Operation(
     summary = "Partially updates a single step",
@@ -243,7 +240,5 @@ class StepController(private val service: StepService) {
       description = "Set present fields to the given values, only reasonForChange is required",
     )
     patchRequest: PatchStepRequest,
-  ): StepEntity {
-    return service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, patchRequest)
-  }
+  ): StepEntity = service.updateStep(ObjectiveKey(crn, objectiveReference), stepReference, patchRequest)
 }

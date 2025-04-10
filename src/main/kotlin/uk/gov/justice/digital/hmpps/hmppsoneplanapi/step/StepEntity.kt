@@ -46,7 +46,8 @@ data class StepEntity(
   val updatedAtPrison: String? = createdAtPrison,
   @JsonIgnore
   val isDeleted: Boolean = false,
-) : Persistable<UUID>, DisplayNameAudited {
+) : Persistable<UUID>,
+  DisplayNameAudited {
   @Transient
   private var isNew = true
 

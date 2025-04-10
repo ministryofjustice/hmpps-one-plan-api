@@ -101,9 +101,7 @@ class ObjectiveController(
   suspend fun getObjective(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
-  ): ObjectiveEntity {
-    return objectiveService.getObjective(ObjectiveKey(crn, objectiveReference))
-  }
+  ): ObjectiveEntity = objectiveService.getObjective(ObjectiveKey(crn, objectiveReference))
 
   @Operation(
     summary = "Get all objectives for a Plan",
@@ -133,9 +131,7 @@ class ObjectiveController(
   suspend fun getObjectivesForPlan(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "planReference") planReference: UUID,
-  ): Flow<ObjectiveEntity> {
-    return objectiveService.getObjectives(PlanKey(crn, planReference))
-  }
+  ): Flow<ObjectiveEntity> = objectiveService.getObjectives(PlanKey(crn, planReference))
 
   @Operation(
     summary = "Get all objectives for a Person",
@@ -163,12 +159,10 @@ class ObjectiveController(
     @RequestParam(value = "includeSteps", required = false)
     @Parameter(description = "whether to include the steps of the objective in the response (defaults to false)")
     includeSteps: Boolean = false,
-  ): Flow<Objective> {
-    return if (includeSteps) {
-      objectiveService.getObjectivesAndSteps(crn)
-    } else {
-      objectiveService.getObjectives(crn)
-    }
+  ): Flow<Objective> = if (includeSteps) {
+    objectiveService.getObjectivesAndSteps(crn)
+  } else {
+    objectiveService.getObjectives(crn)
   }
 
   @Operation(
@@ -200,9 +194,7 @@ class ObjectiveController(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "objectiveReference") objectiveReference: UUID,
     @RequestBody @Valid request: PutObjectiveRequest,
-  ): ObjectiveEntity {
-    return objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
-  }
+  ): ObjectiveEntity = objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
 
   @Operation(
     summary = "Remove an Objective",
@@ -272,7 +264,5 @@ class ObjectiveController(
     )
     @Valid
     request: PatchObjectiveRequest,
-  ): ObjectiveEntity {
-    return objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
-  }
+  ): ObjectiveEntity = objectiveService.updateObjective(ObjectiveKey(crn, objectiveReference), request)
 }

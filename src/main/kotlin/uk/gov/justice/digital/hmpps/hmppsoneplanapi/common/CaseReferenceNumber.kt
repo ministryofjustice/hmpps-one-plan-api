@@ -11,9 +11,7 @@ import kotlin.reflect.KClass
 value class CaseReferenceNumber(
   val value: String,
 ) {
-  override fun toString(): String {
-    return value
-  }
+  override fun toString(): String = value
 }
 
 @Target(AnnotationTarget.VALUE_PARAMETER)

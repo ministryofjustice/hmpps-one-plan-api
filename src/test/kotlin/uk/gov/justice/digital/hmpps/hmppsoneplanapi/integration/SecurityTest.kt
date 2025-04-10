@@ -36,32 +36,28 @@ class SecurityTest : IntegrationTestBase() {
   }
 
   @TestFactory
-  fun `When User is Unauthenticated`(): List<DynamicTest> {
-    return allEndpoints().map { (method, path) ->
-      dynamicTest("$method -> $path") {
-        notAuthedWebTestClient.method(method.asHttpMethod())
-          .uri(path.patternString, "123", randomUUID(), randomUUID(), randomUUID())
-          .exchange()
-          .expectStatus()
-          .isUnauthorized()
-          .expectHeader()
-          .contentLength(0)
-      }
+  fun `When User is Unauthenticated`(): List<DynamicTest> = allEndpoints().map { (method, path) ->
+    dynamicTest("$method -> $path") {
+      notAuthedWebTestClient.method(method.asHttpMethod())
+        .uri(path.patternString, "123", randomUUID(), randomUUID(), randomUUID())
+        .exchange()
+        .expectStatus()
+        .isUnauthorized()
+        .expectHeader()
+        .contentLength(0)
     }
   }
 
   @TestFactory
-  fun `When User is does not have ONE_PLAN_EDIT role`(): List<DynamicTest> {
-    return allEndpoints().map { (method, path) ->
-      dynamicTest("$method -> $path") {
-        authButMissingRoleClient.method(method.asHttpMethod())
-          .uri(path.patternString, "123", randomUUID(), randomUUID(), randomUUID())
-          .exchange()
-          .expectStatus()
-          .isForbidden()
-          .expectHeader()
-          .contentLength(0)
-      }
+  fun `When User is does not have ONE_PLAN_EDIT role`(): List<DynamicTest> = allEndpoints().map { (method, path) ->
+    dynamicTest("$method -> $path") {
+      authButMissingRoleClient.method(method.asHttpMethod())
+        .uri(path.patternString, "123", randomUUID(), randomUUID(), randomUUID())
+        .exchange()
+        .expectStatus()
+        .isForbidden()
+        .expectHeader()
+        .contentLength(0)
     }
   }
   private fun allEndpoints(): List<Pair<RequestMethod, PathPattern>> {

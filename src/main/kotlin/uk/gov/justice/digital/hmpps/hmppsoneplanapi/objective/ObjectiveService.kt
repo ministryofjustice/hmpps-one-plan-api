@@ -100,23 +100,19 @@ class ObjectiveService(
     return objectiveRepository.findAllByPlanId(plan.id)
   }
 
-  suspend fun getObjectives(crn: CaseReferenceNumber): Flow<Objective> {
-    return objectiveRepository.findAllByCrn(crn)
-      .map { buildObjective(it) }
-  }
+  suspend fun getObjectives(crn: CaseReferenceNumber): Flow<Objective> = objectiveRepository.findAllByCrn(crn)
+    .map { buildObjective(it) }
 
-  suspend fun getObjectivesAndSteps(crn: CaseReferenceNumber): Flow<Objective> {
-    return objectiveRepository.findAllByCrnWithSteps(crn).asFlux()
-      .groupBy { it.objective.id }
-      .flatMap { group ->
-        group.collectList()
-          .map { stepAndObjectives ->
-            buildObjective(
-              stepAndObjectives.first().objective,
-              stepAndObjectives.mapNotNull { it.step }
-                .filter { !it.isDeleted },
-            )
-          }
-      }.asFlow()
-  }
+  suspend fun getObjectivesAndSteps(crn: CaseReferenceNumber): Flow<Objective> = objectiveRepository.findAllByCrnWithSteps(crn).asFlux()
+    .groupBy { it.objective.id }
+    .flatMap { group ->
+      group.collectList()
+        .map { stepAndObjectives ->
+          buildObjective(
+            stepAndObjectives.first().objective,
+            stepAndObjectives.mapNotNull { it.step }
+              .filter { !it.isDeleted },
+          )
+        }
+    }.asFlow()
 }

@@ -108,29 +108,26 @@ class StepControllerValidationTests : WebfluxTestBase() {
     staffTask: Any? = "false",
     staffNote: Any? = null,
     createdAtPrison: Any? = null,
-  ): String {
-    return objectMapper
-      .writeValueAsString(
-        mapOf(
-          "description" to description,
-          "status" to status,
-          "stepOrder" to stepOrder,
-          "staffTask" to staffTask,
-          "staffNote" to staffNote,
-          "createdAtPrison" to createdAtPrison,
-        ).filter { it.value != null },
-      )
-  }
+  ): String = objectMapper
+    .writeValueAsString(
+      mapOf(
+        "description" to description,
+        "status" to status,
+        "stepOrder" to stepOrder,
+        "staffTask" to staffTask,
+        "staffNote" to staffNote,
+        "createdAtPrison" to createdAtPrison,
+      ).filter { it.value != null },
+    )
 
-  private fun post(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.post()
-      .uri("/person/123/objectives/{oRef}/steps", UUID.randomUUID())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(body)
-      .exchange()
-      .expectStatus()
-      .isBadRequest()
-      .expectBody(ErrorResponse::class.java)
+  private fun post(body: String): WebTestClient.BodySpec<ErrorResponse, *> = authedWebTestClient.post()
+    .uri("/person/123/objectives/{oRef}/steps", UUID.randomUUID())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus()
+    .isBadRequest()
+    .expectBody(ErrorResponse::class.java)
 
   // <editor-fold desc="PUT">
   @Test
@@ -245,36 +242,33 @@ class StepControllerValidationTests : WebfluxTestBase() {
     staffNote: Any? = null,
     reasonForChange: Any? = "reason for change",
     updatedAtPrison: Any? = null,
-  ): String {
-    return objectMapper
-      .writeValueAsString(
-        mapOf(
-          "description" to description,
-          "status" to status,
-          "stepOrder" to stepOrder,
-          "staffTask" to staffTask,
-          "staffNote" to staffNote,
-          "reasonForChange" to reasonForChange,
-          "updatedAtPrison" to updatedAtPrison,
-        ).filter { it.value != null },
-      )
-  }
+  ): String = objectMapper
+    .writeValueAsString(
+      mapOf(
+        "description" to description,
+        "status" to status,
+        "stepOrder" to stepOrder,
+        "staffTask" to staffTask,
+        "staffNote" to staffNote,
+        "reasonForChange" to reasonForChange,
+        "updatedAtPrison" to updatedAtPrison,
+      ).filter { it.value != null },
+    )
 
   private fun put(body: String): WebTestClient.BodySpec<ErrorResponse, *> = request(HttpMethod.PUT, body)
 
-  private fun request(method: HttpMethod, body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.method(method)
-      .uri(
-        "/person/123/objectives/{oRef}/steps/{sRef}",
-        UUID.randomUUID(),
-        UUID.randomUUID(),
-      )
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(body)
-      .exchange()
-      .expectStatus()
-      .isBadRequest()
-      .expectBody(ErrorResponse::class.java)
+  private fun request(method: HttpMethod, body: String): WebTestClient.BodySpec<ErrorResponse, *> = authedWebTestClient.method(method)
+    .uri(
+      "/person/123/objectives/{oRef}/steps/{sRef}",
+      UUID.randomUUID(),
+      UUID.randomUUID(),
+    )
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus()
+    .isBadRequest()
+    .expectBody(ErrorResponse::class.java)
 
   @Test
   fun `422 when a unique constraint violation happens`() {

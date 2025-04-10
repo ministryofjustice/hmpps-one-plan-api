@@ -65,8 +65,6 @@ class StepAndObjectiveConverter : Converter<Row, ObjectiveAndStep> {
 
 private inline fun <reified T : Any> Row.getMandatory(column: String): T = getMandatory(column, T::class.java)
 private inline fun <reified T : Any> Row.getOptional(column: String): T? = get(column, T::class.java)
-private fun <T : Any> Row.getMandatory(column: String, type: Class<T>): T =
-  this.get(column, type) ?: throw NullPointerException("Null value for non-null column $column")
+private fun <T : Any> Row.getMandatory(column: String, type: Class<T>): T = this.get(column, type) ?: throw NullPointerException("Null value for non-null column $column")
 
-private inline fun <reified T : Enum<T>> Row.getMandatoryEnum(column: String): T =
-  enumValueOf<T>(getMandatory(column, String::class.java))
+private inline fun <reified T : Enum<T>> Row.getMandatoryEnum(column: String): T = enumValueOf<T>(getMandatory(column, String::class.java))

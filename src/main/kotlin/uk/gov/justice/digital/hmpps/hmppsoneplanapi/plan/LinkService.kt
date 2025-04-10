@@ -15,22 +15,20 @@ class LinkService(
   private val objectiveService: ObjectiveService,
 ) {
 
-  suspend fun getAllPlansWithObjectivesAndSteps(crn: CaseReferenceNumber): Flow<Plan> {
-    return coroutineScope {
-      val plans = async { planService.findAllByCrn(crn) }
-      val objectives = async {
-        objectiveService.getObjectivesAndSteps(crn).toList().associateBy { it.id }
-      }
-      val links = async { planService.findAllLinksByCrn(crn).toList().groupBy { it.planId } }
+  suspend fun getAllPlansWithObjectivesAndSteps(crn: CaseReferenceNumber): Flow<Plan> = coroutineScope {
+    val plans = async { planService.findAllByCrn(crn) }
+    val objectives = async {
+      objectiveService.getObjectivesAndSteps(crn).toList().associateBy { it.id }
+    }
+    val links = async { planService.findAllLinksByCrn(crn).toList().groupBy { it.planId } }
 
-      val objectivesById = objectives.await()
-      val linksByPlanId = links.await()
-      plans.await().map { planEntity ->
-        val planObjectives = linksByPlanId[planEntity.id].orEmpty().mapNotNull { link ->
-          objectivesById[link.objectiveId]
-        }
-        buildPlan(planEntity, planObjectives)
+    val objectivesById = objectives.await()
+    val linksByPlanId = links.await()
+    plans.await().map { planEntity ->
+      val planObjectives = linksByPlanId[planEntity.id].orEmpty().mapNotNull { link ->
+        objectivesById[link.objectiveId]
       }
+      buildPlan(planEntity, planObjectives)
     }
   }
 }

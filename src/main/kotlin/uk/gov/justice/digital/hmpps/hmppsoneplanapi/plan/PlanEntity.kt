@@ -44,7 +44,8 @@ data class PlanEntity(
   var updatedAtPrison: String? = createdAtPrison,
   @JsonIgnore
   var isDeleted: Boolean = false,
-) : Persistable<UUID>, DisplayNameAudited {
+) : Persistable<UUID>,
+  DisplayNameAudited {
   override fun getId(): UUID = id
 
   @JsonIgnore

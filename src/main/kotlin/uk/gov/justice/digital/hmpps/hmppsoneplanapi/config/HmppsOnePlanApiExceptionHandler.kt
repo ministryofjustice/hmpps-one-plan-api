@@ -91,8 +91,7 @@ class HmppsOnePlanApiExceptionHandler(
     }
   }
 
-  private fun variablePath(cause: MismatchedInputException) =
-    cause.path.joinToString(".") { it.fieldName ?: "[${it.index}]" }
+  private fun variablePath(cause: MismatchedInputException) = cause.path.joinToString(".") { it.fieldName ?: "[${it.index}]" }
 
   @ExceptionHandler(WebExchangeBindException::class)
   fun handleBindValidationException(e: WebExchangeBindException): ResponseEntity<ErrorResponse> {

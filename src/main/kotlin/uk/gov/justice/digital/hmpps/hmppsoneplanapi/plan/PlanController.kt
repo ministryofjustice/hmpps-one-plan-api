@@ -102,9 +102,7 @@ class PlanController(
   suspend fun getPlan(
     @PathVariable(value = "crn") @Crn crn: CaseReferenceNumber,
     @PathVariable(value = "planReference") planReference: UUID,
-  ): PlanEntity? {
-    return planService.getByKey(PlanKey(crn, planReference))
-  }
+  ): PlanEntity? = planService.getByKey(PlanKey(crn, planReference))
 
   @Operation(
     summary = "Get data for all plans for a given person",
@@ -132,12 +130,10 @@ class PlanController(
     @RequestParam(value = "includeObjectivesAndSteps", required = false)
     @Parameter(description = "Whether to include objectives and steps, defaults to false if not present")
     includeObjectives: Boolean = false,
-  ): Flow<Plan> {
-    return if (includeObjectives) {
-      linkService.getAllPlansWithObjectivesAndSteps(crn)
-    } else {
-      planService.findAllByCrn(crn).map { buildPlan(it) }
-    }
+  ): Flow<Plan> = if (includeObjectives) {
+    linkService.getAllPlansWithObjectivesAndSteps(crn)
+  } else {
+    planService.findAllByCrn(crn).map { buildPlan(it) }
   }
 
   @Operation(

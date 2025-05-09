@@ -8,11 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsoneplanapi.objective.StepAndObjectiveCo
 
 @Configuration
 class DatabaseConfig : AbstractR2dbcConfiguration() {
-  override fun connectionFactory(): ConnectionFactory {
-    return ConnectionFactories.get("r2dbc:…")
-  }
+  override fun connectionFactory(): ConnectionFactory = ConnectionFactories.get("r2dbc:…")
 
-  override fun getCustomConverters(): List<Any> {
-    return listOf(StepAndObjectiveConverter())
-  }
+  override fun getCustomConverters(): List<Any> = listOf(StepAndObjectiveConverter())
 }

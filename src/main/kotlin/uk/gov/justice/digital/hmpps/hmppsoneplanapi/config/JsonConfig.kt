@@ -9,9 +9,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 @Configuration
 class JsonConfig {
   @Bean
-  fun jsonCustomizer(): Jackson2ObjectMapperBuilderCustomizer {
-    return Jackson2ObjectMapperBuilderCustomizer { builder: Jackson2ObjectMapperBuilder ->
-      builder.featuresToEnable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-    }
+  fun jsonCustomizer(): Jackson2ObjectMapperBuilderCustomizer = Jackson2ObjectMapperBuilderCustomizer { builder: Jackson2ObjectMapperBuilder ->
+    builder.featuresToEnable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
   }
 }

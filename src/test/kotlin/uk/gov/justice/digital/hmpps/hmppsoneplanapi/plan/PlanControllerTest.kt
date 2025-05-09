@@ -54,10 +54,9 @@ class PlanControllerTest : IntegrationTestBase() {
       .expectStatus().isNotFound()
   }
 
-  private fun getPlan(crn: String, planReference: UUID): WebTestClient.ResponseSpec =
-    authedWebTestClient.get()
-      .uri("person/{crn}/plans/{reference}", crn, planReference)
-      .exchange()
+  private fun getPlan(crn: String, planReference: UUID): WebTestClient.ResponseSpec = authedWebTestClient.get()
+    .uri("person/{crn}/plans/{reference}", crn, planReference)
+    .exchange()
 
   @Test
   fun `Gives Empty list when Person does not exist`() {
@@ -236,14 +235,13 @@ class PlanControllerTest : IntegrationTestBase() {
       .is4xxClientError()
   }
 
-  private fun getAllExpectingCount(crn: String, count: Int) =
-    authedWebTestClient.get()
-      .uri("person/{crn}/plans", crn)
-      .exchange()
-      .expectStatus().isOk()
-      .expectBody()
-      .jsonPath("$").isArray()
-      .jsonPath("$.size()").isEqualTo(count)
+  private fun getAllExpectingCount(crn: String, count: Int) = authedWebTestClient.get()
+    .uri("person/{crn}/plans", crn)
+    .exchange()
+    .expectStatus().isOk()
+    .expectBody()
+    .jsonPath("$").isArray()
+    .jsonPath("$.size()").isEqualTo(count)
 
   @Test
   fun `Can get all plans with objective and steps`() {

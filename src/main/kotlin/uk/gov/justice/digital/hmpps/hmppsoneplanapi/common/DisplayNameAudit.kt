@@ -18,21 +18,18 @@ interface DisplayNameAudited {
 // This needs to run before spring's inbuilt auditor that sets createdBy etc as it makes a copy and loses the isNew flag
 @Order(1)
 internal class DisplayNameAudit : BeforeConvertCallback<DisplayNameAudited> {
-  override fun onBeforeConvert(entity: DisplayNameAudited, table: SqlIdentifier): Publisher<DisplayNameAudited> {
-    return ReactiveSecurityContextHolder.getContext()
-      .map { securityContext ->
-        val displayName = displayNameFrom(securityContext.authentication.principal)
-        if (entity.isNew()) {
-          entity.createdByDisplayName = displayName
-        }
-        entity.updatedByDisplayName = displayName
-        entity
+  override fun onBeforeConvert(entity: DisplayNameAudited, table: SqlIdentifier): Publisher<DisplayNameAudited> = ReactiveSecurityContextHolder.getContext()
+    .map { securityContext ->
+      val displayName = displayNameFrom(securityContext.authentication.principal)
+      if (entity.isNew()) {
+        entity.createdByDisplayName = displayName
       }
-  }
-
-  private fun displayNameFrom(principal: Any?): String? =
-    when (principal) {
-      is Jwt -> principal.getClaim("name")
-      else -> null
+      entity.updatedByDisplayName = displayName
+      entity
     }
+
+  private fun displayNameFrom(principal: Any?): String? = when (principal) {
+    is Jwt -> principal.getClaim("name")
+    else -> null
+  }
 }

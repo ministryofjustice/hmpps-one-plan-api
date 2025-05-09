@@ -16,7 +16,5 @@ class AuditMessage(private val message: String) {
   val correlationId: String
     get() = correlationIdPath.read(document)
 
-  override fun toString(): String {
-    return "AuditMessage($message)"
-  }
+  override fun toString(): String = "AuditMessage($message)"
 }

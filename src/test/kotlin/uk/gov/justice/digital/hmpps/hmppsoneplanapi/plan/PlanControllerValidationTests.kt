@@ -95,31 +95,28 @@ class PlanControllerValidationTests : WebfluxTestBase() {
       .value { assertThat(it.userMessage).isEqualTo("createdAtPrison: size must be between 0 and 250") }
   }
 
-  private fun addObjectives(body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.patch()
-      .uri("/person/123/plans/{ref}/objectives", UUID.randomUUID())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(body)
-      .exchange()
-      .expectStatus()
-      .isBadRequest()
-      .expectBody(ErrorResponse::class.java)
+  private fun addObjectives(body: String): WebTestClient.BodySpec<ErrorResponse, *> = authedWebTestClient.patch()
+    .uri("/person/123/plans/{ref}/objectives", UUID.randomUUID())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus()
+    .isBadRequest()
+    .expectBody(ErrorResponse::class.java)
 
-  private fun requestBuilder(type: Any? = "PERSONAL_LEARNING", createdAtPrison: String? = null): String =
-    objectMapper.writeValueAsString(
-      mapOf(
-        "planType" to type,
-        "createdAtPrison" to createdAtPrison,
-      ).filterValues { it != null },
-    )
+  private fun requestBuilder(type: Any? = "PERSONAL_LEARNING", createdAtPrison: String? = null): String = objectMapper.writeValueAsString(
+    mapOf(
+      "planType" to type,
+      "createdAtPrison" to createdAtPrison,
+    ).filterValues { it != null },
+  )
 
-  private fun post(crn: String, body: String): WebTestClient.BodySpec<ErrorResponse, *> =
-    authedWebTestClient.post()
-      .uri("/person/{crn}/plans", crn)
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(body)
-      .exchange()
-      .expectStatus()
-      .isBadRequest()
-      .expectBody(ErrorResponse::class.java)
+  private fun post(crn: String, body: String): WebTestClient.BodySpec<ErrorResponse, *> = authedWebTestClient.post()
+    .uri("/person/{crn}/plans", crn)
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus()
+    .isBadRequest()
+    .expectBody(ErrorResponse::class.java)
 }

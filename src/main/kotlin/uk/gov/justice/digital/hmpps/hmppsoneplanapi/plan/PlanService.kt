@@ -33,8 +33,7 @@ class PlanService(
       ?: throw planNotFound(crn, reference)
   }
 
-  suspend fun findAllByCrn(crn: CaseReferenceNumber): Flow<PlanEntity> =
-    planRepository.findByCaseReferenceNumberAndIsDeletedIsFalse(crn.value)
+  suspend fun findAllByCrn(crn: CaseReferenceNumber): Flow<PlanEntity> = planRepository.findByCaseReferenceNumberAndIsDeletedIsFalse(crn.value)
 
   suspend fun markPlanDeleted(crn: CaseReferenceNumber, reference: UUID) {
     val countUpdated = planRepository.updateMarkDeleted(crn.value, reference)

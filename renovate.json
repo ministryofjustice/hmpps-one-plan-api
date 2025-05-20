@@ -1,12 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ministryofjustice/hmpps-renovate-config:jvm"],
+  "extends": [
+    "github>ministryofjustice/hmpps-renovate-config:jvm"
+  ],
   "prBodyTemplate": "{{{table}}}{{{notes}}}{{{warnings}}}{{{controls}}}",
-  "masterIssue": true,
+  "dependencyDashboard": true,
   "packageRules": [
     {
-      "matchManagers": ["gradle"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "groupName": "all non major Gradle dependencies",
       "groupSlug": "all-gradle-minor-patch"
     }

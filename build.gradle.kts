@@ -1,8 +1,8 @@
 import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-  val kotlinVersion = "2.1.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.0.0"
+  val kotlinVersion = "2.1.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -21,27 +21,27 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-  implementation("io.github.oshai:kotlin-logging-jvm:7.0.6")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.2")
-  implementation("org.jsoup:jsoup:1.19.1")
+  implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.4")
+  implementation("org.jsoup:jsoup:1.20.1")
 
-  runtimeOnly("org.flywaydb:flyway-core:11.7.0")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.7.0")
+  runtimeOnly("org.flywaydb:flyway-core:11.8.2")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.2")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.5")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-  testImplementation(platform("org.testcontainers:testcontainers-bom:1.20.3"))
+  testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.0"))
   testImplementation("org.testcontainers:postgresql")
   testImplementation("org.testcontainers:localstack")
-  testImplementation("org.assertj:assertj-core:3.26.3")
+  testImplementation("org.assertj:assertj-core:3.27.3")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
-  testImplementation("io.mockk:mockk:1.13.13")
+  testImplementation("io.mockk:mockk:1.14.2")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("org.awaitility:awaitility:4.2.2")
+  testImplementation("org.awaitility:awaitility:4.3.0")
   testImplementation(kotlin("reflect"))
 }
 

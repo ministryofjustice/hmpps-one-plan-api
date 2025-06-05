@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   val kotlinVersion = "2.1.21"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.2.0"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -23,16 +23,16 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.4")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.5")
   implementation("org.jsoup:jsoup:1.20.1")
 
-  runtimeOnly("org.flywaydb:flyway-core:11.8.2")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.2")
+  runtimeOnly("org.flywaydb:flyway-core:11.9.1")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.9.1")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
-  runtimeOnly("org.postgresql:postgresql:42.7.5")
+  runtimeOnly("org.postgresql:postgresql:42.7.6")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-  testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.0"))
+  testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.1"))
   testImplementation("org.testcontainers:postgresql")
   testImplementation("org.testcontainers:localstack")
   testImplementation("org.assertj:assertj-core:3.27.3")

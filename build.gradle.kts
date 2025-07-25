@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
   val kotlinVersion = "2.2.0"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.4"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -23,11 +23,11 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.9")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.10")
   implementation("org.jsoup:jsoup:1.21.1")
 
-  runtimeOnly("org.flywaydb:flyway-core:11.10.3")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.3")
+  runtimeOnly("org.flywaydb:flyway-core:11.10.4")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.4")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.7")
   runtimeOnly("org.postgresql:r2dbc-postgresql")

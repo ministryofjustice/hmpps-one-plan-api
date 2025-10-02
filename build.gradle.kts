@@ -38,7 +38,7 @@ dependencies {
   testImplementation("org.assertj:assertj-core:3.27.6")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.13.0")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
-  testImplementation("io.mockk:mockk:1.14.5")
+  testImplementation("io.mockk:mockk:1.14.6")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("org.awaitility:awaitility:4.3.0")

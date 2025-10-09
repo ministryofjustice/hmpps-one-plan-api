@@ -26,8 +26,8 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.5.0")
   implementation("org.jsoup:jsoup:1.21.2")
 
-  runtimeOnly("org.flywaydb:flyway-core:11.13.3")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.13.3")
+  runtimeOnly("org.flywaydb:flyway-core:11.14.0")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.0")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.8")
   runtimeOnly("org.postgresql:r2dbc-postgresql")

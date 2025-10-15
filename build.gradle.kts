@@ -32,7 +32,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.8")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-  testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.3"))
+  testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.0"))
   testImplementation("org.testcontainers:postgresql")
   testImplementation("org.testcontainers:localstack")
   testImplementation("org.assertj:assertj-core:3.27.6")

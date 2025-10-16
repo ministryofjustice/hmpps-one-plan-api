@@ -26,13 +26,13 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.5.0")
   implementation("org.jsoup:jsoup:1.21.2")
 
-  runtimeOnly("org.flywaydb:flyway-core:11.14.0")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.0")
+  runtimeOnly("org.flywaydb:flyway-core:11.14.1")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.1")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.8")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
-  testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.0"))
+  testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.1"))
   testImplementation("org.testcontainers:postgresql")
   testImplementation("org.testcontainers:localstack")
   testImplementation("org.assertj:assertj-core:3.27.6")

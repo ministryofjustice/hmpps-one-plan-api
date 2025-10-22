@@ -23,7 +23,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
   implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.5.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.6.0")
   implementation("org.jsoup:jsoup:1.21.2")
 
   runtimeOnly("org.flywaydb:flyway-core:11.14.1")

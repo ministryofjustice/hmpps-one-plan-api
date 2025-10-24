@@ -1,8 +1,8 @@
 import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-  val kotlinVersion = "2.2.20"
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.1.3"
+  val kotlinVersion = "2.2.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.1.4"
   kotlin("plugin.spring") version kotlinVersion
   kotlin("plugin.jpa") version kotlinVersion
 }
@@ -26,8 +26,8 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.6.0")
   implementation("org.jsoup:jsoup:1.21.2")
 
-  runtimeOnly("org.flywaydb:flyway-core:11.14.1")
-  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.1")
+  runtimeOnly("org.flywaydb:flyway-core:11.15.0")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:11.15.0")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
   runtimeOnly("org.postgresql:postgresql:42.7.8")
   runtimeOnly("org.postgresql:r2dbc-postgresql")

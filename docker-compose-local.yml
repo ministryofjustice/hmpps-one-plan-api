@@ -24,7 +24,7 @@ services:
       - POSTGRES_DB=auth-db
 
   hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
+    image: ghcr.io/ministryofjustice/hmpps-auth:latest
     depends_on:
       - auth-db
     networks:

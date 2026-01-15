@@ -29,7 +29,7 @@ dependencies {
   runtimeOnly("org.flywaydb:flyway-core:11.20.2")
   runtimeOnly("org.flywaydb:flyway-database-postgresql:11.20.2")
   runtimeOnly("org.springframework.boot:spring-boot-starter-jdbc")
-  runtimeOnly("org.postgresql:postgresql:42.7.8")
+  runtimeOnly("org.postgresql:postgresql:42.7.9")
   runtimeOnly("org.postgresql:r2dbc-postgresql")
 
   testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.3"))

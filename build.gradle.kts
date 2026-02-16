@@ -21,7 +21,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-  implementation("io.github.oshai:kotlin-logging-jvm:7.0.14")
+  implementation("io.github.oshai:kotlin-logging-jvm:8.0.01")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.6.3")
   implementation("org.jsoup:jsoup:1.22.1")
